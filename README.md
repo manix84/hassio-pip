@@ -2,10 +2,11 @@
 
 HA TV PiP is a planned Home Assistant companion project for showing short-lived camera feeds on Android TV and Google TV devices using Android Picture-in-Picture.
 
-This repository is a monorepo that will contain both sides of the project:
+This repository is a monorepo that contains the receiver app, future Home Assistant integration, and promotional website:
 
 - `android-tv-app/`: Android TV Kotlin app 📱
 - `ha-integration/`: Home Assistant custom integration 🏠
+- `website/`: Vite promotional website 🌐
 - `docs/`: Architecture, roadmap, and development notes 📚
 - `examples/`: Example Home Assistant automations ⚙️
 
@@ -23,6 +24,8 @@ ha-tv-pip/
 │   └── Android TV Kotlin app
 ├── ha-integration/
 │   └── custom_components/ha_tv_pip/
+├── website/
+│   └── Vite React promotional website
 ├── docs/
 │   ├── architecture.md
 │   ├── roadmap.md
@@ -55,6 +58,18 @@ npm run check
 npm run android:assemble
 npm run android:lint
 npm run android:clean
+npm run website:dev
+npm run website:build
+```
+
+## Website 🌐
+
+The promotional website lives in `website/`. It is a static Vite + React + TypeScript site for GitHub Pages, project docs entry points, and future release / Play Store / HACS links.
+
+Run it locally:
+
+```sh
+npm run website:dev
 ```
 
 ## Releases 📦

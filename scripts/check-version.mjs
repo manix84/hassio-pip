@@ -4,6 +4,7 @@ import {
   ANDROID_PACKAGE_PATH,
   HA_MANIFEST_PATH,
   ROOT_PACKAGE_PATH,
+  WEBSITE_PACKAGE_PATH,
   parseSemver,
   readJson
 } from "./version-utils.mjs";
@@ -29,6 +30,17 @@ if (existsSync(ANDROID_PACKAGE_PATH)) {
   }
 } else {
   warnings.push(`TODO: ${ANDROID_PACKAGE_PATH} does not exist yet`);
+}
+
+if (existsSync(WEBSITE_PACKAGE_PATH)) {
+  const websitePackage = readJson(WEBSITE_PACKAGE_PATH);
+  if (websitePackage.version !== expectedVersion) {
+    failures.push(
+      `${WEBSITE_PACKAGE_PATH} version ${websitePackage.version} does not match root ${expectedVersion}`
+    );
+  }
+} else {
+  warnings.push(`TODO: ${WEBSITE_PACKAGE_PATH} does not exist yet`);
 }
 
 if (existsSync(ANDROID_BUILD_PATH)) {

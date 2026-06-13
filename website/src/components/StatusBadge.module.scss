@@ -1,0 +1,22 @@
+.badge {
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.35rem 0.65rem;
+}
+
+.phase1 {
+  background: rgba(3, 169, 244, 0.18);
+  color: #7adaff;
+}
+
+.planned {
+  background: rgba(86, 218, 168, 0.16);
+  color: #9df3cf;
+}
+
+.future {
+  background: rgba(255, 199, 95, 0.15);
+  color: #ffd890;
+}

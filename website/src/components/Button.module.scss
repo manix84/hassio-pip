@@ -1,0 +1,31 @@
+.button {
+  align-items: center;
+  border-radius: 8px;
+  display: inline-flex;
+  font-weight: 700;
+  gap: 0.5rem;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.button:hover,
+.button:focus-visible {
+  transform: translateY(-1px);
+}
+
+.primary {
+  background: #03a9f4;
+  color: #03131c;
+}
+
+.secondary {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #ecf7ff;
+}

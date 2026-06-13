@@ -17,7 +17,10 @@
     "version:major": "node scripts/bump-version.mjs major",
     "version:minor": "node scripts/bump-version.mjs minor",
     "version:patch": "node scripts/bump-version.mjs patch",
-    "version:precommit": "node scripts/precommit-version-bump.mjs"
+    "version:precommit": "node scripts/precommit-version-bump.mjs",
+    "website:build": "npm --prefix website run build",
+    "website:dev": "npm --prefix website run dev",
+    "website:preview": "npm --prefix website run preview"
   },
   "devDependencies": {
     "husky": "^9.1.7"

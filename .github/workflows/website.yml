@@ -1,0 +1,32 @@
+name: Website 🌐
+
+on:
+  pull_request:
+    paths:
+      - "website/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/website.yml"
+
+jobs:
+  build:
+    name: Build website
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install website dependencies
+        run: npm --prefix website install
+
+      - name: Build website
+        run: npm run website:build

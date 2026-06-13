@@ -17,6 +17,9 @@ ha-tv-pip/
 ├── ha-integration/
 │   Home Assistant custom integration
 │
+├── website/
+│   Promotional website
+│
 ├── docs/
 │   Project documentation
 │
@@ -33,7 +36,7 @@ ha-tv-pip/
 
 The repository is intentionally structured as a monorepo.
 
-The Android TV application and Home Assistant integration should remain independently buildable and deployable.
+The Android TV application, Home Assistant integration, and website should remain independently buildable and deployable.
 
 ---
 
@@ -146,7 +149,45 @@ npm run android:assemble:release
 npm run android:lint
 npm run android:clean
 npm run package:integration
+npm run website:dev
+npm run website:build
+npm run website:preview
 ```
+
+### Website Development
+
+```txt
+Vite
+React
+TypeScript
+SCSS Modules
+```
+
+The website lives in:
+
+```txt
+website/
+```
+
+Run locally:
+
+```sh
+npm run website:dev
+```
+
+Build locally:
+
+```sh
+npm run website:build
+```
+
+Preview a built site:
+
+```sh
+npm run website:preview
+```
+
+The website is a static promotional landing page. It should not contain a backend, analytics, authentication, or release generation logic.
 
 The root `package.json` is the monorepo version source. Android app version metadata should stay aligned with it.
 
@@ -162,6 +203,7 @@ Files that should stay aligned:
 
 - Root `package.json`.
 - `android-tv-app/package.json`.
+- `website/package.json`.
 - Android `versionName` in `android-tv-app/app/build.gradle.kts`.
 - Home Assistant `manifest.json` version once the integration is implemented.
 
@@ -188,6 +230,7 @@ The root `package.json` version remains the source of truth. When a bump happens
 - `package.json`
 - `package-lock.json`, if present
 - `android-tv-app/package.json`
+- `website/package.json`
 - Android `versionName` in `android-tv-app/app/build.gradle.kts`
 - Home Assistant `manifest.json`, once it exists
 

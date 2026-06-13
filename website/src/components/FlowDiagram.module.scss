@@ -1,0 +1,49 @@
+.flow {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  list-style: none;
+  margin: 2rem 0 0;
+  padding: 0;
+}
+
+.flow li {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  color: #effaff;
+  min-height: 96px;
+  padding: 1rem;
+  position: relative;
+}
+
+.flow li:not(:last-child)::after {
+  color: #66d4ff;
+  content: "→";
+  font-size: 1.5rem;
+  position: absolute;
+  right: -0.72rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.flow span {
+  display: block;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+@media (max-width: 820px) {
+  .flow {
+    grid-template-columns: 1fr;
+  }
+
+  .flow li:not(:last-child)::after {
+    bottom: -1.1rem;
+    left: 1rem;
+    right: auto;
+    top: auto;
+    transform: rotate(90deg);
+  }
+}

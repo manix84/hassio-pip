@@ -1,0 +1,26 @@
+.section {
+  margin: 0 auto;
+  max-width: 1120px;
+  padding: 5rem 1.5rem;
+}
+
+.heading {
+  max-width: 760px;
+}
+
+.eyebrow {
+  color: #66d4ff;
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.65rem;
+  text-transform: uppercase;
+}
+
+.heading h2 {
+  color: #f5fbff;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1.05;
+  margin: 0 0 1.4rem;
+}

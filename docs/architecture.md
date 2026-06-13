@@ -4,13 +4,15 @@
 
 HA TV PiP is a local-first Home Assistant companion system that allows Home Assistant automations to display camera feeds, snapshots, and alerts on Android TV and Google TV devices using Picture-in-Picture (PiP) playback.
 
-The project consists of two independently deployable components:
+The project consists of three independently deployable components:
 
 ```txt
 ha-tv-pip/
 ├── android-tv-app/
 │
 ├── ha-integration/
+│
+├── website/
 │
 ├── docs/
 │
@@ -20,6 +22,8 @@ ha-tv-pip/
 The Android TV application acts as a receiver.
 
 The Home Assistant integration acts as a controller.
+
+The promotional website acts as the public landing page and documentation entry point.
 
 The overall design philosophy is:
 
@@ -132,6 +136,9 @@ ha-tv-pip/
 ├── ha-integration/
 │   Home Assistant custom integration
 │
+├── website/
+│   Promotional website and project landing page
+│
 ├── docs/
 │   Project documentation
 │
@@ -143,7 +150,7 @@ ha-tv-pip/
 
 The repository is intentionally structured as a monorepo.
 
-Both projects should share documentation and release planning while remaining independently deployable.
+All projects should share documentation and release planning while remaining independently deployable.
 
 ---
 
@@ -273,6 +280,29 @@ Living Room TV
 ```
 
 This allows users to manage multiple receivers independently.
+
+---
+
+# Promotional Website
+
+## Responsibilities
+
+The promotional website is responsible for:
+
+- Explaining the project clearly.
+- Showing current project status.
+- Linking to roadmap, architecture, development docs, releases, and license.
+- Promoting the Android TV app and Home Assistant integration.
+- Preparing for future GitHub Pages deployment.
+
+The website should remain static.
+
+It should not:
+
+- Generate releases.
+- Require authentication.
+- Include analytics by default.
+- Act as a backend or control plane.
 
 ---
 

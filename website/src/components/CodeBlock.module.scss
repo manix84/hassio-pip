@@ -1,0 +1,15 @@
+.codeBlock {
+  background: #06141d;
+  border: 1px solid rgba(102, 212, 255, 0.2);
+  border-radius: 8px;
+  color: #d8f4ff;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  margin: 0;
+  overflow-x: auto;
+  padding: 1.25rem;
+}
+
+.codeBlock code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}

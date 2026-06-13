@@ -6,7 +6,7 @@
 
 The goal is to let Home Assistant automations display security camera feeds, snapshots, alerts, or other visual notifications on Android TV / Google TV devices using Picture-in-Picture or lightweight overlay-style playback.
 
-The project is split into two main parts:
+The project is split into three main parts:
 
 ```txt
 android-tv-app/
@@ -14,11 +14,16 @@ android-tv-app/
 
 ha-integration/
   Home Assistant custom integration.
+
+website/
+  Promotional website and documentation entry point.
 ```
 
 The Android TV app should act as the receiver.
 
 The Home Assistant integration should act as the controller.
+
+The website should explain the project, current status, roadmap, and release paths.
 
 The intended user experience is:
 
@@ -467,6 +472,39 @@ Make the app and integration easy for normal Home Assistant users to install.
 - User can install the app from the Android TV Play Store.
 - User can install the integration through HACS.
 - Setup is understandable without reading source code.
+
+---
+
+# Website Track: Promotional Site
+
+## Goal
+
+Provide a static project landing page suitable for GitHub Pages.
+
+## Scope
+
+- Vite.
+- React.
+- TypeScript.
+- SCSS Modules.
+- Current project status.
+- Roadmap preview.
+- Example automation.
+- Release and documentation links.
+
+## Out of Scope
+
+- Full documentation platform.
+- Backend services.
+- Analytics.
+- Authentication.
+- Release generation.
+
+## Success Criteria
+
+- Website builds successfully.
+- Website reflects current MVP status honestly.
+- Website can be deployed to GitHub Pages in a future workflow.
 
 ---
 

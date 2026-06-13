@@ -6,11 +6,13 @@ export const ROOT_LOCK_PATH = "package-lock.json";
 export const ANDROID_PACKAGE_PATH = "android-tv-app/package.json";
 export const ANDROID_BUILD_PATH = "android-tv-app/app/build.gradle.kts";
 export const HA_MANIFEST_PATH = "ha-integration/custom_components/ha_tv_pip/manifest.json";
+export const WEBSITE_PACKAGE_PATH = "website/package.json";
 
 const VERSION_FILE_PATTERNS = [
   /^package\.json$/,
   /^package-lock\.json$/,
   /^android-tv-app\/package\.json$/,
+  /^website\/package\.json$/,
   /^android-tv-app\/.*build\.gradle(?:\.kts)?$/,
   /^ha-integration\/custom_components\/ha_tv_pip\/manifest\.json$/
 ];
@@ -51,7 +53,8 @@ const SUPPORT_ONLY_PATTERNS = [
   /^SUPPORT\.md$/,
   /^package\.json$/,
   /^package-lock\.json$/,
-  /^android-tv-app\/package\.json$/
+  /^android-tv-app\/package\.json$/,
+  /^website\//
 ];
 
 const MINOR_MARKERS = [
@@ -318,6 +321,15 @@ export function syncVersionFiles(nextVersion) {
       androidPackage.version = nextVersion;
       writeJson(ANDROID_PACKAGE_PATH, androidPackage);
       updated.push(ANDROID_PACKAGE_PATH);
+    }
+  }
+
+  if (existsSync(WEBSITE_PACKAGE_PATH)) {
+    const websitePackage = readJson(WEBSITE_PACKAGE_PATH);
+    if (websitePackage.version !== nextVersion) {
+      websitePackage.version = nextVersion;
+      writeJson(WEBSITE_PACKAGE_PATH, websitePackage);
+      updated.push(WEBSITE_PACKAGE_PATH);
     }
   }
 
