@@ -1,4 +1,4 @@
-package com.example.hatvpipreceiver
+package com.hatvpip.receiver
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

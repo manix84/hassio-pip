@@ -1,4 +1,4 @@
-package com.example.hatvpipreceiver
+package com.hatvpip.receiver
 
 enum class PlaybackStatus(val label: String) {
     Idle("Idle"),

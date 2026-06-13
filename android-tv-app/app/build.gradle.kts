@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.hatvpipreceiver"
+    namespace = "com.hatvpip.receiver"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.hatvpipreceiver"
+        applicationId = "com.hatvpip.receiver"
         minSdk = 26
         targetSdk = 36
         versionCode = 1

@@ -45,8 +45,16 @@ ha-tv-pip/
 From VSCode or a terminal with a configured JDK and Android SDK:
 
 ```sh
-cd android-tv-app
-./gradlew assembleDebug
+npm run android:assemble
+```
+
+Useful repo scripts:
+
+```sh
+npm run check
+npm run android:assemble
+npm run android:lint
+npm run android:clean
 ```
 
 ## Future Home Assistant Plan 🏠

@@ -1,4 +1,4 @@
-package com.example.hatvpipreceiver
+package com.hatvpip.receiver
 
 import android.util.Log
 

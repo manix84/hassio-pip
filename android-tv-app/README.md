@@ -9,7 +9,7 @@ Open this directory in Android Studio and let Gradle sync.
 Command line:
 
 ```sh
-./gradlew assembleDebug
+npm run assemble
 ```
 
 Requirements:
@@ -17,6 +17,12 @@ Requirements:
 - JDK 17 or newer ☕
 - Android Studio with Android SDK 36 🤖
 - Android TV emulator or Android TV / Google TV device running Android 8.0/API 26 or newer 📡
+
+From the monorepo root, the equivalent command is:
+
+```sh
+npm run android:assemble
+```
 
 ## Run 🚀
 

@@ -137,6 +137,17 @@ Android Studio should be used for:
 
 VSCode remains the preferred daily development environment.
 
+Common repo scripts:
+
+```sh
+npm run check
+npm run android:assemble
+npm run android:lint
+npm run android:clean
+```
+
+The root `package.json` is the monorepo version source. Android app version metadata should stay aligned with it.
+
 ---
 
 ### Home Assistant Development
