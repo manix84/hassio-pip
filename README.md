@@ -1,6 +1,6 @@
 # HA TV PiP 📺🪟
 
-[![Release 📦](https://github.com/manix84/hassio-pip/actions/workflows/release.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/release.yml) [![Website 🌐](https://github.com/manix84/hassio-pip/actions/workflows/website.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/website.yml)
+[![Quality ✅](https://github.com/manix84/hassio-pip/actions/workflows/quality.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/quality.yml) [![Release 📦](https://github.com/manix84/hassio-pip/actions/workflows/release.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/release.yml) [![Website 🌐](https://github.com/manix84/hassio-pip/actions/workflows/website.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/website.yml)
 
 HA TV PiP is a planned Home Assistant companion project for showing short-lived camera feeds on Android TV and Google TV devices using Android Picture-in-Picture.
 
@@ -57,11 +57,16 @@ Useful repo scripts:
 
 ```sh
 npm run check
+npm run lint
+npm run typecheck
 npm run android:assemble
+npm run android:build:dry-run
 npm run android:lint
 npm run android:clean
+npm run ha:build:dry-run
 npm run website:dev
 npm run website:build
+npm run website:build:dry-run
 ```
 
 ## Website 🌐

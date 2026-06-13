@@ -3,7 +3,10 @@ import {
   ANDROID_BUILD_PATH,
   ANDROID_PACKAGE_PATH,
   HA_MANIFEST_PATH,
+  HA_PACKAGE_PATH,
+  ROOT_LOCK_PATH,
   ROOT_PACKAGE_PATH,
+  WEBSITE_LOCK_PATH,
   WEBSITE_PACKAGE_PATH,
   parseSemver,
   readJson
@@ -14,6 +17,25 @@ const expectedVersion = rootPackage.version;
 
 const failures = [];
 const warnings = [];
+
+function checkPackageLockVersion(path, expectedVersion) {
+  if (!existsSync(path)) {
+    warnings.push(`TODO: ${path} does not exist yet`);
+    return;
+  }
+
+  const lock = readJson(path);
+  if (lock.version !== expectedVersion) {
+    failures.push(`${path} version ${lock.version} does not match root ${expectedVersion}`);
+  }
+
+  const packageVersion = lock.packages?.[""]?.version;
+  if (packageVersion !== expectedVersion) {
+    failures.push(
+      `${path} packages[""].version ${packageVersion ?? "<missing>"} does not match root ${expectedVersion}`
+    );
+  }
+}
 
 try {
   parseSemver(expectedVersion);
@@ -32,6 +54,8 @@ if (existsSync(ANDROID_PACKAGE_PATH)) {
   warnings.push(`TODO: ${ANDROID_PACKAGE_PATH} does not exist yet`);
 }
 
+checkPackageLockVersion(ROOT_LOCK_PATH, expectedVersion);
+
 if (existsSync(WEBSITE_PACKAGE_PATH)) {
   const websitePackage = readJson(WEBSITE_PACKAGE_PATH);
   if (websitePackage.version !== expectedVersion) {
@@ -41,6 +65,19 @@ if (existsSync(WEBSITE_PACKAGE_PATH)) {
   }
 } else {
   warnings.push(`TODO: ${WEBSITE_PACKAGE_PATH} does not exist yet`);
+}
+
+checkPackageLockVersion(WEBSITE_LOCK_PATH, expectedVersion);
+
+if (existsSync(HA_PACKAGE_PATH)) {
+  const haPackage = readJson(HA_PACKAGE_PATH);
+  if (haPackage.version !== expectedVersion) {
+    failures.push(
+      `${HA_PACKAGE_PATH} version ${haPackage.version} does not match root ${expectedVersion}`
+    );
+  }
+} else {
+  warnings.push(`TODO: ${HA_PACKAGE_PATH} does not exist yet`);
 }
 
 if (existsSync(ANDROID_BUILD_PATH)) {

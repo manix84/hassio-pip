@@ -5,14 +5,18 @@ export const ROOT_PACKAGE_PATH = "package.json";
 export const ROOT_LOCK_PATH = "package-lock.json";
 export const ANDROID_PACKAGE_PATH = "android-tv-app/package.json";
 export const ANDROID_BUILD_PATH = "android-tv-app/app/build.gradle.kts";
+export const HA_PACKAGE_PATH = "ha-integration/package.json";
 export const HA_MANIFEST_PATH = "ha-integration/custom_components/ha_tv_pip/manifest.json";
 export const WEBSITE_PACKAGE_PATH = "website/package.json";
+export const WEBSITE_LOCK_PATH = "website/package-lock.json";
 
 const VERSION_FILE_PATTERNS = [
   /^package\.json$/,
   /^package-lock\.json$/,
   /^android-tv-app\/package\.json$/,
+  /^ha-integration\/package\.json$/,
   /^website\/package\.json$/,
+  /^website\/package-lock\.json$/,
   /^android-tv-app\/.*build\.gradle(?:\.kts)?$/,
   /^ha-integration\/custom_components\/ha_tv_pip\/manifest\.json$/
 ];
@@ -54,6 +58,7 @@ const SUPPORT_ONLY_PATTERNS = [
   /^package\.json$/,
   /^package-lock\.json$/,
   /^android-tv-app\/package\.json$/,
+  /^ha-integration\/package\.json$/,
   /^website\//
 ];
 
@@ -221,6 +226,31 @@ function isVersionOnlyDiff(path) {
   });
 }
 
+function syncPackageLockVersion(path, nextVersion) {
+  if (!existsSync(path)) {
+    return false;
+  }
+
+  const lock = readJson(path);
+  let changed = false;
+
+  if (lock.version !== nextVersion) {
+    lock.version = nextVersion;
+    changed = true;
+  }
+
+  if (lock.packages?.[""] && lock.packages[""].version !== nextVersion) {
+    lock.packages[""].version = nextVersion;
+    changed = true;
+  }
+
+  if (changed) {
+    writeJson(path, lock);
+  }
+
+  return changed;
+}
+
 export function areOnlyVersionFiles(stagedFiles) {
   return stagedFiles.length > 0 && stagedFiles.every((path) => isVersionFile(path));
 }
@@ -298,21 +328,8 @@ export function syncVersionFiles(nextVersion) {
     updated.push(ROOT_PACKAGE_PATH);
   }
 
-  if (existsSync(ROOT_LOCK_PATH)) {
-    const rootLock = readJson(ROOT_LOCK_PATH);
-    let changed = false;
-    if (rootLock.version !== nextVersion) {
-      rootLock.version = nextVersion;
-      changed = true;
-    }
-    if (rootLock.packages?.[""] && rootLock.packages[""].version !== nextVersion) {
-      rootLock.packages[""].version = nextVersion;
-      changed = true;
-    }
-    if (changed) {
-      writeJson(ROOT_LOCK_PATH, rootLock);
-      updated.push(ROOT_LOCK_PATH);
-    }
+  if (syncPackageLockVersion(ROOT_LOCK_PATH, nextVersion)) {
+    updated.push(ROOT_LOCK_PATH);
   }
 
   if (existsSync(ANDROID_PACKAGE_PATH)) {
@@ -330,6 +347,19 @@ export function syncVersionFiles(nextVersion) {
       websitePackage.version = nextVersion;
       writeJson(WEBSITE_PACKAGE_PATH, websitePackage);
       updated.push(WEBSITE_PACKAGE_PATH);
+    }
+  }
+
+  if (syncPackageLockVersion(WEBSITE_LOCK_PATH, nextVersion)) {
+    updated.push(WEBSITE_LOCK_PATH);
+  }
+
+  if (existsSync(HA_PACKAGE_PATH)) {
+    const haPackage = readJson(HA_PACKAGE_PATH);
+    if (haPackage.version !== nextVersion) {
+      haPackage.version = nextVersion;
+      writeJson(HA_PACKAGE_PATH, haPackage);
+      updated.push(HA_PACKAGE_PATH);
     }
   }
 

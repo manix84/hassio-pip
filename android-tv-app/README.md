@@ -1,6 +1,6 @@
 # HA TV PiP Receiver Android TV App 📺
 
-[![Release 📦](https://github.com/manix84/hassio-pip/actions/workflows/release.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/release.yml)
+[![Quality ✅](https://github.com/manix84/hassio-pip/actions/workflows/quality.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/quality.yml) [![Release 📦](https://github.com/manix84/hassio-pip/actions/workflows/release.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/release.yml)
 
 Phase 1 Android TV MVP for HA TV PiP. This app plays a public HLS test stream and validates Android TV Picture-in-Picture behavior.
 
@@ -25,6 +25,17 @@ From the monorepo root, the equivalent command is:
 ```sh
 npm run android:assemble
 ```
+
+## Quality Checks ✅
+
+```sh
+npm run android:lint
+npm run android:typecheck
+npm run android:build:dry-run
+```
+
+Android lint uses the Android Gradle plugin. Type checking compiles the debug Kotlin sources.
+The dry-run build assembles the debug APK.
 
 ## Run 🚀
 

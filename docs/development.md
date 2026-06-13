@@ -144,14 +144,76 @@ Common repo scripts:
 
 ```sh
 npm run check
+npm run lint
+npm run typecheck
 npm run android:assemble
 npm run android:assemble:release
+npm run android:build:dry-run
 npm run android:lint
+npm run android:typecheck
+npm run ha:build:dry-run
+npm run ha:lint
+npm run ha:typecheck
 npm run android:clean
 npm run package:integration
 npm run website:dev
 npm run website:build
+npm run website:build:dry-run
+npm run website:lint
+npm run website:typecheck
 npm run website:preview
+```
+
+## Quality Checks ✅
+
+The monorepo exposes shared quality commands from the root:
+
+```sh
+npm run lint
+npm run typecheck
+npm run check
+```
+
+`npm run check` runs version consistency, linting, and type checking.
+
+Project-specific quality commands:
+
+```sh
+npm run android:lint
+npm run android:typecheck
+npm run ha:lint
+npm run ha:typecheck
+npm run website:lint
+npm run website:typecheck
+npm run android:build:dry-run
+npm run ha:build:dry-run
+npm run website:build:dry-run
+```
+
+Quality tooling by area:
+
+- Android TV app: Android Gradle Plugin lint and Kotlin debug compilation.
+- Home Assistant integration: Ruff and MyPy against `ha-integration/custom_components`.
+- Website: ESLint for React/TypeScript and `tsc --noEmit` for type checking.
+
+Dry-run builds by area:
+
+- Android TV app: assembles the debug APK.
+- Home Assistant integration: packages the custom integration zip from the placeholder component path.
+- Website: runs the Vite production build.
+
+GitHub Actions runs these as separate Quality workflow jobs, such as `website: lint`, `website: typecheck`, and `website: build dry-run`. The Website workflow only builds/deploys the site, and the Release workflow only packages release assets.
+
+Install Home Assistant integration dev tools with:
+
+```sh
+python3 -m pip install -r ha-integration/requirements-dev.txt
+```
+
+Install website dependencies with:
+
+```sh
+npm --prefix website install
 ```
 
 ### Website Development
@@ -204,8 +266,11 @@ The root `package.json` version is the source of truth for the monorepo.
 Files that should stay aligned:
 
 - Root `package.json`.
+- Root `package-lock.json`, if present.
 - `android-tv-app/package.json`.
+- `ha-integration/package.json`.
 - `website/package.json`.
+- `website/package-lock.json`, if present.
 - Android `versionName` in `android-tv-app/app/build.gradle.kts`.
 - Home Assistant `manifest.json` version once the integration is implemented.
 
@@ -232,7 +297,9 @@ The root `package.json` version remains the source of truth. When a bump happens
 - `package.json`
 - `package-lock.json`, if present
 - `android-tv-app/package.json`
+- `ha-integration/package.json`
 - `website/package.json`
+- `website/package-lock.json`, if present
 - Android `versionName` in `android-tv-app/app/build.gradle.kts`
 - Home Assistant `manifest.json`, once it exists
 
