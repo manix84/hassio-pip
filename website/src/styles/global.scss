@@ -19,6 +19,7 @@
   --link: #9fdff7;
   --on-accent: #03131c;
   --page-bg: linear-gradient(180deg, #07131c 0%, #0b1821 46%, #07131c 100%);
+  --selection-bg: rgba(3, 169, 244, 0.35);
   --shadow: 0 36px 80px rgba(0, 0, 0, 0.38);
   --surface: rgba(255, 255, 255, 0.06);
   --surface-strong: rgba(3, 169, 244, 0.08);
@@ -41,7 +42,7 @@
   --tv-pip-glint: rgba(255, 255, 255, 0.16);
   --tv-pip-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
   --tv-stand: #274653;
-  color: #f5fbff;
+  color: var(--text);
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-synthesis: none;
@@ -69,6 +70,7 @@
   --link: #006a9e;
   --on-accent: #ffffff;
   --page-bg: linear-gradient(180deg, #f5fbff 0%, #e8f4fa 46%, #f5fbff 100%);
+  --selection-bg: rgba(0, 126, 189, 0.28);
   --shadow: 0 28px 70px rgba(18, 71, 94, 0.18);
   --surface: rgba(6, 52, 76, 0.06);
   --surface-strong: rgba(3, 169, 244, 0.12);
@@ -115,6 +117,7 @@
     --link: #006a9e;
     --on-accent: #ffffff;
     --page-bg: linear-gradient(180deg, #f5fbff 0%, #e8f4fa 46%, #f5fbff 100%);
+    --selection-bg: rgba(0, 126, 189, 0.28);
     --shadow: 0 28px 70px rgba(18, 71, 94, 0.18);
     --surface: rgba(6, 52, 76, 0.06);
     --surface-strong: rgba(3, 169, 244, 0.12);
@@ -168,5 +171,5 @@ select {
 }
 
 ::selection {
-  background: rgba(3, 169, 244, 0.35);
+  background: var(--selection-bg);
 }
