@@ -1,0 +1,20 @@
+#!/bin/sh
+
+APP_HOME=$(cd "${0%/*}" || exit; pwd -P)
+
+CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
+
+if [ -n "$JAVA_HOME" ]; then
+    JAVACMD=$JAVA_HOME/bin/java
+else
+    JAVACMD=$(command -v java)
+fi
+
+if [ ! -x "$JAVACMD" ]; then
+    echo "ERROR: Java could not be found. Set JAVA_HOME or add java to PATH." >&2
+    exit 1
+fi
+
+exec "$JAVACMD" -Xmx64m -Xms64m $JAVA_OPTS $GRADLE_OPTS \
+    -classpath "$CLASSPATH" \
+    org.gradle.wrapper.GradleWrapperMain "$@"

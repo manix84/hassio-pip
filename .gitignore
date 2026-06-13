@@ -1,0 +1,10 @@
+.gradle/
+.idea/
+*.iml
+build/
+local.properties
+captures/
+app/build/
+android-tv-app/.gradle/
+android-tv-app/build/
+android-tv-app/app/build/
