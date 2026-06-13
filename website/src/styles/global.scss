@@ -10,8 +10,20 @@
   --badge-planned-bg: #0c5a43;
   --badge-planned-text: #dbffef;
   --border: rgba(255, 255, 255, 0.12);
+  --code-boolean: #f5d76e;
   --code-bg: #06141d;
+  --code-comment: #7f97a6;
+  --code-key: #56daa8;
+  --code-number: #f5d76e;
+  --code-separator: #7f97a6;
+  --code-string: #9fdff7;
   --code-text: #d8f4ff;
+  --copy-error-bg: #5d1f24;
+  --copy-error-border: #ff8a96;
+  --copy-error-text: #ffe8eb;
+  --copy-success-bg: #0c5a43;
+  --copy-success-border: #56daa8;
+  --copy-success-text: #dbffef;
   --hero-bg:
     radial-gradient(circle at 18% 20%, rgba(3, 169, 244, 0.24), transparent 28rem),
     radial-gradient(circle at 80% 12%, rgba(0, 188, 212, 0.18), transparent 26rem),
@@ -67,8 +79,20 @@
   --badge-planned-bg: #006346;
   --badge-planned-text: #ffffff;
   --border: rgba(5, 47, 68, 0.14);
+  --code-boolean: #795500;
   --code-bg: #f7fcff;
+  --code-comment: #657985;
+  --code-key: #006346;
+  --code-number: #795500;
+  --code-separator: #657985;
+  --code-string: #006a9e;
   --code-text: #173245;
+  --copy-error-bg: #7a2530;
+  --copy-error-border: #7a2530;
+  --copy-error-text: #ffffff;
+  --copy-success-bg: #006346;
+  --copy-success-border: #006346;
+  --copy-success-text: #ffffff;
   --hero-bg:
     radial-gradient(circle at 18% 20%, rgba(3, 169, 244, 0.22), transparent 28rem),
     radial-gradient(circle at 78% 14%, rgba(86, 218, 168, 0.18), transparent 26rem),
@@ -120,8 +144,20 @@
     --badge-planned-bg: #006346;
     --badge-planned-text: #ffffff;
     --border: rgba(5, 47, 68, 0.14);
+    --code-boolean: #795500;
     --code-bg: #f7fcff;
+    --code-comment: #657985;
+    --code-key: #006346;
+    --code-number: #795500;
+    --code-separator: #657985;
+    --code-string: #006a9e;
     --code-text: #173245;
+    --copy-error-bg: #7a2530;
+    --copy-error-border: #7a2530;
+    --copy-error-text: #ffffff;
+    --copy-success-bg: #006346;
+    --copy-success-border: #006346;
+    --copy-success-text: #ffffff;
     --hero-bg:
       radial-gradient(circle at 18% 20%, rgba(3, 169, 244, 0.22), transparent 28rem),
       radial-gradient(circle at 78% 14%, rgba(86, 218, 168, 0.18), transparent 26rem),

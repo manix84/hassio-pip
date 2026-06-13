@@ -1,7 +1,77 @@
-.codeBlock {
+.codeFrame {
   background: var(--code-bg);
   border: 1px solid var(--border);
   border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.toolbar {
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  display: flex;
+  font-size: 0.78rem;
+  font-weight: 800;
+  justify-content: space-between;
+  letter-spacing: 0.08em;
+  padding: 0.65rem 0.75rem 0.65rem 1rem;
+  text-transform: uppercase;
+}
+
+.copyButton {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-soft);
+  cursor: pointer;
+  display: inline-flex;
+  height: 2.25rem;
+  justify-content: center;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+  width: 2.25rem;
+}
+
+.copyButton:hover,
+.copyButton:focus-visible {
+  background: var(--surface-strong);
+  border-color: var(--accent);
+  color: var(--link);
+  outline: none;
+}
+
+.copyButton:active {
+  transform: translateY(1px);
+}
+
+.copyButton[data-state="success"] {
+  background: var(--copy-success-bg);
+  border-color: var(--copy-success-border);
+  color: var(--copy-success-text);
+}
+
+.copyButton[data-state="error"] {
+  background: var(--copy-error-bg);
+  border-color: var(--copy-error-border);
+  color: var(--copy-error-text);
+}
+
+.copyButton svg {
+  fill: none;
+  height: 1.05rem;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  width: 1.05rem;
+}
+
+.codeBlock {
   color: var(--code-text);
   font-size: 0.92rem;
   line-height: 1.55;
@@ -12,4 +82,65 @@
 
 .codeBlock code {
   font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}
+
+.line {
+  display: block;
+  min-height: 1.55em;
+}
+
+.key {
+  color: var(--code-key);
+}
+
+.separator {
+  color: var(--code-separator);
+}
+
+.string {
+  color: var(--code-string);
+}
+
+.number {
+  color: var(--code-number);
+}
+
+.boolean {
+  color: var(--code-boolean);
+}
+
+.comment {
+  color: var(--code-comment);
+}
+
+.feedback {
+  border-radius: 999px;
+  bottom: 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  opacity: 0;
+  padding: 0.35rem 0.55rem;
+  pointer-events: none;
+  position: absolute;
+  right: 0.75rem;
+  transform: translateY(0.2rem);
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.feedback[data-state="success"],
+.feedback[data-state="error"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.feedback[data-state="success"] {
+  background: var(--copy-success-bg);
+  color: var(--copy-success-text);
+}
+
+.feedback[data-state="error"] {
+  background: var(--copy-error-bg);
+  color: var(--copy-error-text);
 }

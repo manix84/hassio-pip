@@ -288,7 +288,7 @@ function App() {
       </Section>
 
       <Section eyebrow="Example automation" title="Where this is headed.">
-        <CodeBlock code={automationExample} />
+        <CodeBlock code={automationExample} language="home-assistant-yaml" />
       </Section>
 
       <footer className={styles.footer}>
