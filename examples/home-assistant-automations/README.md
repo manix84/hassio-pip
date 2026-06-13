@@ -1,3 +1,3 @@
-# Home Assistant Automation Examples
+# Home Assistant Automation Examples ⚙️
 
-Automation examples will be added after the Home Assistant integration exists.
+Automation examples will be added after the Home Assistant integration exists 🚧
