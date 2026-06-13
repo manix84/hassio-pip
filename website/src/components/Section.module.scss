@@ -9,7 +9,7 @@
 }
 
 .eyebrow {
-  color: #66d4ff;
+  color: var(--accent);
   display: block;
   font-size: 0.78rem;
   font-weight: 800;
@@ -19,7 +19,7 @@
 }
 
 .heading h2 {
-  color: #f5fbff;
+  color: var(--text);
   font-size: clamp(2rem, 5vw, 3.4rem);
   line-height: 1.05;
   margin: 0 0 1.4rem;

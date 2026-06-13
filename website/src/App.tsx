@@ -1,16 +1,21 @@
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "./components/Button";
 import { CodeBlock } from "./components/CodeBlock";
 import { FeatureCard } from "./components/FeatureCard";
 import { FlowDiagram } from "./components/FlowDiagram";
 import { Section } from "./components/Section";
 import { StatusBadge } from "./components/StatusBadge";
+import { ThemeToggle, type ThemeMode } from "./components/ThemeToggle";
+import controlMockup from "./assets/home-assistant-control.png";
+import networkMockup from "./assets/local-network-pip.png";
+import tvPipMockup from "./assets/tv-pip-promo.png";
 import styles from "./App.module.scss";
 
-const githubUrl = "https://github.com/rob/ha-tv-pip";
+const githubUrl = "https://github.com/manix84/hassio-pip";
 const roadmapUrl = "../docs/roadmap.md";
 const architectureUrl = "../docs/architecture.md";
 const developmentUrl = "../docs/development.md";
-const releasesUrl = "https://github.com/rob/ha-tv-pip/releases";
+const releasesUrl = "https://github.com/manix84/hassio-pip/releases";
 const licenseUrl = "../LICENSE";
 
 const automationExample = `
@@ -84,8 +89,39 @@ const roadmapItems = [
 ];
 
 function App() {
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
+    const saved = window.localStorage.getItem("ha-tv-pip-theme");
+    return saved === "light" || saved === "dark" || saved === "auto" ? saved : "auto";
+  });
+
+  useEffect(() => {
+    window.localStorage.setItem("ha-tv-pip-theme", themeMode);
+    if (themeMode === "auto") {
+      document.documentElement.removeAttribute("data-theme");
+      return;
+    }
+    document.documentElement.dataset.theme = themeMode;
+  }, [themeMode]);
+
+  const visualCards = useMemo(
+    () => [
+      {
+        image: controlMockup,
+        title: "Automation control surface",
+        text: "A Home Assistant-friendly control plane for future receiver discovery, pairing, and service calls."
+      },
+      {
+        image: networkMockup,
+        title: "Local-first receiver path",
+        text: "The TV app owns playback and PiP while Home Assistant decides what should appear."
+      }
+    ],
+    []
+  );
+
   return (
     <main>
+      <ThemeToggle mode={themeMode} onChange={setThemeMode} />
       <section className={styles.hero}>
         <div className={styles.heroContent}>
           <div className={styles.heroText}>
@@ -124,26 +160,53 @@ function App() {
       </Section>
 
       <Section eyebrow="The solution" title="A receiver app for the TV, a controller in Home Assistant.">
-        <div className={styles.solutionGrid}>
-          <p>Install the Android TV receiver app.</p>
-          <p>Install the Home Assistant integration.</p>
-          <p>Pair them locally.</p>
-          <p>Trigger camera popups from automations.</p>
+        <div className={styles.solutionShowcase}>
+          <div className={styles.solutionSteps}>
+            <p>Install the Android TV receiver app.</p>
+            <p>Install the Home Assistant integration.</p>
+            <p>Pair them locally.</p>
+            <p>Trigger camera popups from automations.</p>
+          </div>
+          <figure className={styles.imageCard}>
+            <img
+              alt="Mockup showing Home Assistant controls connected to an Android TV PiP receiver"
+              src={controlMockup}
+            />
+          </figure>
         </div>
       </Section>
 
       <Section eyebrow="How it works" title="A local-first path from event to PiP popup.">
-        <FlowDiagram
-          steps={[
-            "Home Assistant event",
-            "HA TV PiP integration",
-            "Android TV receiver app",
-            "PiP camera popup"
-          ]}
-        />
+        <div className={styles.flowShowcase}>
+          <FlowDiagram
+            steps={[
+              "Home Assistant event",
+              "HA TV PiP integration",
+              "Android TV receiver app",
+              "PiP camera popup"
+            ]}
+          />
+          <figure className={styles.imageCard}>
+            <img
+              alt="Mockup showing a local smart-home network sending a camera feed to Android TV PiP"
+              src={networkMockup}
+            />
+          </figure>
+        </div>
       </Section>
 
       <Section eyebrow="Features" title="Built in phases, designed as one experience.">
+        <div className={styles.visualGrid}>
+          {visualCards.map((card) => (
+            <article className={styles.visualCard} key={card.title}>
+              <img alt="" src={card.image} />
+              <div>
+                <h3>{card.title}</h3>
+                <p>{card.text}</p>
+              </div>
+            </article>
+          ))}
+        </div>
         <div className={styles.featureGrid}>
           {features.map((feature) => (
             <FeatureCard
@@ -158,11 +221,17 @@ function App() {
 
       <Section eyebrow="Current status" title="Phase 1: Android TV PiP MVP">
         <div className={styles.statusPanel}>
-          <p>Currently proving reliable Android TV video playback and PiP behaviour.</p>
-          <p>
-            Home Assistant integration, discovery, pairing, camera streams, and remote mode are
-            intentionally future phases.
-          </p>
+          <div>
+            <p>Currently proving reliable Android TV video playback and PiP behaviour.</p>
+            <p>
+              Home Assistant integration, discovery, pairing, camera streams, and remote mode are
+              intentionally future phases.
+            </p>
+          </div>
+          <img
+            alt="Promotional mockup of HA TV PiP running on a living room Android TV"
+            src={tvPipMockup}
+          />
         </div>
       </Section>
 

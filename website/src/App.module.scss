@@ -1,8 +1,5 @@
 .hero {
-  background:
-    radial-gradient(circle at 18% 20%, rgba(3, 169, 244, 0.24), transparent 28rem),
-    radial-gradient(circle at 80% 12%, rgba(0, 188, 212, 0.18), transparent 26rem),
-    linear-gradient(140deg, #07131c 0%, #0d2330 48%, #08131a 100%);
+  background: var(--hero-bg);
   min-height: 92vh;
   overflow: hidden;
   padding: 3rem 1.5rem 5rem;
@@ -23,13 +20,13 @@
 }
 
 .version {
-  color: #9fdff7;
+  color: var(--link);
   font-weight: 800;
   margin: 1.2rem 0 0;
 }
 
 .heroText h1 {
-  color: #f7fcff;
+  color: var(--text);
   font-size: clamp(3rem, 8vw, 6.6rem);
   letter-spacing: 0;
   line-height: 0.95;
@@ -39,7 +36,7 @@
 
 .subheading,
 .copy {
-  color: #c2d3df;
+  color: var(--text-soft);
   font-size: clamp(1.1rem, 2.1vw, 1.35rem);
   line-height: 1.65;
   max-width: 760px;
@@ -65,7 +62,7 @@
   border: 12px solid #1c313d;
   border-radius: 8px;
   box-shadow:
-    0 36px 80px rgba(0, 0, 0, 0.38),
+    var(--shadow),
     0 0 0 1px rgba(255, 255, 255, 0.08);
   max-width: 500px;
   min-width: 300px;
@@ -124,18 +121,30 @@
   width: 38%;
 }
 
-.solutionGrid,
+.solutionShowcase,
+.flowShowcase,
 .featureGrid {
+  display: grid;
+  gap: 1rem;
+}
+
+.solutionShowcase,
+.flowShowcase {
+  align-items: stretch;
+  grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
+}
+
+.solutionSteps {
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-.solutionGrid p {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+.solutionSteps p {
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 8px;
-  color: #effaff;
+  color: var(--text);
   font-size: 1.05rem;
   font-weight: 800;
   line-height: 1.4;
@@ -144,24 +153,89 @@
   padding: 1.2rem;
 }
 
+.imageCard,
+.visualCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  margin: 0;
+  overflow: hidden;
+}
+
+.imageCard img,
+.visualCard img,
+.statusPanel img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.visualGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 1rem;
+}
+
+.visualCard {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(220px, 0.65fr);
+}
+
+.visualCard img {
+  aspect-ratio: 16 / 10;
+}
+
+.visualCard div {
+  align-self: center;
+  padding: 1.3rem;
+}
+
+.visualCard h3 {
+  color: var(--text);
+  font-size: 1.15rem;
+  margin: 0 0 0.6rem;
+}
+
+.visualCard p {
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
 .featureGrid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .statusPanel {
-  background: rgba(3, 169, 244, 0.08);
-  border: 1px solid rgba(102, 212, 255, 0.2);
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
   border-radius: 8px;
-  color: #d8ecf7;
+  color: var(--text-soft);
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  padding: 1.5rem;
+  grid-template-columns: minmax(0, 0.85fr) minmax(320px, 1.15fr);
+  overflow: hidden;
 }
 
 .statusPanel p {
   line-height: 1.65;
   margin: 0;
+}
+
+.statusPanel div {
+  align-self: center;
+  padding: 1.5rem;
+}
+
+.statusPanel div p + p {
+  margin-top: 1rem;
+}
+
+.statusPanel img {
+  aspect-ratio: 16 / 10;
 }
 
 .roadmap {
@@ -174,18 +248,18 @@
 }
 
 .roadmap li {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 8px;
-  color: #effaff;
+  color: var(--text);
   font-weight: 800;
   padding: 1rem;
 }
 
 .footer {
   align-items: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  color: #bdd1dd;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
   display: flex;
   gap: 1rem;
   justify-content: space-between;
@@ -201,7 +275,7 @@
 }
 
 .footer strong {
-  color: #f5fbff;
+  color: var(--text);
 }
 
 .footer nav {
@@ -212,7 +286,7 @@
 }
 
 .footer a {
-  color: #9fdff7;
+  color: var(--link);
   text-decoration: none;
 }
 
@@ -227,10 +301,18 @@
     grid-template-columns: 1fr;
   }
 
-  .solutionGrid,
+  .solutionSteps,
   .featureGrid,
-  .roadmap {
+  .roadmap,
+  .visualGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .solutionShowcase,
+  .flowShowcase,
+  .statusPanel,
+  .visualCard {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -239,9 +321,10 @@
     padding-top: 2rem;
   }
 
-  .solutionGrid,
+  .solutionSteps,
   .featureGrid,
-  .roadmap {
+  .roadmap,
+  .visualGrid {
     grid-template-columns: 1fr;
   }
 

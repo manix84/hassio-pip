@@ -1,19 +1,19 @@
 .card {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 8px;
   min-height: 190px;
   padding: 1.35rem;
 }
 
 .card h3 {
-  color: #f7fcff;
+  color: var(--text);
   font-size: 1.15rem;
   margin: 1rem 0 0.6rem;
 }
 
 .card p {
-  color: #b8c9d6;
+  color: var(--text-muted);
   line-height: 1.6;
   margin: 0;
 }

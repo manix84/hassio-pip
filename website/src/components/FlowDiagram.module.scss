@@ -8,17 +8,17 @@
 }
 
 .flow li {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 8px;
-  color: #effaff;
+  color: var(--text);
   min-height: 96px;
   padding: 1rem;
   position: relative;
 }
 
 .flow li:not(:last-child)::after {
-  color: #66d4ff;
+  color: var(--accent);
   content: "→";
   font-size: 1.5rem;
   position: absolute;

@@ -1,8 +1,8 @@
 .codeBlock {
-  background: #06141d;
-  border: 1px solid rgba(102, 212, 255, 0.2);
+  background: var(--code-bg);
+  border: 1px solid var(--border);
   border-radius: 8px;
-  color: #d8f4ff;
+  color: var(--code-text);
   font-size: 0.92rem;
   line-height: 1.55;
   margin: 0;

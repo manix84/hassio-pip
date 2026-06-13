@@ -1,5 +1,7 @@
 # HA TV PiP Receiver Android TV App 📺
 
+[![Release 📦](https://github.com/manix84/hassio-pip/actions/workflows/release.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/release.yml)
+
 Phase 1 Android TV MVP for HA TV PiP. This app plays a public HLS test stream and validates Android TV Picture-in-Picture behavior.
 
 ## Build 🛠️

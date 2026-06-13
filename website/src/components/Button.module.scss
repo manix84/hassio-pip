@@ -20,12 +20,12 @@
 }
 
 .primary {
-  background: #03a9f4;
-  color: #03131c;
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .secondary {
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-  color: #ecf7ff;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  color: var(--text);
 }

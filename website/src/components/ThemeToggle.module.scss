@@ -1,0 +1,42 @@
+.toggle {
+  backdrop-filter: blur(18px);
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  display: inline-flex;
+  gap: 0.2rem;
+  padding: 0.25rem;
+  position: fixed;
+  right: 1.25rem;
+  top: 1.25rem;
+  z-index: 20;
+}
+
+.toggle button {
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 0.48rem 0.7rem;
+  text-transform: capitalize;
+}
+
+.toggle button:hover,
+.toggle button:focus-visible {
+  color: var(--text);
+}
+
+.toggle .active {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+@media (max-width: 640px) {
+  .toggle {
+    right: 0.75rem;
+    top: 0.75rem;
+  }
+}

@@ -1,5 +1,7 @@
 # HA TV PiP 📺🪟
 
+[![Release 📦](https://github.com/manix84/hassio-pip/actions/workflows/release.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/release.yml) [![Website 🌐](https://github.com/manix84/hassio-pip/actions/workflows/website.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/website.yml)
+
 HA TV PiP is a planned Home Assistant companion project for showing short-lived camera feeds on Android TV and Google TV devices using Android Picture-in-Picture.
 
 This repository is a monorepo that contains the receiver app, future Home Assistant integration, and promotional website:

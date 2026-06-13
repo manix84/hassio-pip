@@ -1,5 +1,7 @@
 # HA TV PiP Website 🌐
 
+[![Website 🌐](https://github.com/manix84/hassio-pip/actions/workflows/website.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/website.yml)
+
 Promotional Vite website for HA TV PiP.
 
 ## Tech Stack 🛠️
