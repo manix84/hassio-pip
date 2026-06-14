@@ -38,10 +38,11 @@ The site is static and ready for future GitHub Pages deployment.
 ```sh
 npm run lint
 npm run typecheck
+npm run test
 npm run build
 ```
 
-The website uses ESLint for React/TypeScript linting and `tsc --noEmit` for type checking.
+The website uses ESLint for React/TypeScript linting, `tsc --noEmit` for type checking, and Vitest for tests.
 The build command is also used as the website dry-run build in the Quality workflow.
 
 ## Deployment 🌍

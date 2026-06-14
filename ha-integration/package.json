@@ -1,12 +1,13 @@
 {
   "name": "@ha-tv-pip/ha-integration",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "private": true,
   "description": "Home Assistant custom integration for HA TV PiP.",
   "license": "MIT",
   "scripts": {
-    "check": "npm run lint && npm run typecheck",
-    "lint": "python3 -m ruff check custom_components",
-    "typecheck": "python3 -m mypy custom_components"
+    "check": "npm run lint && npm run typecheck && npm run test",
+    "lint": "node ../scripts/run-ha-python-module.mjs ruff check custom_components tests",
+    "test": "node ../scripts/run-ha-python-module.mjs pytest",
+    "typecheck": "node ../scripts/run-ha-python-module.mjs mypy custom_components tests"
   }
 }

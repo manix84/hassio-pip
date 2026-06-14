@@ -13,3 +13,5 @@ dist/
 *.aab
 *.zip
 node_modules/
+.venv/
+ha-integration/.venv/

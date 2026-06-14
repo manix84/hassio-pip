@@ -31,10 +31,12 @@ npm run android:assemble
 ```sh
 npm run android:lint
 npm run android:typecheck
+npm run android:test
 npm run android:build:dry-run
 ```
 
 Android lint uses the Android Gradle plugin. Type checking compiles the debug Kotlin sources.
+Unit tests run on the JVM with Gradle's debug unit test task.
 The dry-run build assembles the debug APK.
 
 ## Run 🚀

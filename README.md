@@ -50,6 +50,7 @@ ha-tv-pip/
 From VSCode or a terminal with a configured JDK and Android SDK:
 
 ```sh
+npm run install:all
 npm run android:assemble
 ```
 
@@ -59,14 +60,18 @@ Useful repo scripts:
 npm run check
 npm run lint
 npm run typecheck
+npm run test
 npm run android:assemble
 npm run android:build:dry-run
 npm run android:lint
+npm run android:test
 npm run android:clean
 npm run ha:build:dry-run
+npm run ha:test
 npm run website:dev
 npm run website:build
 npm run website:build:dry-run
+npm run website:test
 ```
 
 ## Website 🌐

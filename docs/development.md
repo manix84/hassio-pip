@@ -143,16 +143,20 @@ VSCode remains the preferred daily development environment.
 Common repo scripts:
 
 ```sh
+npm run install:all
 npm run check
 npm run lint
 npm run typecheck
+npm run test
 npm run android:assemble
 npm run android:assemble:release
 npm run android:build:dry-run
 npm run android:lint
+npm run android:test
 npm run android:typecheck
 npm run ha:build:dry-run
 npm run ha:lint
+npm run ha:test
 npm run ha:typecheck
 npm run android:clean
 npm run package:integration
@@ -160,6 +164,7 @@ npm run website:dev
 npm run website:build
 npm run website:build:dry-run
 npm run website:lint
+npm run website:test
 npm run website:typecheck
 npm run website:preview
 ```
@@ -171,19 +176,23 @@ The monorepo exposes shared quality commands from the root:
 ```sh
 npm run lint
 npm run typecheck
+npm run test
 npm run check
 ```
 
-`npm run check` runs version consistency, linting, and type checking.
+`npm run check` runs version consistency, linting, type checking, and tests.
 
 Project-specific quality commands:
 
 ```sh
 npm run android:lint
+npm run android:test
 npm run android:typecheck
 npm run ha:lint
+npm run ha:test
 npm run ha:typecheck
 npm run website:lint
+npm run website:test
 npm run website:typecheck
 npm run android:build:dry-run
 npm run ha:build:dry-run
@@ -192,9 +201,9 @@ npm run website:build:dry-run
 
 Quality tooling by area:
 
-- Android TV app: Android Gradle Plugin lint and Kotlin debug compilation.
-- Home Assistant integration: Ruff and MyPy against `ha-integration/custom_components`.
-- Website: ESLint for React/TypeScript and `tsc --noEmit` for type checking.
+- Android TV app: Android Gradle Plugin lint, JVM unit tests, and Kotlin debug compilation.
+- Home Assistant integration: Ruff, pytest, and MyPy against the placeholder custom integration package.
+- Website: ESLint for React/TypeScript, Vitest, and `tsc --noEmit` for type checking.
 
 Dry-run builds by area:
 
@@ -202,19 +211,31 @@ Dry-run builds by area:
 - Home Assistant integration: packages the custom integration zip from the placeholder component path.
 - Website: runs the Vite production build.
 
-GitHub Actions runs these as separate Quality workflow jobs, such as `website: lint`, `website: typecheck`, and `website: build dry-run`. The Website workflow only builds/deploys the site, and the Release workflow only packages release assets.
+GitHub Actions runs these as separate Quality workflow jobs, such as `website: lint`, `website: test`, `website: typecheck`, and `website: build dry-run`. The Website workflow only builds/deploys the site, and the Release workflow only packages release assets.
 
 Install Home Assistant integration dev tools with:
 
 ```sh
-python3 -m pip install -r ha-integration/requirements-dev.txt
+npm run install:all
 ```
+
+The install script creates `ha-integration/.venv/` and installs Python dev tools there, so Homebrew-managed Python installations are not modified.
 
 Install website dependencies with:
 
 ```sh
 npm --prefix website install
 ```
+
+Install all project dependencies from the root with:
+
+```sh
+npm run install:all
+```
+
+The install script covers root npm metadata, Android app npm metadata, website npm dependencies, and Home Assistant integration Python dev tools. Android Gradle dependencies are still resolved by Android Studio or Gradle during Android builds.
+
+For Android builds, the install script writes `android-tv-app/local.properties` when it can find an SDK through `ANDROID_HOME`, `ANDROID_SDK_ROOT`, or the usual Android Studio SDK locations. If no SDK is installed yet, install it through Android Studio and rerun `npm run install:all`.
 
 ### Website Development
 
@@ -298,6 +319,7 @@ The hook runs:
 
 ```sh
 npm run version:precommit
+npm run test
 ```
 
 The root `package.json` version remains the source of truth. When a bump happens, the hook syncs:

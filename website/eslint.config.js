@@ -55,7 +55,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ["src/__tests__/**/*.ts", "src/test/**/*.ts"],
+    files: ["src/**/*.test.ts", "src/**/*.test.tsx", "src/__tests__/**/*.ts", "src/test/**/*.ts"],
     languageOptions: {
       globals: {
         ...globals.browser,

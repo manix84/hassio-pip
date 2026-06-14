@@ -1,4 +1,5 @@
 #!/bin/sh
 set -eu
 
+npm run test
 npm run version:precommit

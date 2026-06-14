@@ -62,6 +62,32 @@ jobs:
       - name: Run Android typecheck
         run: npm run android:typecheck
 
+  android-test:
+    name: "android: test"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK packages
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Run Android unit tests
+        run: npm run android:test
+
   android-build-dry-run:
     name: "android: build dry-run"
     runs-on: ubuntu-latest
@@ -126,6 +152,25 @@ jobs:
       - name: Run Home Assistant integration typecheck
         run: npm run ha:typecheck
 
+  ha-integration-test:
+    name: "ha-integration: test"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dev tools
+        run: python -m pip install -r ha-integration/requirements-dev.txt
+
+      - name: Run Home Assistant integration tests
+        run: npm run ha:test
+
   ha-integration-build-dry-run:
     name: "ha-integration: build dry-run"
     runs-on: ubuntu-latest
@@ -179,6 +224,25 @@ jobs:
 
       - name: Run website typecheck
         run: npm run website:typecheck
+
+  website-test:
+    name: "website: test"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install website dependencies
+        run: npm --prefix website install
+
+      - name: Run website tests
+        run: npm run website:test
 
   website-build-dry-run:
     name: "website: build dry-run"

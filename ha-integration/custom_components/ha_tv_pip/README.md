@@ -11,11 +11,12 @@ The integration is not implemented in Phase 1. Future work is expected to add di
 From the monorepo root:
 
 ```sh
-python3 -m pip install -r ha-integration/requirements-dev.txt
+npm run install:all
 npm run ha:lint
 npm run ha:typecheck
+npm run ha:test
 npm run ha:build:dry-run
 ```
 
-The placeholder package uses Ruff for Python linting and MyPy for type checking.
+The placeholder package uses Ruff for Python linting, MyPy for type checking, and pytest for tests. `npm run install:all` installs those tools into `ha-integration/.venv/`.
 The dry-run build packages the placeholder custom integration zip and will remain the integration build check until a fuller Home Assistant implementation exists.

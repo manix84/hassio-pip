@@ -14,10 +14,7 @@ select = [
 
 [tool.mypy]
 python_version = "3.12"
+explicit_package_bases = true
 strict = true
 warn_return_any = true
 warn_unused_configs = true
-
-[[tool.mypy.overrides]]
-module = "homeassistant.*"
-ignore_missing_imports = true
