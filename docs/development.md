@@ -211,7 +211,7 @@ Dry-run builds by area:
 - Home Assistant integration: packages the custom integration zip from the placeholder component path.
 - Website: runs the Vite production build.
 
-GitHub Actions runs these as separate Quality workflow jobs, such as `website: lint`, `website: test`, `website: typecheck`, and `website: build dry-run`. The Website workflow only builds/deploys the site, and the Release workflow only packages release assets.
+GitHub Actions runs project-specific quality workflows for the Android TV app, Home Assistant integration, and website. Each workflow still exposes separate jobs, such as `website: lint`, `website: test`, `website: typecheck`, and `website: build dry-run`. The Website Deploy workflow only builds/deploys the site, and the Release workflow only packages release assets.
 
 Install Home Assistant integration dev tools with:
 

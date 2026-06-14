@@ -1,6 +1,6 @@
 # HA TV PiP Home Assistant Integration 🏠
 
-[![Quality ✅](https://github.com/manix84/hassio-pip/actions/workflows/quality.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/quality.yml) [![Release 📦](https://github.com/manix84/hassio-pip/actions/workflows/release.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/release.yml)
+[![Home Assistant Integration Quality 🏠](https://github.com/manix84/hassio-pip/actions/workflows/quality-ha-integration.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/quality-ha-integration.yml) [![Release 📦](https://github.com/manix84/hassio-pip/actions/workflows/release.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/release.yml)
 
 This directory is a placeholder for a future Home Assistant custom integration 🚧
 

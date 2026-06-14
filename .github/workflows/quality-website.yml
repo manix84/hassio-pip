@@ -1,0 +1,87 @@
+name: Website Quality 🌐
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  website-lint:
+    name: "website: lint"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install website dependencies
+        run: npm --prefix website install
+
+      - name: Run website lint
+        run: npm run website:lint
+
+  website-typecheck:
+    name: "website: typecheck"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install website dependencies
+        run: npm --prefix website install
+
+      - name: Run website typecheck
+        run: npm run website:typecheck
+
+  website-test:
+    name: "website: test"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install website dependencies
+        run: npm --prefix website install
+
+      - name: Run website tests
+        run: npm run website:test
+
+  website-build-dry-run:
+    name: "website: build dry-run"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install website dependencies
+        run: npm --prefix website install
+
+      - name: Build website
+        run: npm run website:build:dry-run

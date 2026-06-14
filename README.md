@@ -1,6 +1,8 @@
 # HA TV PiP 📺🪟
 
-[![Quality ✅](https://github.com/manix84/hassio-pip/actions/workflows/quality.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/quality.yml) [![Release 📦](https://github.com/manix84/hassio-pip/actions/workflows/release.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/release.yml) [![Website 🌐](https://github.com/manix84/hassio-pip/actions/workflows/website.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/website.yml)
+[![Android TV App Quality 📺](https://github.com/manix84/hassio-pip/actions/workflows/quality-android-tv-app.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/quality-android-tv-app.yml) [![Home Assistant Integration Quality 🏠](https://github.com/manix84/hassio-pip/actions/workflows/quality-ha-integration.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/quality-ha-integration.yml) [![Website Quality 🌐](https://github.com/manix84/hassio-pip/actions/workflows/quality-website.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/quality-website.yml)
+
+[![Release 📦](https://github.com/manix84/hassio-pip/actions/workflows/release.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/release.yml) [![Website Deploy 🌍](https://github.com/manix84/hassio-pip/actions/workflows/website.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/website.yml)
 
 HA TV PiP is a planned Home Assistant companion project for showing short-lived camera feeds on Android TV and Google TV devices using Android Picture-in-Picture.
 

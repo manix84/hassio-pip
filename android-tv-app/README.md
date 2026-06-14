@@ -1,6 +1,6 @@
 # HA TV PiP Receiver Android TV App 📺
 
-[![Quality ✅](https://github.com/manix84/hassio-pip/actions/workflows/quality.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/quality.yml) [![Release 📦](https://github.com/manix84/hassio-pip/actions/workflows/release.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/release.yml)
+[![Android TV App Quality 📺](https://github.com/manix84/hassio-pip/actions/workflows/quality-android-tv-app.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/quality-android-tv-app.yml) [![Release 📦](https://github.com/manix84/hassio-pip/actions/workflows/release.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/release.yml)
 
 Phase 1 Android TV MVP for HA TV PiP. This app plays a public HLS test stream and validates Android TV Picture-in-Picture behavior.
 

@@ -1,6 +1,6 @@
 # HA TV PiP Website 🌐
 
-[![Quality ✅](https://github.com/manix84/hassio-pip/actions/workflows/quality.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/quality.yml) [![Website 🌐](https://github.com/manix84/hassio-pip/actions/workflows/website.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/website.yml)
+[![Website Quality 🌐](https://github.com/manix84/hassio-pip/actions/workflows/quality-website.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/quality-website.yml) [![Website Deploy 🌍](https://github.com/manix84/hassio-pip/actions/workflows/website.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/website.yml)
 
 Promotional Vite website for HA TV PiP.
 
@@ -43,7 +43,7 @@ npm run build
 ```
 
 The website uses ESLint for React/TypeScript linting, `tsc --noEmit` for type checking, and Vitest for tests.
-The build command is also used as the website dry-run build in the Quality workflow.
+The build command is also used as the website dry-run build in the Website Quality workflow.
 
 ## Deployment 🌍
 

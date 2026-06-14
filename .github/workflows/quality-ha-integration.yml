@@ -1,0 +1,99 @@
+name: Home Assistant Integration Quality 🏠
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  ha-integration-lint:
+    name: "ha-integration: lint"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Python dev tools
+        run: npm run ha:install
+
+      - name: Run Home Assistant integration lint
+        run: npm run ha:lint
+
+  ha-integration-typecheck:
+    name: "ha-integration: typecheck"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Python dev tools
+        run: npm run ha:install
+
+      - name: Run Home Assistant integration typecheck
+        run: npm run ha:typecheck
+
+  ha-integration-test:
+    name: "ha-integration: test"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Python dev tools
+        run: npm run ha:install
+
+      - name: Run Home Assistant integration tests
+        run: npm run ha:test
+
+  ha-integration-build-dry-run:
+    name: "ha-integration: build dry-run"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Package Home Assistant integration
+        run: npm run ha:build:dry-run
