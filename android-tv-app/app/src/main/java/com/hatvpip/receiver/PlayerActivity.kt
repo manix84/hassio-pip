@@ -22,8 +22,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -120,6 +124,7 @@ class PlayerActivity : ComponentActivity() {
                 }
             )
             exoPlayer.setMediaItem(MediaItem.fromUri(TEST_STREAM_URL))
+            exoPlayer.repeatMode = Player.REPEAT_MODE_ONE
             exoPlayer.playWhenReady = true
             exoPlayer.prepare()
             AppLog.playbackStart(TEST_STREAM_URL)
@@ -172,6 +177,12 @@ private fun PlayerScreen(
     isInPip: Boolean,
     onEnterPip: () -> Unit
 ) {
+    val pipButtonFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        pipButtonFocusRequester.requestFocus()
+    }
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -187,14 +198,18 @@ private fun PlayerScreen(
                             ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.MATCH_PARENT
                         )
-                        useController = true
+                        // Android TV D-pad focus can be trapped by Media3's built-in controller.
+                        // Phase 1 keeps playback in Media3 and exposes TV-friendly controls in Compose.
+                        useController = false
+                        isFocusable = false
+                        isFocusableInTouchMode = false
+                        descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
                         this.player = player
                     }
                 },
                 update = { playerView ->
                     playerView.player = player
-                    // PiP windows should show the content only; full-screen mode keeps controls visible.
-                    playerView.useController = !isInPip
+                    playerView.useController = false
                 }
             )
 
@@ -213,7 +228,10 @@ private fun PlayerScreen(
                         fontSize = 18.sp
                     )
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                        Button(onClick = onEnterPip) {
+                        Button(
+                            modifier = Modifier.focusRequester(pipButtonFocusRequester),
+                            onClick = onEnterPip
+                        ) {
                             Text(text = "Enter PiP")
                         }
                     }
