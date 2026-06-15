@@ -5,12 +5,12 @@
     "@manix84"
   ],
   "config_flow": true,
-  "documentation": "https://github.com/manix84/hassio-pip",
+  "documentation": "https://github.com/manix84/ha-tv-pip",
   "integration_type": "device",
   "iot_class": "local_push",
-  "issue_tracker": "https://github.com/manix84/hassio-pip/issues",
+  "issue_tracker": "https://github.com/manix84/ha-tv-pip/issues",
   "requirements": [],
-  "version": "0.15.0",
+  "version": "0.16.0",
   "zeroconf": [
     {
       "type": "_ha-tv-pip._tcp.local."

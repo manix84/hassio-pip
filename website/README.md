@@ -1,6 +1,6 @@
 # HA TV PiP Website 🌐
 
-[![Website Quality 🌐](https://github.com/manix84/hassio-pip/actions/workflows/quality-website.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/quality-website.yml) [![Website Deploy 🌍](https://github.com/manix84/hassio-pip/actions/workflows/website.yml/badge.svg)](https://github.com/manix84/hassio-pip/actions/workflows/website.yml)
+[![Website Quality 🌐](https://github.com/manix84/ha-tv-pip/actions/workflows/quality-website.yml/badge.svg)](https://github.com/manix84/ha-tv-pip/actions/workflows/quality-website.yml) [![Website Deploy 🌍](https://github.com/manix84/ha-tv-pip/actions/workflows/website.yml/badge.svg)](https://github.com/manix84/ha-tv-pip/actions/workflows/website.yml)
 
 Promotional Vite website for HA TV PiP.
 

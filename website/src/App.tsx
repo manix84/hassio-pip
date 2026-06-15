@@ -12,15 +12,15 @@ import { Section } from "./components/Section";
 import { StatusBadge } from "./components/StatusBadge";
 import { ThemeToggle, type ThemeMode } from "./components/ThemeToggle";
 
-const githubUrl = "https://github.com/manix84/hassio-pip";
+const githubUrl = "https://github.com/manix84/ha-tv-pip";
 const roadmapUrl =
-  "https://github.com/manix84/hassio-pip/blob/main/docs/roadmap.md";
+  "https://github.com/manix84/ha-tv-pip/blob/main/docs/roadmap.md";
 const architectureUrl =
-  "https://github.com/manix84/hassio-pip/blob/main/docs/architecture.md";
+  "https://github.com/manix84/ha-tv-pip/blob/main/docs/architecture.md";
 const developmentUrl =
-  "https://github.com/manix84/hassio-pip/blob/main/docs/development.md";
-const releasesUrl = "https://github.com/manix84/hassio-pip/releases";
-const licenseUrl = "https://github.com/manix84/hassio-pip/blob/main/LICENSE";
+  "https://github.com/manix84/ha-tv-pip/blob/main/docs/development.md";
+const releasesUrl = "https://github.com/manix84/ha-tv-pip/releases";
+const licenseUrl = "https://github.com/manix84/ha-tv-pip/blob/main/LICENSE";
 
 const automationExample = `
 alias: Show front door on TV
