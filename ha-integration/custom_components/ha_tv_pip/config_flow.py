@@ -113,6 +113,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
 
         return self.async_show_form(
             step_id="confirm",
+            data_schema=vol.Schema({}),
             description_placeholders={
                 CONF_HOST: receiver.host,
                 CONF_NAME: receiver.name,

@@ -10,7 +10,7 @@
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/manix84/hassio-pip/issues",
   "requirements": [],
-  "version": "0.12.0",
+  "version": "0.13.0",
   "zeroconf": [
     {
       "type": "_ha-tv-pip._tcp.local."

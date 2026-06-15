@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 0.13.0 - Device Page And Shared Icon 🧩
+
+- Registered discovered receivers in Home Assistant's device registry so they have a device page 🏠
+- Added explicit confirmation form schema and English translations for the discovery confirmation screen 📝
+- Added a shared PNG project icon for Android, Home Assistant, and the website 🎨
+
 ## 0.12.0 - Discovery Confirmation Flow 🔎
 
 - Changed Zeroconf discovery to show a confirmation card instead of auto-creating entries 🧭

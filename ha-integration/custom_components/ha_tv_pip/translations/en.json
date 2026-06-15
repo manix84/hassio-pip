@@ -1,0 +1,25 @@
+{
+  "config": {
+    "abort": {
+      "invalid_discovery": "Home Assistant found an HA TV PiP receiver, but the discovery data was incomplete."
+    },
+    "error": {
+      "invalid_host": "Enter the Android TV receiver IP address or hostname.",
+      "invalid_port": "Enter a valid port between 1 and 65535."
+    },
+    "step": {
+      "confirm": {
+        "description": "Home Assistant discovered {name} at {host}:{port}. Add this Android TV receiver?",
+        "title": "Add discovered HA TV PiP receiver"
+      },
+      "user": {
+        "data": {
+          "host": "Receiver host",
+          "port": "Receiver port"
+        },
+        "description": "Use manual setup if Home Assistant has not discovered the Android TV receiver automatically.",
+        "title": "Add HA TV PiP receiver"
+      }
+    }
+  }
+}
