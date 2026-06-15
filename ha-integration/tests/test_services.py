@@ -1,5 +1,7 @@
 """Tests for HA TV PiP Home Assistant services."""
 
+import sys
+import types
 from dataclasses import dataclass
 from typing import Any
 
@@ -16,8 +18,10 @@ from custom_components.ha_tv_pip.services import (
     ATTR_DEVICE_ID,
     ATTR_DURATION_SECONDS,
     ATTR_ENTER_PIP,
+    ATTR_RECEIVER_DEVICE_ID,
     ATTR_TITLE,
     ServiceValidationError,
+    _absolute_stream_url,
     _camera_title,
     _request_from_call,
     _resolve_receiver,
@@ -69,6 +73,11 @@ class FakeHass:
         self.states = FakeStates(states or {})
 
 
+class FakeNetworkModule(types.ModuleType):
+    def get_url(self, hass: Any, prefer_external: bool = False) -> str:
+        return "http://10.0.0.2:8123"
+
+
 def test_request_from_call_reads_target_and_defaults() -> None:
     request = _request_from_call(
         FakeCall(
@@ -98,6 +107,19 @@ def test_request_from_call_accepts_title_and_duration() -> None:
     assert request.duration_seconds == 10
     assert request.enter_pip is False
     assert request.title == "Doorbell"
+
+
+def test_request_from_call_accepts_receiver_device_id_field() -> None:
+    request = _request_from_call(
+        FakeCall(
+            data={
+                ATTR_CAMERA_ENTITY: "camera.front_door",
+                ATTR_RECEIVER_DEVICE_ID: "device-1",
+            },
+        )
+    )
+
+    assert request.device_ids == ("device-1",)
 
 
 def test_resolve_receiver_uses_single_paired_entry_without_target() -> None:
@@ -130,13 +152,14 @@ def test_resolve_receiver_requires_token() -> None:
         },
     )
 
-    with pytest.raises(ServiceValidationError, match="receiver_not_paired"):
+    with pytest.raises(ServiceValidationError) as error:
         _resolve_receiver(
             FakeHass(entries=[entry]),
             _request_from_call(
                 FakeCall(data={ATTR_CAMERA_ENTITY: "camera.front_door"})
             ),
         )
+    assert error.value.code == "receiver_not_paired"
 
 
 def test_resolve_receiver_requires_target_when_multiple_entries() -> None:
@@ -145,13 +168,14 @@ def test_resolve_receiver_requires_target_when_multiple_entries() -> None:
         FakeEntry("entry-2", {CONF_HOST: "10.0.0.2", CONF_PORT: 8765, CONF_TOKEN: "b"}),
     ]
 
-    with pytest.raises(ServiceValidationError, match="multiple_receivers"):
+    with pytest.raises(ServiceValidationError) as error:
         _resolve_receiver(
             FakeHass(entries=entries),
             _request_from_call(
                 FakeCall(data={ATTR_CAMERA_ENTITY: "camera.front_door"})
             ),
         )
+    assert error.value.code == "multiple_receivers"
 
 
 def test_validate_camera_entity_requires_camera_domain_and_state() -> None:
@@ -162,11 +186,32 @@ def test_validate_camera_entity_requires_camera_domain_and_state() -> None:
 
     _validate_camera_entity(hass, "camera.front_door")
 
-    with pytest.raises(ServiceValidationError, match="invalid_camera_entity"):
+    with pytest.raises(ServiceValidationError) as invalid_error:
         _validate_camera_entity(hass, "light.front_door")
+    assert invalid_error.value.code == "invalid_camera_entity"
 
-    with pytest.raises(ServiceValidationError, match="camera_not_found"):
+    with pytest.raises(ServiceValidationError) as missing_error:
         _validate_camera_entity(hass, "camera.missing")
+    assert missing_error.value.code == "camera_not_found"
+
+
+def test_absolute_stream_url_keeps_absolute_url() -> None:
+    assert (
+        _absolute_stream_url(FakeHass(entries=[]), "http://homeassistant.local/api/hls")
+        == "http://homeassistant.local/api/hls"
+    )
+
+
+def test_absolute_stream_url_expands_relative_url(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    network_module = FakeNetworkModule("homeassistant.helpers.network")
+    monkeypatch.setitem(sys.modules, "homeassistant.helpers.network", network_module)
+
+    assert (
+        _absolute_stream_url(FakeHass(entries=[]), "/api/hls/front-door")
+        == "http://10.0.0.2:8123/api/hls/front-door"
+    )
 
 
 def test_camera_title_uses_friendly_name() -> None:

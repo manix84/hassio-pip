@@ -845,7 +845,7 @@ Current development target:
 
 ```txt
 Phase 5
-Home Assistant Service MVP
+Home Assistant Service MVP complete in 0.21.0
 ```
 
 Phase 1 is complete in `0.4.0`. It validated:
@@ -897,3 +897,24 @@ Check the `discovery` object in the response. A healthy Android-side advertiseme
 The Android TV main screen also reports whether discovery is advertising.
 
 The Home Assistant integration declares a Zeroconf matcher for `_ha-tv-pip._tcp.local.`, includes discovery setup, starts pairing, and stores the returned token after the user enters the TV-visible code. Local Python tests cover discovery metadata parsing, config-flow helpers, and receiver client error handling.
+
+Stage 5 Home Assistant service testing:
+
+```yaml
+action: ha_tv_pip.show_camera
+data:
+  receiver_device_id: living_room_tv
+  camera_entity: camera.front_door
+  duration_seconds: 30
+  enter_pip: true
+```
+
+Use the Home Assistant device ID for `receiver_device_id` and a camera entity that exposes a TV-compatible HLS stream. Reolink substreams have been verified on Chromecast during Stage 5. Some Reolink main streams can fail with Android decoder initialisation errors when the codec/profile is not supported by the receiver device.
+
+Receiver playback diagnostics:
+
+```sh
+curl http://ANDROID_TV_IP:8765/status
+```
+
+Check `playbackState`, `displayMode`, `url`, and `error` after triggering the service.

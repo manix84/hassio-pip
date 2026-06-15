@@ -251,10 +251,17 @@ The integration should never be responsible for media playback.
 
 ## Home Assistant Services
 
-Planned services:
+Initial service:
 
 ```txt
 ha_tv_pip.show_camera
+```
+
+The Stage 5 service resolves Home Assistant camera HLS URLs and sends authenticated `/show` commands to paired receivers. It uses `receiver_device_id` to target receiver devices because the integration does not expose entities yet.
+
+Planned services:
+
+```txt
 ha_tv_pip.show_snapshot
 ha_tv_pip.close
 ha_tv_pip.test_receiver

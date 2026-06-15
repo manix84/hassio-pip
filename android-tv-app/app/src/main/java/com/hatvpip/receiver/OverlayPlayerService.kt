@@ -10,7 +10,9 @@ import android.view.Gravity
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.media3.common.MediaItem
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
@@ -19,6 +21,7 @@ class OverlayPlayerService : Service() {
     private lateinit var windowManager: WindowManager
     private var overlayView: FrameLayout? = null
     private var player: ExoPlayer? = null
+    private var errorTextView: TextView? = null
     private var title: String = "HA TV PiP"
     private var url: String = PlayerActivity.TEST_STREAM_URL
     private var durationSeconds: Int? = null
@@ -58,6 +61,41 @@ class OverlayPlayerService : Service() {
         }
 
         val overlayPlayer = ExoPlayer.Builder(this).build().also { exoPlayer ->
+            exoPlayer.addListener(
+                object : Player.Listener {
+                    override fun onPlaybackStateChanged(playbackState: Int) {
+                        val playerError = exoPlayer.playerError
+                        updatePlaybackState(
+                            status = playerError?.let { PlaybackStatus.Error }
+                                ?: playbackState.toPlaybackStatus(),
+                            isPlaying = exoPlayer.isPlaying,
+                            errorMessage = playerError?.toDisplayMessage()
+                        )
+                    }
+
+                    override fun onIsPlayingChanged(isPlaying: Boolean) {
+                        val playerError = exoPlayer.playerError
+                        updatePlaybackState(
+                            status = playerError?.let { PlaybackStatus.Error }
+                                ?: exoPlayer.playbackState.toPlaybackStatus(),
+                            isPlaying = isPlaying,
+                            errorMessage = playerError?.toDisplayMessage()
+                        )
+                    }
+
+                    override fun onPlayerError(error: PlaybackException) {
+                        val message = error.toDisplayMessage()
+                        updatePlaybackState(
+                            status = PlaybackStatus.Error,
+                            isPlaying = false,
+                            errorMessage = message
+                        )
+                        errorTextView?.text = "Playback error\n${error.errorCodeName}"
+                        errorTextView?.visibility = TextView.VISIBLE
+                        AppLog.error("Overlay playback failed: $message", error)
+                    }
+                }
+            )
             exoPlayer.setMediaItem(MediaItem.fromUri(url))
             exoPlayer.repeatMode = Player.REPEAT_MODE_ONE
             exoPlayer.playWhenReady = true
@@ -78,6 +116,18 @@ class OverlayPlayerService : Service() {
             setBackgroundColor(android.graphics.Color.BLACK)
             addView(playerView)
         }
+        errorTextView = TextView(this).apply {
+            setTextColor(android.graphics.Color.WHITE)
+            setBackgroundColor(0xCC000000.toInt())
+            textSize = 14f
+            gravity = Gravity.CENTER
+            visibility = TextView.GONE
+            layoutParams = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        }
+        root.addView(errorTextView)
 
         val params = WindowManager.LayoutParams(
             OVERLAY_WIDTH_PX,
@@ -96,14 +146,10 @@ class OverlayPlayerService : Service() {
         runCatching {
             windowManager.addView(root, params)
             overlayView = root
-            ReceiverRuntimeState.update(
-                ReceiverPlaybackSnapshot(
-                    status = PlaybackStatus.Ready,
-                    isPlaying = true,
-                    mode = ReceiverPlaybackMode.Overlay,
-                    title = title,
-                    url = url
-                )
+            updatePlaybackState(
+                status = PlaybackStatus.Buffering,
+                isPlaying = false,
+                errorMessage = null
             )
             AppLog.playbackStart(url)
             scheduleAutoClose()
@@ -120,10 +166,28 @@ class OverlayPlayerService : Service() {
             runCatching { windowManager.removeView(view) }
         }
         overlayView = null
+        errorTextView = null
         player?.release()
         player = null
         ReceiverRuntimeState.markIdle()
         AppLog.playbackStop(reason = "overlay_service_stopped")
+    }
+
+    private fun updatePlaybackState(
+        status: PlaybackStatus,
+        isPlaying: Boolean,
+        errorMessage: String?
+    ) {
+        ReceiverRuntimeState.update(
+            ReceiverPlaybackSnapshot(
+                status = status,
+                isPlaying = isPlaying,
+                mode = ReceiverPlaybackMode.Overlay,
+                title = title,
+                url = url,
+                errorMessage = errorMessage
+            )
+        )
     }
 
     private fun scheduleAutoClose() {
@@ -140,3 +204,15 @@ class OverlayPlayerService : Service() {
         private const val OVERLAY_MARGIN_PX = 48
     }
 }
+
+private fun Int.toPlaybackStatus(): PlaybackStatus =
+    when (this) {
+        Player.STATE_BUFFERING -> PlaybackStatus.Buffering
+        Player.STATE_READY -> PlaybackStatus.Ready
+        Player.STATE_ENDED -> PlaybackStatus.Ended
+        Player.STATE_IDLE -> PlaybackStatus.Idle
+        else -> PlaybackStatus.Idle
+    }
+
+private fun PlaybackException.toDisplayMessage(): String =
+    "$errorCodeName: ${message ?: "unknown playback error"}"

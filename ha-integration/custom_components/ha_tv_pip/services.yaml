@@ -1,8 +1,12 @@
 show_camera:
-  target:
-    device:
-      integration: ha_tv_pip
   fields:
+    receiver_device_id:
+      required: false
+      selector:
+        device:
+          integration: ha_tv_pip
+      name: Receiver device
+      description: Paired Android TV or Google TV receiver to display the camera on.
     camera_entity:
       required: true
       selector:

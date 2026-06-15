@@ -41,12 +41,12 @@ The dry-run build packages the custom integration zip and will remain the integr
 
 ```yaml
 service: ha_tv_pip.show_camera
-target:
-  device_id: living_room_tv
 data:
+  receiver_device_id: living_room_tv
   camera_entity: camera.front_door
   duration_seconds: 30
   enter_pip: true
 ```
 
 The service resolves an HLS stream URL through Home Assistant's camera stream API and sends it to the paired receiver with the stored bearer token.
+For cameras with multiple streams, use a TV-compatible H.264/HLS stream where possible. Reolink substreams have been verified during Stage 5; some Reolink main streams can fail on Chromecast devices with decoder initialisation errors.

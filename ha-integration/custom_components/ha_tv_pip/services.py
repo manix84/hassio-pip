@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
+from urllib.parse import urljoin, urlparse
 
 from .client import ReceiverClientError, ShowCameraCommand, async_show_camera
 from .const import (
@@ -16,15 +17,47 @@ from .const import (
     SERVICE_SHOW_CAMERA,
 )
 
+if TYPE_CHECKING:
+
+    class HomeAssistantError(Exception):
+        """Type-checking stand-in for Home Assistant's native error."""
+
+
+else:
+    try:
+        from homeassistant.exceptions import HomeAssistantError
+    except ModuleNotFoundError:
+
+        class HomeAssistantError(Exception):  # type: ignore[no-redef]
+            """Fallback used by lightweight unit tests outside Home Assistant."""
+
+
 _LOGGER = logging.getLogger(__name__)
 
 ATTR_CAMERA_ENTITY = "camera_entity"
 ATTR_DEVICE_ID = "device_id"
 ATTR_DURATION_SECONDS = "duration_seconds"
 ATTR_ENTER_PIP = "enter_pip"
+ATTR_RECEIVER_DEVICE_ID = "receiver_device_id"
 ATTR_TITLE = "title"
 CAMERA_DOMAIN = "camera"
-
+ERROR_MESSAGES = {
+    "camera_not_found": "Camera entity was not found.",
+    "camera_stream_unavailable": (
+        "Home Assistant could not create an HLS stream for the camera."
+    ),
+    "invalid_camera_entity": "The selected entity is not a camera.",
+    "invalid_duration": "Duration must be at least 1 second.",
+    "missing_camera_entity": "A camera entity is required.",
+    "multiple_receivers": (
+        "Multiple HA TV PiP receivers are configured. Target one receiver device."
+    ),
+    "receiver_command_failed": (
+        "The receiver rejected or could not process the camera command."
+    ),
+    "receiver_not_found": "No matching HA TV PiP receiver was found.",
+    "receiver_not_paired": "The selected HA TV PiP receiver is not paired.",
+}
 
 @dataclass(frozen=True)
 class ReceiverEntry:
@@ -48,8 +81,16 @@ class ShowCameraRequest:
     device_ids: tuple[str, ...]
 
 
-class ServiceValidationError(ValueError):
+class ServiceValidationError(HomeAssistantError):
     """Raised when a service call cannot be mapped to a receiver command."""
+
+    def __init__(self, code: str, detail: str | None = None) -> None:
+        self.code = code
+        self.detail = detail
+        message = ERROR_MESSAGES.get(code, code)
+        if detail:
+            message = f"{message} Detail: {detail}"
+        super().__init__(message)
 
 
 async def async_register_services(hass: Any) -> None:
@@ -68,6 +109,7 @@ async def async_register_services(hass: Any) -> None:
         {
             vol.Required(ATTR_CAMERA_ENTITY): cv.entity_id,
             vol.Optional(ATTR_DEVICE_ID): vol.Any(str, [str]),
+            vol.Optional(ATTR_RECEIVER_DEVICE_ID): vol.Any(str, [str]),
             vol.Optional(ATTR_DURATION_SECONDS, default=30): vol.All(
                 vol.Coerce(int),
                 vol.Range(min=1, max=3600),
@@ -96,6 +138,13 @@ async def async_handle_show_camera(hass: Any, call: Any) -> None:
     receiver = _resolve_receiver(hass, request)
     stream_url = await _async_camera_stream_url(hass, request.camera_entity)
     title = request.title or _camera_title(hass, request.camera_entity)
+    _LOGGER.info(
+        "Sending camera %s to receiver %s at %s:%s",
+        request.camera_entity,
+        receiver.name,
+        receiver.host,
+        receiver.port,
+    )
 
     try:
         await async_show_camera(
@@ -111,13 +160,17 @@ async def async_handle_show_camera(hass: Any, call: Any) -> None:
         )
     except ReceiverClientError as error:
         _LOGGER.error("Unable to send camera stream to %s: %s", receiver.name, error)
-        raise ServiceValidationError("receiver_command_failed") from error
+        raise ServiceValidationError("receiver_command_failed", str(error)) from error
 
 
 def _request_from_call(call: Any) -> ShowCameraRequest:
     data = dict(getattr(call, "data", {}))
     target = getattr(call, "target", {}) or {}
-    device_ids = _tuple_value(data.get(ATTR_DEVICE_ID) or target.get(ATTR_DEVICE_ID))
+    device_ids = _tuple_value(
+        data.get(ATTR_RECEIVER_DEVICE_ID)
+        or data.get(ATTR_DEVICE_ID)
+        or target.get(ATTR_DEVICE_ID)
+    )
 
     duration_value = data.get(ATTR_DURATION_SECONDS, 30)
     duration_seconds = int(duration_value) if duration_value is not None else None
@@ -143,15 +196,23 @@ def _resolve_receiver(hass: Any, request: ShowCameraRequest) -> ReceiverEntry:
         entries = _entries_for_devices(hass, entries, request.device_ids)
 
     if not entries:
+        _LOGGER.warning(
+            "No receiver matched service target devices: %s",
+            request.device_ids,
+        )
         raise ServiceValidationError("receiver_not_found")
 
     if len(entries) > 1:
+        _LOGGER.warning(
+            "Service call matched multiple receivers; target a specific receiver device"
+        )
         raise ServiceValidationError("multiple_receivers")
 
     entry = entries[0]
     data = entry.data
     token = str(data.get(CONF_TOKEN, "")).strip()
     if not token:
+        _LOGGER.warning("Receiver %s is missing a pairing token", entry.entry_id)
         raise ServiceValidationError("receiver_not_paired")
 
     return ReceiverEntry(
@@ -197,6 +258,7 @@ def _validate_camera_entity(hass: Any, entity_id: str) -> None:
 
     state = hass.states.get(entity_id)
     if state is None:
+        _LOGGER.warning("Camera entity %s was not found", entity_id)
         raise ServiceValidationError("camera_not_found")
 
 
@@ -215,7 +277,31 @@ async def _async_camera_stream_url(hass: Any, entity_id: str) -> str:
     except exceptions_module.HomeAssistantError as error:
         _LOGGER.error("Unable to resolve stream for %s: %s", entity_id, error)
         raise ServiceValidationError("camera_stream_unavailable") from error
-    return str(stream_url)
+
+    if not stream_url:
+        _LOGGER.error("Camera stream API returned no stream URL for %s", entity_id)
+        raise ServiceValidationError("camera_stream_unavailable")
+
+    absolute_url = _absolute_stream_url(hass, str(stream_url))
+    _LOGGER.debug("Resolved stream URL for %s to %s", entity_id, absolute_url)
+    return absolute_url
+
+
+def _absolute_stream_url(hass: Any, stream_url: str) -> str:
+    parsed = urlparse(stream_url)
+    if parsed.scheme and parsed.netloc:
+        return stream_url
+
+    network_module = __import__(
+        "homeassistant.helpers.network",
+        fromlist=["get_url"],
+    )
+    try:
+        base_url = network_module.get_url(hass, prefer_external=False)
+    except TypeError:
+        base_url = network_module.get_url(hass)
+
+    return urljoin(f"{base_url.rstrip('/')}/", stream_url.lstrip("/"))
 
 
 def _camera_title(hass: Any, entity_id: str) -> str:

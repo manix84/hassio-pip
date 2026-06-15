@@ -304,7 +304,7 @@ Current behaviour:
 
 # Phase 5: Home Assistant Service MVP
 
-Status: In progress in `0.19.0`.
+Status: Complete in `0.21.0`.
 
 ## Goal
 
@@ -315,13 +315,12 @@ Expose a Home Assistant service that can show a camera feed on a paired Android 
 Initial service:
 
 ```yaml
-ha_tv_pip.show_camera:
-  target:
-    device_id: living_room_tv
-  data:
-    camera_entity: camera.front_door
-    duration_seconds: 30
-    enter_pip: true
+action: ha_tv_pip.show_camera
+data:
+  receiver_device_id: living_room_tv
+  camera_entity: camera.front_door
+  duration_seconds: 30
+  enter_pip: true
 ```
 
 ## Integration Behaviour
@@ -337,10 +336,12 @@ The integration should:
 Initial behaviour:
 
 - Registers `ha_tv_pip.show_camera`.
-- Accepts a target receiver device, `camera_entity`, `duration_seconds`, `enter_pip`, and optional `title`.
+- Accepts `receiver_device_id`, `camera_entity`, `duration_seconds`, `enter_pip`, and optional `title`.
 - Resolves HLS streams with Home Assistant's camera stream API.
 - Sends authenticated `/show` commands to the paired receiver.
 - Requires paired receiver config entries with stored tokens.
+- Preserves receiver playback errors in `/status` for codec and stream debugging.
+- Verified with a Reolink substream; Reolink main streams can fail on Chromecast with decoder initialisation errors when the camera codec/profile is unsupported.
 
 ## Example Automation
 
@@ -352,9 +353,8 @@ trigger:
     to: "on"
 action:
   - service: ha_tv_pip.show_camera
-    target:
-      device_id: living_room_tv
     data:
+      receiver_device_id: living_room_tv
       camera_entity: camera.front_door_bell
       duration_seconds: 30
       enter_pip: true
@@ -364,7 +364,8 @@ action:
 
 - Home Assistant automation can trigger a TV PiP camera popup.
 - Errors are visible and understandable in Home Assistant logs.
-- Multiple configured TVs can be targeted separately.
+- Receiver playback errors are visible through the receiver status endpoint.
+- Multiple configured TVs can be targeted separately with `receiver_device_id`.
 
 ---
 

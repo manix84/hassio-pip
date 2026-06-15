@@ -14,6 +14,7 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
     <application
+        android:usesCleartextTraffic="true"
         android:allowBackup="true"
         android:banner="@drawable/ic_banner"
         android:icon="@mipmap/ic_launcher"

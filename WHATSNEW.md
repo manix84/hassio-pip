@@ -6,6 +6,8 @@
 - Resolves Home Assistant camera HLS stream URLs and sends them to paired receivers 🎬
 - Added service schema metadata for the Home Assistant UI 🧭
 - Added focused service and receiver-client tests 🧪
+- Verified the service path with a Reolink substream on Chromecast 📺
+- Added receiver playback diagnostics for unsupported stream codec errors 🩺
 
 ## 0.18.0 - Stage 4 Complete 🔐
 
