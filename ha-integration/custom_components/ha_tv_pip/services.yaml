@@ -1,0 +1,34 @@
+show_camera:
+  target:
+    device:
+      integration: ha_tv_pip
+  fields:
+    camera_entity:
+      required: true
+      selector:
+        entity:
+          domain: camera
+      name: Camera entity
+      description: Camera entity to display on the paired receiver.
+    duration_seconds:
+      default: 30
+      selector:
+        number:
+          min: 1
+          max: 3600
+          mode: box
+          unit_of_measurement: seconds
+      name: Duration
+      description: How long the receiver should keep the display open.
+    enter_pip:
+      default: true
+      selector:
+        boolean:
+      name: Enter PiP
+      description: Ask the receiver to use PiP or overlay mode when available.
+    title:
+      required: false
+      selector:
+        text:
+      name: Title
+      description: Optional display title. Defaults to the camera friendly name.

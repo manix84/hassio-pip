@@ -304,6 +304,8 @@ Current behaviour:
 
 # Phase 5: Home Assistant Service MVP
 
+Status: In progress in `0.19.0`.
+
 ## Goal
 
 Expose a Home Assistant service that can show a camera feed on a paired Android TV device.
@@ -331,6 +333,14 @@ The integration should:
 - Resolve a usable stream URL.
 - Send a `/show` command to the TV app.
 - Log clear errors if the camera cannot be streamed.
+
+Initial behaviour:
+
+- Registers `ha_tv_pip.show_camera`.
+- Accepts a target receiver device, `camera_entity`, `duration_seconds`, `enter_pip`, and optional `title`.
+- Resolves HLS streams with Home Assistant's camera stream API.
+- Sends authenticated `/show` commands to the paired receiver.
+- Requires paired receiver config entries with stored tokens.
 
 ## Example Automation
 

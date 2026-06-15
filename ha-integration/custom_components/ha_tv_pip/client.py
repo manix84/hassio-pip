@@ -31,6 +31,16 @@ class PairingConfirmResult:
     client_name: str
 
 
+@dataclass(frozen=True)
+class ShowCameraCommand:
+    """Command payload sent to the receiver to show a camera stream."""
+
+    title: str
+    url: str
+    duration_seconds: int | None
+    enter_pip: bool
+
+
 async def async_start_pairing(
     host: str,
     port: int,
@@ -91,17 +101,50 @@ async def async_confirm_pairing(
     )
 
 
+async def async_show_camera(
+    host: str,
+    port: int,
+    *,
+    token: str,
+    command: ShowCameraCommand,
+) -> None:
+    """Ask the paired receiver to display a camera stream."""
+
+    payload: dict[str, Any] = {
+        "title": command.title,
+        "url": command.url,
+        "streamType": "hls",
+        "enterPip": command.enter_pip,
+    }
+    if command.duration_seconds is not None:
+        payload["durationSeconds"] = command.duration_seconds
+
+    await asyncio.to_thread(
+        _post_json,
+        host,
+        port,
+        "/show",
+        payload,
+        token,
+    )
+
+
 def _post_json(
     host: str,
     port: int,
     path: str,
     payload: dict[str, Any],
+    token: str | None = None,
 ) -> dict[str, Any]:
     url = f"http://{host}:{port}{path}"
+    headers = {"Content-Type": "application/json"}
+    if token is not None:
+        headers["Authorization"] = f"Bearer {token}"
+
     request = Request(
         url,
         data=json.dumps(payload).encode(),
-        headers={"Content-Type": "application/json"},
+        headers=headers,
         method="POST",
     )
     try:

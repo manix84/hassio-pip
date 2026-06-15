@@ -1,15 +1,11 @@
-"""HA TV PiP Home Assistant integration.
-
-The first integration slice supports Zeroconf discovery and config entry
-creation. Device control, pairing, services, and entities are added in later
-stages.
-"""
+"""HA TV PiP Home Assistant integration."""
 
 # ruff: noqa: I001
 
 from typing import Any
 
 from .const import CONF_DEVICE_ID, CONF_HOST, CONF_NAME, CONF_PORT, CONF_VERSION, DOMAIN
+from .services import async_register_services
 
 __all__ = ["DOMAIN"]
 
@@ -31,10 +27,14 @@ async def async_setup_entry(hass: Any, entry: Any) -> bool:
         sw_version=entry.data.get(CONF_VERSION),
         configuration_url=f"http://{host}:{port}" if host and port else None,
     )
+
+    hass.data.setdefault(DOMAIN, {}).setdefault("entries", {})[entry.entry_id] = entry
+    await async_register_services(hass)
     return True
 
 
 async def async_unload_entry(hass: Any, entry: Any) -> bool:
     """Unload a HA TV PiP config entry."""
 
+    hass.data.get(DOMAIN, {}).get("entries", {}).pop(entry.entry_id, None)
     return True

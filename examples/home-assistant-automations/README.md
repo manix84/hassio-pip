@@ -1,6 +1,6 @@
 # Home Assistant Automation Examples ⚙️
 
-Automation examples will become executable once Stage 5 adds the first Home Assistant service.
+Automation examples use the Stage 5 `ha_tv_pip.show_camera` service.
 
 Planned Stage 5 shape:
 
@@ -20,4 +20,4 @@ action:
       enter_pip: true
 ```
 
-This is a roadmap example until `ha_tv_pip.show_camera` is implemented.
+Replace `device_id` and `camera_entity` with values from your Home Assistant instance.
