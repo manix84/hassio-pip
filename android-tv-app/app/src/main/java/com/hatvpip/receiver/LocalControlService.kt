@@ -41,7 +41,7 @@ class LocalControlService : Service() {
 
     private fun buildNotification() =
         NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher)
+            .setSmallIcon(R.drawable.ic_stat_ha_tv_pip)
             .setContentTitle("HA TV PiP Receiver")
             .setContentText("Local control endpoint running on port ${LocalControlServer.DEFAULT_PORT}")
             .setOngoing(true)
