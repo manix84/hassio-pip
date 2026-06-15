@@ -1,8 +1,10 @@
-"""Placeholder package for the future HA TV PiP Home Assistant integration.
+"""HA TV PiP Home Assistant integration.
 
-The integration implementation will be added in a later phase. This file keeps
-the custom component importable so Python linting and type checking can run
-against a real package during the placeholder phase.
+The first integration slice supports Zeroconf discovery and config entry
+creation. Device control, pairing, services, and entities are added in later
+stages.
 """
 
-DOMAIN = "ha_tv_pip"
+from .const import DOMAIN
+
+__all__ = ["DOMAIN"]

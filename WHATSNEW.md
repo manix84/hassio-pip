@@ -1,5 +1,16 @@
 # What's New ✨
 
+## 0.8.0 - Home Assistant Discovery Scaffold 🏠
+
+Stage 3 now has the first Home Assistant-side discovery scaffold.
+
+- Added Home Assistant integration manifest with version sync and Zeroconf matching 🔎
+- Added a config-flow entry point for HA TV PiP receiver discovery 🧭
+- Added typed discovery payload parsing for receiver id, host, port, name, version, pairing state, and API version 🪪
+- Added tests for Android TXT-record parsing and fallback defaults 🧪
+- Confirmed the release zip now packages the integration files under `custom_components/ha_tv_pip/` 📦
+- Kept TV control from Home Assistant, pairing, and authentication out of scope for this slice 🔒
+
 ## 0.7.0 - Stage 3 Discovery Begins 🔎
 
 Stage 3 starts with Android-side local network discovery advertising.
@@ -9,7 +20,7 @@ Stage 3 starts with Android-side local network discovery advertising.
 - Added discovery state to `GET /status` responses 🩺
 - Added discovery status to the Android TV main screen 📺
 - Added unit coverage for discovery descriptors and runtime state 🧪
-- Kept Home Assistant Zeroconf discovery, config flows, pairing, and authentication out of scope for this slice 🔒
+- Kept Home Assistant Zeroconf config flow, pairing, and authentication out of scope for this slice 🔒
 
 ## 0.6.0 - Stage 2 Endpoint Hardening 🛠️
 

@@ -871,4 +871,6 @@ Check the `discovery` object in the response. A healthy Android-side advertiseme
 }
 ```
 
-The Android TV main screen also reports whether discovery is advertising. Home Assistant Zeroconf discovery and config flow handling will be added after the Android advertisement is verified on real hardware.
+The Android TV main screen also reports whether discovery is advertising.
+
+The Home Assistant integration declares a Zeroconf matcher for `_ha-tv-pip._tcp.local.` and includes the first config flow slice. The local Python tests focus on discovery metadata parsing because the lightweight integration dev environment does not install the full Home Assistant runtime yet.

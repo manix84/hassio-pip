@@ -499,12 +499,13 @@ Phase 3 currently adds:
 - Android NSD / mDNS advertisement for `_ha-tv-pip._tcp.local.`
 - Discovery metadata for device id, name, version, pairing state, and API version
 - Discovery runtime state in the Android app status endpoint and main screen
+- Home Assistant integration manifest Zeroconf matching
+- Home Assistant config flow creation from discovered receiver metadata
 
 ## Planned
 
 Future phases will add:
 
-- Home Assistant Zeroconf discovery handling
 - Pairing
 - Home Assistant integration
 - Camera support

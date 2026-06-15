@@ -187,12 +187,17 @@ pairing=required|paired|disabled
 api=1
 ```
 
-Initial `0.7.0` behaviour:
+Initial `0.7.0` Android behaviour:
 
 - The Android TV app advertises `_ha-tv-pip._tcp.local.` with Android NSD while the local endpoint is running.
 - Advertised metadata includes stable device id, receiver name, app version, pairing state, and API version.
 - `GET /status` reports discovery state, service name, service type, port, and registration errors.
 - The Android TV main screen reports whether discovery is advertising.
+
+Initial `0.8.0` Home Assistant behaviour:
+
+- The Home Assistant integration declares a Zeroconf matcher for `_ha-tv-pip._tcp.local.`.
+- The Home Assistant config flow can create or update a receiver config entry from discovered metadata.
 
 ## Home Assistant Integration Requirements
 
