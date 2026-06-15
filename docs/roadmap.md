@@ -146,6 +146,8 @@ Initial `0.5.0` behaviour:
 - `/status` includes endpoint uptime, request count, and previous request diagnostics.
 - The Android TV main screen shows live endpoint state, uptime, request count, and previous request diagnostics.
 - `/close` reports whether playback was active and which display mode was closed.
+- `GET /` reports API metadata and supported endpoints.
+- Known endpoints return `405 Method Not Allowed` when called with the wrong HTTP method.
 
 ## Success Criteria
 

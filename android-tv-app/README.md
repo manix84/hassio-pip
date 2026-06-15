@@ -68,6 +68,7 @@ The main screen shows the current LAN endpoint address when Android exposes a lo
 It also shows live control diagnostics including service state, uptime, request count, and the previous request.
 
 ```sh
+curl http://ANDROID_TV_IP:8765/
 curl http://ANDROID_TV_IP:8765/status
 curl -X POST http://ANDROID_TV_IP:8765/close
 ```
@@ -85,6 +86,7 @@ Stage 2 does not include pairing or authentication yet. Test this only on a trus
 Duplicate `/show` requests replace the current playback or overlay. `durationSeconds` is enforced for both full-screen playback and the overlay fallback.
 `/status` also reports endpoint diagnostics, including control uptime, request count, and the previous request.
 `/close` reports whether a display was active and which display mode it closed.
+`GET /` returns API metadata and the supported endpoint list. Known endpoints return `405 Method Not Allowed` when called with the wrong HTTP method.
 
 ## Stream Configuration 🎬
 

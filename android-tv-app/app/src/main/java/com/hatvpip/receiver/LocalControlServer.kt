@@ -13,6 +13,7 @@ import java.net.SocketTimeoutException
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import org.json.JSONArray
 import org.json.JSONObject
 
 class LocalControlServer(
@@ -74,14 +75,43 @@ class LocalControlServer(
 
     private fun handle(request: HttpRequest): HttpResponse =
         when {
+            request.method == "GET" && request.path == "/" -> rootResponse()
             request.method == "GET" && request.path == "/status" -> statusResponse()
             request.method == "POST" && request.path == "/show" -> showResponse(request.body)
             request.method == "POST" && request.path == "/close" -> closeResponse()
+            request.path in KNOWN_ENDPOINTS -> HttpResponse.json(
+                status = 405,
+                body = JSONObject()
+                    .put("error", "Method not allowed")
+                    .put("method", request.method)
+                    .put("path", request.path)
+                    .put("allowedMethods", allowedMethodsFor(request.path))
+            )
             else -> HttpResponse.json(
                 status = 404,
-                body = JSONObject().put("error", "Endpoint not found")
+                body = JSONObject()
+                    .put("error", "Endpoint not found")
+                    .put("path", request.path)
             )
         }
+
+    private fun rootResponse(): HttpResponse =
+        HttpResponse.json(
+            status = 200,
+            body = JSONObject()
+                .put("app", "HA TV PiP Receiver")
+                .put("version", BuildConfig.VERSION_NAME)
+                .put("apiVersion", 1)
+                .put("pairingRequired", false)
+                .put(
+                    "endpoints",
+                    JSONArray()
+                        .put(endpoint("GET", "/", "API metadata"))
+                        .put(endpoint("GET", "/status", "Receiver and playback status"))
+                        .put(endpoint("POST", "/show", "Show an HLS stream"))
+                        .put(endpoint("POST", "/close", "Close the active display"))
+                )
+        )
 
     private fun statusResponse(): HttpResponse {
         val playback = ReceiverRuntimeState.snapshot()
@@ -214,8 +244,23 @@ class LocalControlServer(
     companion object {
         const val DEFAULT_PORT = 8765
         private const val ACCEPT_TIMEOUT_MS = 500
+        private val KNOWN_ENDPOINTS = setOf("/", "/status", "/show", "/close")
     }
 }
+
+private fun endpoint(method: String, path: String, description: String): JSONObject =
+    JSONObject()
+        .put("method", method)
+        .put("path", path)
+        .put("description", description)
+
+private fun allowedMethodsFor(path: String): JSONArray =
+    JSONArray().apply {
+        when (path) {
+            "/", "/status" -> put("GET")
+            "/show", "/close" -> put("POST")
+        }
+    }
 
 private data class HttpRequest(
     val method: String,
@@ -236,6 +281,7 @@ private data class HttpResponse(
                     200 -> "OK"
                     202 -> "Accepted"
                     400 -> "Bad Request"
+                    405 -> "Method Not Allowed"
                     404 -> "Not Found"
                     else -> "OK"
                 },
