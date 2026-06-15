@@ -37,6 +37,18 @@ object AppLog {
         Log.i(TAG, "event=control_request method=$method path=$path status=$status")
     }
 
+    fun discoveryRegistered(serviceName: String, serviceType: String, port: Int) {
+        Log.i(TAG, "event=discovery_registered serviceName=$serviceName serviceType=$serviceType port=$port")
+    }
+
+    fun discoveryStopped(serviceName: String) {
+        Log.i(TAG, "event=discovery_stopped serviceName=$serviceName")
+    }
+
+    fun discoveryFailed(serviceName: String, message: String) {
+        Log.w(TAG, "event=discovery_failed serviceName=$serviceName message=$message")
+    }
+
     fun error(message: String, throwable: Throwable? = null) {
         Log.e(TAG, "event=error message=$message", throwable)
     }

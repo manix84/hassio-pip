@@ -1,7 +1,6 @@
 package com.hatvpip.receiver
 
 import android.content.Context
-import android.provider.Settings
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.InputStreamReader
@@ -20,7 +19,8 @@ class LocalControlServer(
     private val context: Context,
     private val port: Int = DEFAULT_PORT,
     private val onShow: (ShowCommand) -> Unit,
-    private val onClose: () -> Unit
+    private val onClose: () -> Unit,
+    private val onStarted: (Int) -> Unit = {}
 ) {
     @Volatile
     private var running = false
@@ -36,6 +36,7 @@ class LocalControlServer(
                     serverSocket = socket
                     socket.soTimeout = ACCEPT_TIMEOUT_MS
                     ControlRuntimeState.markStarted(port)
+                    onStarted(port)
                     AppLog.controlServerStarted(port)
                     while (running) {
                         try {
@@ -116,18 +117,28 @@ class LocalControlServer(
     private fun statusResponse(): HttpResponse {
         val playback = ReceiverRuntimeState.snapshot()
         val control = ControlRuntimeState.snapshot()
+        val discovery = DiscoveryRuntimeState.snapshot()
         val lastRequest = control.lastRequest
         val body = JSONObject()
             .put("app", "HA TV PiP Receiver")
             .put("version", BuildConfig.VERSION_NAME)
-            .put("deviceId", stableDeviceId())
-            .put("deviceName", Settings.Global.getString(context.contentResolver, Settings.Global.DEVICE_NAME) ?: "Android TV")
+            .put("deviceId", ReceiverDeviceInfo.stableDeviceId(context))
+            .put("deviceName", ReceiverDeviceInfo.deviceName(context))
             .put("pairingRequired", false)
             .put("apiVersion", 1)
             .put("controlPort", port)
             .put("controlRunning", control.running)
             .put("controlUptimeSeconds", control.uptimeSeconds(System.currentTimeMillis()))
             .put("requestCount", control.requestCount)
+            .put(
+                "discovery",
+                JSONObject()
+                    .put("running", discovery.running)
+                    .put("serviceName", discovery.serviceName)
+                    .put("serviceType", discovery.serviceType)
+                    .put("port", discovery.port)
+                    .put("error", discovery.errorMessage)
+            )
             .put(
                 "lastRequest",
                 lastRequest?.let {
@@ -189,10 +200,6 @@ class LocalControlServer(
                 .put("previousDisplayMode", playback.mode.wireName)
         )
     }
-
-    private fun stableDeviceId(): String =
-        Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
-            ?: "unknown"
 
     private fun Socket.readHttpRequest(): HttpRequest {
         val reader = BufferedReader(InputStreamReader(getInputStream()))

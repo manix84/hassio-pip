@@ -492,13 +492,19 @@ Phase 2 currently adds:
 - Local HLS show command
 - Local close command
 - Runtime playback state reporting
+- API metadata and JSON error responses
+
+Phase 3 currently adds:
+
+- Android NSD / mDNS advertisement for `_ha-tv-pip._tcp.local.`
+- Discovery metadata for device id, name, version, pairing state, and API version
+- Discovery runtime state in the Android app status endpoint and main screen
 
 ## Planned
 
 Future phases will add:
 
-- Local control endpoint
-- Discovery
+- Home Assistant Zeroconf discovery handling
 - Pairing
 - Home Assistant integration
 - Camera support

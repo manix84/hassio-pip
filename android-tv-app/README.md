@@ -4,7 +4,9 @@
 
 Phase 1 Android TV MVP for HA TV PiP. This app plays a public HLS test stream and validates Android TV Picture-in-Picture behavior where supported, with a floating overlay fallback for devices that do not expose native PiP.
 
-Stage 2 adds the first local HTTP control endpoint for developer testing.
+Phase 2 adds the local HTTP control endpoint for developer testing.
+
+Stage 3 adds Android-side mDNS discovery advertising so the future Home Assistant integration can find the receiver on the LAN.
 
 ## Build 🛠️
 
@@ -88,10 +90,20 @@ Duplicate `/show` requests replace the current playback or overlay. `durationSec
 `/close` reports whether a display was active and which display mode it closed.
 `GET /` returns API metadata and the supported endpoint list. Known endpoints return `405 Method Not Allowed` when called with the wrong HTTP method.
 
+## Discovery Testing 🔎
+
+When the local control service is running, the app advertises:
+
+```txt
+_ha-tv-pip._tcp.local.
+```
+
+The advertisement includes the stable device id, device name, app version, pairing state, and API version. The main screen and `/status` response show whether discovery is currently advertising.
+
 ## Stream Configuration 🎬
 
 The test stream URL is defined in `PlayerActivity.TEST_STREAM_URL`.
 
 ## Future Notes 🚧
 
-This app does not yet implement Home Assistant integration, discovery, pairing, authentication, camera support, snapshots, HLS from Home Assistant, or WebRTC.
+This app does not yet implement Home Assistant integration, pairing, authentication, camera support, snapshots, HLS from Home Assistant, or WebRTC.

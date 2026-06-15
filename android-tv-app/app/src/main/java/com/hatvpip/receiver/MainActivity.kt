@@ -47,10 +47,12 @@ class MainActivity : ComponentActivity() {
     private var compatibility by mutableStateOf<DeviceCompatibility?>(null)
     private var endpointInfo by mutableStateOf(ControlEndpointInfo())
     private var controlSnapshot by mutableStateOf(ControlRuntimeState.snapshot())
+    private var discoverySnapshot by mutableStateOf(DiscoveryRuntimeState.snapshot())
     private val controlSnapshotHandler = Handler(Looper.getMainLooper())
     private val controlSnapshotUpdater = object : Runnable {
         override fun run() {
             controlSnapshot = ControlRuntimeState.snapshot()
+            discoverySnapshot = DiscoveryRuntimeState.snapshot()
             controlSnapshotHandler.postDelayed(this, CONTROL_STATUS_REFRESH_MS)
         }
     }
@@ -73,6 +75,7 @@ class MainActivity : ComponentActivity() {
                         compatibility = currentCompatibility,
                         endpointInfo = endpointInfo,
                         controlSnapshot = controlSnapshot,
+                        discoverySnapshot = discoverySnapshot,
                         onRequestOverlayPermission = ::openOverlayPermissionSettings,
                         onStopOverlay = ::stopOverlayFallback,
                         onPlayTestVideo = {
@@ -105,6 +108,7 @@ class MainActivity : ComponentActivity() {
         compatibility = DeviceCompatibilityEvaluator.from(this)
         endpointInfo = ControlEndpointInfo()
         controlSnapshot = ControlRuntimeState.snapshot()
+        discoverySnapshot = DiscoveryRuntimeState.snapshot()
     }
 
     private fun openOverlayPermissionSettings() {
@@ -135,6 +139,7 @@ private fun MainScreen(
     compatibility: DeviceCompatibility,
     endpointInfo: ControlEndpointInfo,
     controlSnapshot: ControlServerSnapshot,
+    discoverySnapshot: DiscoverySnapshot,
     onRequestOverlayPermission: () -> Unit,
     onStopOverlay: () -> Unit,
     onPlayTestVideo: () -> Unit
@@ -177,7 +182,8 @@ private fun MainScreen(
             Spacer(modifier = Modifier.height(18.dp))
             ControlEndpointStatus(
                 endpointInfo = endpointInfo,
-                controlSnapshot = controlSnapshot
+                controlSnapshot = controlSnapshot,
+                discoverySnapshot = discoverySnapshot
             )
             Spacer(modifier = Modifier.height(24.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -246,7 +252,8 @@ private fun TvActionButton(
 @Composable
 private fun ControlEndpointStatus(
     endpointInfo: ControlEndpointInfo,
-    controlSnapshot: ControlServerSnapshot
+    controlSnapshot: ControlServerSnapshot,
+    discoverySnapshot: DiscoverySnapshot
 ) {
     Column(
         modifier = Modifier.widthIn(max = 760.dp),
@@ -277,6 +284,25 @@ private fun ControlEndpointStatus(
             Text(
                 text = "Last: ${lastRequest.method} ${lastRequest.path} -> ${lastRequest.status}",
                 color = MaterialTheme.colorScheme.onBackground,
+                fontSize = 15.sp
+            )
+        }
+        Text(
+            text = "Discovery: ${if (discoverySnapshot.running) "advertising" else "stopped"} | ${discoverySnapshot.serviceType}",
+            color = MaterialTheme.colorScheme.onBackground,
+            fontSize = 15.sp
+        )
+        discoverySnapshot.serviceName?.let { serviceName ->
+            Text(
+                text = "Service: $serviceName",
+                color = MaterialTheme.colorScheme.onBackground,
+                fontSize = 15.sp
+            )
+        }
+        discoverySnapshot.errorMessage?.let { error ->
+            Text(
+                text = "Discovery error: $error",
+                color = MaterialTheme.colorScheme.error,
                 fontSize = 15.sp
             )
         }

@@ -80,9 +80,9 @@ Do not implement yet:
 
 ---
 
-# Phase 2: Local Control Endpoint
+# Phase 2: Local Control Endpoint ✅
 
-Status: In progress in `0.5.0`.
+Status: Complete in `0.6.0`.
 
 ## Goal
 
@@ -133,7 +133,7 @@ Example `/show` request:
 - The player auto-closes after `durationSeconds` if provided.
 - `/close` stops playback and closes the player.
 
-Initial `0.5.0` behaviour:
+Completed behaviour:
 
 - The Android TV app starts an unauthenticated local HTTP endpoint on port `8765`.
 - `GET /status` reports app version, stable device id, playback state, display mode, title, and URL.
@@ -148,6 +148,7 @@ Initial `0.5.0` behaviour:
 - `/close` reports whether playback was active and which display mode was closed.
 - `GET /` reports API metadata and supported endpoints.
 - Known endpoints return `405 Method Not Allowed` when called with the wrong HTTP method.
+- Unknown endpoints return `404 Not Found` with a JSON error response.
 
 ## Success Criteria
 
@@ -159,6 +160,8 @@ Initial `0.5.0` behaviour:
 ---
 
 # Phase 3: mDNS / Local Network Discovery
+
+Status: Started in `0.7.0`.
 
 ## Goal
 
@@ -183,6 +186,13 @@ version=0.1.0
 pairing=required|paired|disabled
 api=1
 ```
+
+Initial `0.7.0` behaviour:
+
+- The Android TV app advertises `_ha-tv-pip._tcp.local.` with Android NSD while the local endpoint is running.
+- Advertised metadata includes stable device id, receiver name, app version, pairing state, and API version.
+- `GET /status` reports discovery state, service name, service type, port, and registration errors.
+- The Android TV main screen reports whether discovery is advertising.
 
 ## Home Assistant Integration Requirements
 

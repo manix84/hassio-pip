@@ -11,18 +11,25 @@ import androidx.core.app.NotificationCompat
 
 class LocalControlService : Service() {
     private var server: LocalControlServer? = null
+    private var discoveryAdvertiser: DiscoveryAdvertiser? = null
 
     override fun onCreate() {
         super.onCreate()
         startForeground(NOTIFICATION_ID, buildNotification())
+        discoveryAdvertiser = DiscoveryAdvertiser(applicationContext)
         server = LocalControlServer(
             context = applicationContext,
             onShow = ::showPlayer,
-            onClose = ::closePlayer
+            onClose = ::closePlayer,
+            onStarted = { port ->
+                discoveryAdvertiser?.start(port)
+            }
         ).also { it.start() }
     }
 
     override fun onDestroy() {
+        discoveryAdvertiser?.stop()
+        discoveryAdvertiser = null
         server?.stop()
         server = null
         super.onDestroy()

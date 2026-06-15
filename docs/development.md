@@ -823,8 +823,8 @@ Choose the simplest implementation that supports future expansion.
 Current development target:
 
 ```txt
-Phase 2
-Local Control Endpoint
+Phase 3
+mDNS / Local Network Discovery
 ```
 
 Phase 1 is complete in `0.4.0`. It validated:
@@ -837,7 +837,7 @@ Remain stable across lifecycle events.
 Provide a foundation for future receiver control.
 ```
 
-Phase 2 should add local receiver control without implementing the Home Assistant integration yet.
+Phase 2 is complete in `0.6.0`. It added local receiver control without implementing the Home Assistant integration.
 
 Stage 2 local endpoint testing:
 
@@ -854,3 +854,21 @@ curl -X POST http://ANDROID_TV_IP:8765/close
 The Stage 2 endpoint is intentionally unauthenticated. Pairing and request authentication belong to Phase 4.
 
 The Android TV main screen displays the local endpoint address when available. Duplicate `/show` requests replace current playback, and `durationSeconds` should close either full-screen playback or the overlay fallback.
+
+Stage 3 local discovery testing:
+
+```sh
+curl http://ANDROID_TV_IP:8765/status
+```
+
+Check the `discovery` object in the response. A healthy Android-side advertisement should report:
+
+```json
+{
+  "running": true,
+  "serviceType": "_ha-tv-pip._tcp.",
+  "port": 8765
+}
+```
+
+The Android TV main screen also reports whether discovery is advertising. Home Assistant Zeroconf discovery and config flow handling will be added after the Android advertisement is verified on real hardware.

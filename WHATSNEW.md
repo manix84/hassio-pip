@@ -1,5 +1,16 @@
 # What's New ✨
 
+## 0.7.0 - Stage 3 Discovery Begins 🔎
+
+Stage 3 starts with Android-side local network discovery advertising.
+
+- Added Android NSD / mDNS advertisement for `_ha-tv-pip._tcp.local.` 📡
+- Added discovery metadata for device id, receiver name, app version, pairing state, and API version 🪪
+- Added discovery state to `GET /status` responses 🩺
+- Added discovery status to the Android TV main screen 📺
+- Added unit coverage for discovery descriptors and runtime state 🧪
+- Kept Home Assistant Zeroconf discovery, config flows, pairing, and authentication out of scope for this slice 🔒
+
 ## 0.6.0 - Stage 2 Endpoint Hardening 🛠️
 
 The local control endpoint now handles the first round of real-device hardening after Chromecast validation.
@@ -10,6 +21,7 @@ The local control endpoint now handles the first round of real-device hardening 
 - Added `apiVersion` and `controlPort` to `/status` responses 📡
 - Added endpoint uptime, request count, and previous request diagnostics to `/status` 🩺
 - Added live endpoint diagnostics to the Android TV main screen 📺
+- Added `GET /` API metadata plus JSON `404` and `405` error responses 🧭
 - Added defensive local IP detection and endpoint display tests 🧪
 
 ## 0.5.0 - Stage 2 Local Control Begins 🌐

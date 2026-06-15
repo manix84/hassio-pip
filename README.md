@@ -18,9 +18,11 @@ This repository is a monorepo that contains the receiver app, future Home Assist
 
 Phase 1 is complete in `0.4.0`. The Android TV MVP proves that an Android TV app can play a public HLS test stream and show it outside the full-screen app using native Picture-in-Picture where Android TV exposes it, or a no-ADB overlay fallback where native PiP is unavailable.
 
-Stage 2 has started in `0.5.0`. The Android TV app now includes an initial local HTTP control endpoint for developer testing.
+Phase 2 is complete in `0.6.0`. The Android TV app now includes a local HTTP control endpoint for developer testing, including status, show, close, API metadata, and clear error responses.
 
-The Home Assistant integration, discovery, pairing, authentication, camera entity support, snapshots, and WebRTC support are not implemented yet.
+Stage 3 has started in `0.7.0`. The Android TV app can advertise the receiver on the local network with Android NSD / mDNS so the future Home Assistant integration can discover it automatically.
+
+The Home Assistant integration, Home Assistant discovery flow, pairing, authentication, camera entity support, snapshots, and WebRTC support are not implemented yet.
 
 ## Monorepo Layout 🧱
 
@@ -111,6 +113,18 @@ curl -X POST http://ANDROID_TV_IP:8765/close
 ```
 
 This endpoint is unauthenticated during Stage 2 and should only be used on a trusted local network.
+
+## Local Discovery MVP 🔎
+
+Stage 3 begins with Android-side mDNS advertising while the local endpoint is running.
+
+```txt
+Service type: _ha-tv-pip._tcp.local.
+Port: 8765
+Metadata: id, name, version, pairing, api
+```
+
+The receiver reports discovery state in `GET /status` and on the Android TV main screen. Home Assistant discovery support will be added in a later Stage 3 slice.
 
 ## Releases 📦
 
