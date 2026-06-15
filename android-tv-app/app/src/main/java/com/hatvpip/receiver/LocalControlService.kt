@@ -84,10 +84,18 @@ class LocalControlService : Service() {
     }
 
     private fun closePlayer() {
+        val playback = ReceiverRuntimeState.snapshot()
         stopService(
             Intent(this, OverlayPlayerService::class.java)
                 .setAction(OverlayPlayerService.ACTION_STOP)
         )
+
+        if (playback.mode == ReceiverPlaybackMode.Idle || playback.mode == ReceiverPlaybackMode.Overlay) {
+            if (playback.mode == ReceiverPlaybackMode.Idle) {
+                ReceiverRuntimeState.markIdle()
+            }
+            return
+        }
 
         startActivity(
             Intent(this, PlayerActivity::class.java)

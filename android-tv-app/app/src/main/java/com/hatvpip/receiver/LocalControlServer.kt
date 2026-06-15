@@ -148,10 +148,15 @@ class LocalControlServer(
     }
 
     private fun closeResponse(): HttpResponse {
+        val playback = ReceiverRuntimeState.snapshot()
+        val wasActive = playback.mode != ReceiverPlaybackMode.Idle
         onClose()
         return HttpResponse.json(
             status = 202,
-            body = JSONObject().put("accepted", true)
+            body = JSONObject()
+                .put("accepted", true)
+                .put("closed", wasActive)
+                .put("previousDisplayMode", playback.mode.wireName)
         )
     }
 

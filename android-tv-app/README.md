@@ -84,6 +84,7 @@ Stage 2 does not include pairing or authentication yet. Test this only on a trus
 
 Duplicate `/show` requests replace the current playback or overlay. `durationSeconds` is enforced for both full-screen playback and the overlay fallback.
 `/status` also reports endpoint diagnostics, including control uptime, request count, and the previous request.
+`/close` reports whether a display was active and which display mode it closed.
 
 ## Stream Configuration 🎬
 
