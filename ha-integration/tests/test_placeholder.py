@@ -72,11 +72,14 @@ def test_config_entry_setup_registers_receiver_device() -> None:
     helpers = types.ModuleType("homeassistant.helpers")
     config_validation = types.ModuleType("homeassistant.helpers.config_validation")
     device_registry = types.ModuleType("homeassistant.helpers.device_registry")
-    voluptuous = sys.modules["voluptuous"]
+    voluptuous = sys.modules.setdefault("voluptuous", types.ModuleType("voluptuous"))
     voluptuous.Any = lambda *args: args  # type: ignore[attr-defined]
     voluptuous.All = lambda *args: args  # type: ignore[attr-defined]
     voluptuous.Coerce = lambda value: value  # type: ignore[attr-defined]
     voluptuous.Range = lambda **kwargs: kwargs  # type: ignore[attr-defined]
+    voluptuous.Required = lambda key: key  # type: ignore[attr-defined]
+    voluptuous.Optional = lambda key, **kwargs: key  # type: ignore[attr-defined]
+    voluptuous.Schema = lambda schema: schema  # type: ignore[attr-defined]
     config_validation.entity_id = str  # type: ignore[attr-defined]
     device_registry.async_get = lambda hass: registry  # type: ignore[attr-defined]
     homeassistant.helpers = helpers  # type: ignore[attr-defined]

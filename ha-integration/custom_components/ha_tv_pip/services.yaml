@@ -24,18 +24,21 @@ show_camera:
           unit_of_measurement: seconds
       name: Duration
       description: How long the receiver should keep the display open.
+      example: 30
     enter_pip:
       default: true
       selector:
         boolean:
       name: Enter PiP
       description: Ask the receiver to use PiP or overlay mode when available.
+      example: true
     snapshot_fallback:
       default: true
       selector:
         boolean:
       name: Snapshot fallback
       description: Show a camera snapshot while the video stream loads, when Home Assistant exposes one.
+      example: true
     snapshot_camera_entity:
       required: false
       selector:
@@ -53,12 +56,14 @@ show_camera:
             - snapshot
       name: Stream type
       description: Choose automatic handling, force an HLS stream, or send a snapshot through the camera service.
+      example: auto
     title:
       required: false
       selector:
         text:
       name: Title
       description: Optional display title. Defaults to the camera friendly name.
+      example: Front Door
     message:
       required: false
       selector:
@@ -66,6 +71,7 @@ show_camera:
           multiline: true
       name: Message
       description: Optional smaller text to overlay on the camera popup.
+      example: Motion detected at the front door.
     position:
       default: top_right
       selector:
@@ -77,12 +83,14 @@ show_camera:
             - bottom_left
       name: Position
       description: Corner where optional overlay text should appear.
+      example: top_right
     title_color:
       default: "#50BFF2"
       selector:
         text:
       name: Title color
       description: Hex color for the title text when message overlay is used.
+      example: "#50BFF2"
     title_size:
       default: 24
       selector:
@@ -92,12 +100,14 @@ show_camera:
           mode: box
       name: Title size
       description: Title text size when message overlay is used.
+      example: 24
     message_color:
       default: "#fbf5f5"
       selector:
         text:
       name: Message color
       description: Hex color for the message text.
+      example: "#fbf5f5"
     message_size:
       default: 18
       selector:
@@ -107,12 +117,14 @@ show_camera:
           mode: box
       name: Message size
       description: Message text size.
+      example: 18
     background_color:
       default: "#B30F0E0E"
       selector:
         text:
       name: Background color
       description: Hex or alpha-hex color for the optional text overlay background.
+      example: "#B30F0E0E"
     width:
       required: false
       selector:
@@ -123,6 +135,7 @@ show_camera:
           unit_of_measurement: px
       name: Width
       description: Optional overlay width in pixels. Defaults to the receiver's sensible popup width.
+      example: 720
     height:
       required: false
       selector:
@@ -133,6 +146,7 @@ show_camera:
           unit_of_measurement: px
       name: Height
       description: Optional overlay height in pixels. Media popups default to 640x360; text-only notifications default to content height.
+      example: 405
 show_snapshot:
   fields:
     receiver_device_id:
@@ -159,18 +173,21 @@ show_snapshot:
           unit_of_measurement: seconds
       name: Duration
       description: How long the receiver should keep the snapshot open.
+      example: 10
     enter_pip:
       default: true
       selector:
         boolean:
       name: Enter PiP
       description: Ask the receiver to use overlay mode for the snapshot.
+      example: true
     title:
       required: false
       selector:
         text:
       name: Title
       description: Optional display title. Defaults to the camera friendly name.
+      example: Front Door
     message:
       required: false
       selector:
@@ -178,6 +195,7 @@ show_snapshot:
           multiline: true
       name: Message
       description: Optional smaller text to overlay on the snapshot popup.
+      example: Visitor snapshot captured.
     position:
       default: top_right
       selector:
@@ -189,12 +207,14 @@ show_snapshot:
             - bottom_left
       name: Position
       description: Corner where optional overlay text should appear.
+      example: top_right
     title_color:
       default: "#50BFF2"
       selector:
         text:
       name: Title color
       description: Hex color for the title text when message overlay is used.
+      example: "#50BFF2"
     title_size:
       default: 24
       selector:
@@ -204,12 +224,14 @@ show_snapshot:
           mode: box
       name: Title size
       description: Title text size when message overlay is used.
+      example: 24
     message_color:
       default: "#fbf5f5"
       selector:
         text:
       name: Message color
       description: Hex color for the message text.
+      example: "#fbf5f5"
     message_size:
       default: 18
       selector:
@@ -219,12 +241,14 @@ show_snapshot:
           mode: box
       name: Message size
       description: Message text size.
+      example: 18
     background_color:
       default: "#B30F0E0E"
       selector:
         text:
       name: Background color
       description: Hex or alpha-hex color for the optional text overlay background.
+      example: "#B30F0E0E"
     width:
       required: false
       selector:
@@ -235,6 +259,7 @@ show_snapshot:
           unit_of_measurement: px
       name: Width
       description: Optional overlay width in pixels. Defaults to the receiver's sensible popup width.
+      example: 720
     height:
       required: false
       selector:
@@ -245,6 +270,7 @@ show_snapshot:
           unit_of_measurement: px
       name: Height
       description: Optional overlay height in pixels. Media popups default to 640x360; text-only notifications default to content height.
+      example: 405
 show_notification:
   fields:
     receiver_device_id:
@@ -260,6 +286,7 @@ show_notification:
         text:
       name: Title
       description: Larger notification heading text.
+      example: Doorbell
     message:
       required: false
       selector:
@@ -267,6 +294,7 @@ show_notification:
           multiline: true
       name: Message
       description: Smaller notification body text.
+      example: Someone is at the front door.
     duration_seconds:
       default: 15
       selector:
@@ -277,12 +305,14 @@ show_notification:
           unit_of_measurement: seconds
       name: Duration
       description: How long the receiver should keep the notification open.
+      example: 15
     enter_pip:
       default: true
       selector:
         boolean:
       name: Enter PiP
       description: Ask the receiver to use PiP or overlay mode when available.
+      example: true
     position:
       default: top_right
       selector:
@@ -294,12 +324,14 @@ show_notification:
             - bottom_left
       name: Position
       description: Corner where the receiver should place the notification.
+      example: top_right
     title_color:
       default: "#50BFF2"
       selector:
         text:
       name: Title color
       description: Hex color for the title text.
+      example: "#50BFF2"
     title_size:
       default: 24
       selector:
@@ -309,12 +341,14 @@ show_notification:
           mode: box
       name: Title size
       description: Title text size.
+      example: 24
     message_color:
       default: "#fbf5f5"
       selector:
         text:
       name: Message color
       description: Hex color for the message text.
+      example: "#fbf5f5"
     message_size:
       default: 18
       selector:
@@ -324,12 +358,14 @@ show_notification:
           mode: box
       name: Message size
       description: Message text size.
+      example: 18
     background_color:
       default: "#B30F0E0E"
       selector:
         text:
       name: Background color
       description: Hex or alpha-hex color for the notification background. Defaults to a translucent glass-style background.
+      example: "#B30F0E0E"
     width:
       required: false
       selector:
@@ -340,6 +376,7 @@ show_notification:
           unit_of_measurement: px
       name: Width
       description: Optional notification width in pixels. Defaults to 512 pixels.
+      example: 512
     height:
       required: false
       selector:
@@ -350,3 +387,4 @@ show_notification:
           unit_of_measurement: px
       name: Height
       description: Optional notification height in pixels. Defaults to content height.
+      example: 240
