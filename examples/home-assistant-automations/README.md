@@ -1,8 +1,8 @@
 # Home Assistant Automation Examples ⚙️
 
-Automation examples use the Stage 5 `ha_tv_pip.show_camera` service and Stage 6 `ha_tv_pip.show_snapshot` service.
+Automation examples use the Stage 7 `ha_tv_pip.show_camera` stream type options and Stage 6 `ha_tv_pip.show_snapshot` service.
 
-Current Stage 5 service shape:
+Current Stage 7 service shape:
 
 ```yaml
 alias: Show front door on TV
@@ -17,11 +17,12 @@ action:
       camera_entity: camera.front_door
       duration_seconds: 30
       enter_pip: true
+      stream_type: auto
       snapshot_fallback: true
       snapshot_camera_entity: camera.front_door_sub
 ```
 
-Replace `receiver_device_id` and `camera_entity` with values from your Home Assistant instance. `snapshot_camera_entity` is optional and defaults to the main camera entity. For cameras with multiple stream profiles, use a TV-compatible H.264 or lower-resolution stream where possible; high-resolution main streams can exceed what Android TV devices can decode directly.
+Replace `receiver_device_id` and `camera_entity` with values from your Home Assistant instance. `stream_type` defaults to `auto`; use `hls` to force video or `snapshot` to force a still image through the camera service. `snapshot_camera_entity` is optional and defaults to the main camera entity. For cameras with multiple stream profiles, use a TV-compatible H.264 or lower-resolution stream where possible; high-resolution main streams can exceed what Android TV devices can decode directly.
 
 Snapshot alert example:
 

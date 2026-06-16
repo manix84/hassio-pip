@@ -539,11 +539,20 @@ Phase 6 currently adds:
 - Shared pairing, bearer-token auth, receiver targeting, and duration timeouts for snapshots
 - Optional entity-based snapshot previews while video streams load
 
+Phase 7 currently adds:
+
+- `stream_type: auto`, `stream_type: hls`, and `stream_type: snapshot` for `ha_tv_pip.show_camera`
+- Home Assistant-side fallback to snapshot when HLS stream resolution fails
+- Receiver-side snapshot preview fallback when accepted video streams fail during playback
+- Stream type selection logging before receiver commands are sent
+
 ## Planned
 
 Future phases will add:
 
-- Stream type selection and fallback policy
+- Receiver entities and diagnostics
+- MJPEG and WebRTC stream modes
+- Stream profile selection or transcoding
 - Remote operation
 - HACS distribution
 - Official Home Assistant integration readiness

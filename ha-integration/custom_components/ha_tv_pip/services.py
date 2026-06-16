@@ -42,10 +42,13 @@ ATTR_ENTER_PIP = "enter_pip"
 ATTR_RECEIVER_DEVICE_ID = "receiver_device_id"
 ATTR_SNAPSHOT_CAMERA_ENTITY = "snapshot_camera_entity"
 ATTR_SNAPSHOT_FALLBACK = "snapshot_fallback"
+ATTR_STREAM_TYPE = "stream_type"
 ATTR_TITLE = "title"
 CAMERA_DOMAIN = "camera"
+STREAM_TYPE_AUTO = "auto"
 STREAM_TYPE_HLS = "hls"
 STREAM_TYPE_SNAPSHOT = "snapshot"
+STREAM_TYPES = (STREAM_TYPE_AUTO, STREAM_TYPE_HLS, STREAM_TYPE_SNAPSHOT)
 ERROR_MESSAGES = {
     "camera_not_found": "Camera entity was not found.",
     "camera_stream_unavailable": (
@@ -53,6 +56,7 @@ ERROR_MESSAGES = {
     ),
     "invalid_camera_entity": "The selected entity is not a camera.",
     "invalid_duration": "Duration must be at least 1 second.",
+    "invalid_stream_type": "Stream type must be auto, hls, or snapshot.",
     "missing_camera_entity": "A camera entity is required.",
     "multiple_receivers": (
         "Multiple HA TV PiP receivers are configured. Target one receiver device."
@@ -88,6 +92,7 @@ class ShowCameraRequest:
     enter_pip: bool
     snapshot_camera_entity: str | None
     snapshot_fallback: bool
+    stream_type: str
     title: str | None
     device_ids: tuple[str, ...]
 
@@ -126,6 +131,9 @@ async def async_register_services(hass: Any) -> None:
             **base_schema,
             vol.Optional(ATTR_SNAPSHOT_CAMERA_ENTITY): cv.entity_id,
             vol.Optional(ATTR_SNAPSHOT_FALLBACK, default=True): bool,
+            vol.Optional(ATTR_STREAM_TYPE, default=STREAM_TYPE_AUTO): vol.Any(
+                *STREAM_TYPES
+            ),
             vol.Optional(ATTR_DURATION_SECONDS, default=30): vol.All(
                 vol.Coerce(int),
                 vol.Range(min=1, max=3600),
@@ -171,19 +179,15 @@ async def async_handle_show_camera(hass: Any, call: Any) -> None:
     request = _request_from_call(call)
     _validate_camera_entity(hass, request.camera_entity)
     receiver = _resolve_receiver(hass, request)
-    stream_url = await _async_camera_stream_url(hass, request.camera_entity)
-    preview_url = None
-    if request.snapshot_fallback:
-        preview_entity = request.snapshot_camera_entity or request.camera_entity
-        _validate_camera_entity(hass, preview_entity)
-        preview_url = _optional_camera_snapshot_url(hass, preview_entity)
     title = request.title or _camera_title(hass, request.camera_entity)
+    command = await _async_show_camera_command(hass, request, title=title)
     _LOGGER.info(
-        "Sending camera %s to receiver %s at %s:%s",
+        "Sending camera %s to receiver %s at %s:%s using %s",
         request.camera_entity,
         receiver.name,
         receiver.host,
         receiver.port,
+        command.stream_type,
     )
 
     try:
@@ -191,14 +195,7 @@ async def async_handle_show_camera(hass: Any, call: Any) -> None:
             receiver.host,
             receiver.port,
             token=receiver.token,
-            command=ShowCameraCommand(
-                title=title,
-                url=stream_url,
-                duration_seconds=request.duration_seconds,
-                enter_pip=request.enter_pip,
-                stream_type=STREAM_TYPE_HLS,
-                preview_url=preview_url,
-            ),
+            command=command,
         )
     except ReceiverClientError as error:
         _LOGGER.error("Unable to send camera stream to %s: %s", receiver.name, error)
@@ -257,6 +254,10 @@ def _request_from_call(call: Any) -> ShowCameraRequest:
     if not camera_entity:
         raise ServiceValidationError("missing_camera_entity")
 
+    stream_type = str(data.get(ATTR_STREAM_TYPE, STREAM_TYPE_AUTO)).strip().lower()
+    if stream_type not in STREAM_TYPES:
+        raise ServiceValidationError("invalid_stream_type")
+
     return ShowCameraRequest(
         camera_entity=camera_entity,
         duration_seconds=duration_seconds,
@@ -264,6 +265,7 @@ def _request_from_call(call: Any) -> ShowCameraRequest:
         title=_optional_text(data.get(ATTR_TITLE)),
         snapshot_camera_entity=_optional_text(data.get(ATTR_SNAPSHOT_CAMERA_ENTITY)),
         snapshot_fallback=bool(data.get(ATTR_SNAPSHOT_FALLBACK, True)),
+        stream_type=stream_type,
         device_ids=device_ids,
     )
 
@@ -338,6 +340,61 @@ def _validate_camera_entity(hass: Any, entity_id: str) -> None:
     if state is None:
         _LOGGER.warning("Camera entity %s was not found", entity_id)
         raise ServiceValidationError("camera_not_found")
+
+
+async def _async_show_camera_command(
+    hass: Any,
+    request: ShowCameraRequest,
+    *,
+    title: str,
+) -> ShowCameraCommand:
+    if request.stream_type == STREAM_TYPE_SNAPSHOT:
+        return ShowCameraCommand(
+            title=title,
+            url=_camera_snapshot_url(hass, request.camera_entity),
+            duration_seconds=request.duration_seconds,
+            enter_pip=request.enter_pip,
+            stream_type=STREAM_TYPE_SNAPSHOT,
+        )
+
+    preview_url = _snapshot_preview_url(hass, request)
+    try:
+        return ShowCameraCommand(
+            title=title,
+            url=await _async_camera_stream_url(hass, request.camera_entity),
+            duration_seconds=request.duration_seconds,
+            enter_pip=request.enter_pip,
+            stream_type=STREAM_TYPE_HLS,
+            preview_url=preview_url,
+        )
+    except ServiceValidationError as error:
+        if (
+            request.stream_type == STREAM_TYPE_HLS
+            or error.code != "camera_stream_unavailable"
+        ):
+            raise
+
+        _LOGGER.warning(
+            "Falling back to snapshot for %s because HLS stream resolution failed: %s",
+            request.camera_entity,
+            error,
+        )
+        return ShowCameraCommand(
+            title=title,
+            url=_camera_snapshot_url(hass, request.camera_entity),
+            duration_seconds=request.duration_seconds,
+            enter_pip=request.enter_pip,
+            stream_type=STREAM_TYPE_SNAPSHOT,
+        )
+
+
+def _snapshot_preview_url(hass: Any, request: ShowCameraRequest) -> str | None:
+    if request.stream_type == STREAM_TYPE_SNAPSHOT or not request.snapshot_fallback:
+        return None
+
+    preview_entity = request.snapshot_camera_entity or request.camera_entity
+    _validate_camera_entity(hass, preview_entity)
+    return _optional_camera_snapshot_url(hass, preview_entity)
 
 
 async def _async_camera_stream_url(hass: Any, entity_id: str) -> str:

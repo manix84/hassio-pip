@@ -85,10 +85,12 @@ class OverlayPlayerService : Service() {
             setBackgroundColor(0xCC000000.toInt())
             textSize = 14f
             gravity = Gravity.CENTER
+            setPadding(16, 12, 16, 12)
             visibility = TextView.GONE
             layoutParams = FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                Gravity.BOTTOM
             )
         }
         root.addView(errorTextView)
@@ -163,12 +165,25 @@ class OverlayPlayerService : Service() {
 
                     override fun onPlayerError(error: PlaybackException) {
                         val message = error.toDisplayMessage()
+                        val hasPreviewFallback = previewImageView != null
+                        if (hasPreviewFallback) {
+                            playerView.alpha = 0f
+                            previewImageView.visibility = ImageView.VISIBLE
+                        }
                         updatePlaybackState(
                             status = PlaybackStatus.Error,
                             isPlaying = false,
-                            errorMessage = message
+                            errorMessage = if (hasPreviewFallback) {
+                                "Showing snapshot fallback after video error: $message"
+                            } else {
+                                message
+                            }
                         )
-                        errorTextView?.text = error.toOverlayMessage()
+                        errorTextView?.text = if (hasPreviewFallback) {
+                            "Video stream unavailable; showing snapshot fallback"
+                        } else {
+                            error.toOverlayMessage()
+                        }
                         errorTextView?.visibility = TextView.VISIBLE
                         AppLog.error("Overlay playback failed: $message", error)
                     }

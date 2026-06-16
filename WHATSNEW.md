@@ -1,5 +1,13 @@
 # What's New ✨
 
+## 0.24.0 - Stage 7 Stream Type Options 🎛️
+
+- Added `stream_type: auto`, `stream_type: hls`, and `stream_type: snapshot` to `ha_tv_pip.show_camera` 🏠
+- Made automatic mode prefer HLS and fall back to a snapshot command when Home Assistant cannot resolve a stream 🖼️
+- Kept receiver snapshot previews visible when video playback fails after the stream URL is accepted 📺
+- Logged the selected stream type before sending receiver commands 📺
+- Confirmed the Chromecast fallback path shows a snapshot with a small fallback message instead of a black box ✅
+
 ## 0.23.0 - Snapshot Fallback Previews 🖼️
 
 - Added optional entity-based snapshot fallback previews while video streams load 🏠

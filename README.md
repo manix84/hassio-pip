@@ -28,6 +28,8 @@ Stage 5 is complete in `0.21.0`. Home Assistant automations can call `ha_tv_pip.
 
 Stage 6 is complete in `0.23.0`. Home Assistant automations can call `ha_tv_pip.show_snapshot` to display fast camera snapshots on paired receivers using the same local auth and targeting path. Video stream commands can also send an optional entity-based snapshot preview while live playback loads.
 
+Stage 7 is complete in `0.24.0`. `ha_tv_pip.show_camera` supports `stream_type: auto`, `stream_type: hls`, and `stream_type: snapshot`, with tested receiver-side snapshot fallback when an accepted video stream fails during playback.
+
 ## Monorepo Layout 🧱
 
 ```txt

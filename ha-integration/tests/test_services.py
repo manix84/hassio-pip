@@ -1,5 +1,6 @@
 """Tests for HA TV PiP Home Assistant services."""
 
+import asyncio
 import sys
 import types
 from dataclasses import dataclass
@@ -21,9 +22,11 @@ from custom_components.ha_tv_pip.services import (
     ATTR_RECEIVER_DEVICE_ID,
     ATTR_SNAPSHOT_CAMERA_ENTITY,
     ATTR_SNAPSHOT_FALLBACK,
+    ATTR_STREAM_TYPE,
     ATTR_TITLE,
     ServiceValidationError,
     _absolute_stream_url,
+    _async_show_camera_command,
     _camera_snapshot_url,
     _camera_title,
     _request_from_call,
@@ -81,6 +84,30 @@ class FakeNetworkModule(types.ModuleType):
         return "http://10.0.0.2:8123"
 
 
+class FakeHomeAssistantError(Exception):
+    """Fake Home Assistant error used by stream resolution tests."""
+
+
+class FakeExceptionsModule(types.ModuleType):
+    HomeAssistantError = FakeHomeAssistantError
+
+
+class FakeCameraModule(types.ModuleType):
+    def __init__(self, stream_url: str | None = "/api/hls/front-door") -> None:
+        super().__init__("homeassistant.components.camera")
+        self.stream_url = stream_url
+
+    async def async_request_stream(
+        self,
+        hass: Any,
+        entity_id: str,
+        stream_type: str,
+    ) -> str | None:
+        if self.stream_url == "raise":
+            raise FakeHomeAssistantError("stream failed")
+        return self.stream_url
+
+
 def test_request_from_call_reads_target_and_defaults() -> None:
     request = _request_from_call(
         FakeCall(
@@ -95,6 +122,7 @@ def test_request_from_call_reads_target_and_defaults() -> None:
     assert request.enter_pip is True
     assert request.snapshot_camera_entity is None
     assert request.snapshot_fallback is True
+    assert request.stream_type == "auto"
 
 
 def test_request_from_call_accepts_title_and_duration() -> None:
@@ -106,6 +134,7 @@ def test_request_from_call_accepts_title_and_duration() -> None:
                 ATTR_ENTER_PIP: False,
                 ATTR_SNAPSHOT_CAMERA_ENTITY: "camera.front_door_sub",
                 ATTR_SNAPSHOT_FALLBACK: False,
+                ATTR_STREAM_TYPE: "snapshot",
                 ATTR_TITLE: "Doorbell",
             }
         )
@@ -115,6 +144,7 @@ def test_request_from_call_accepts_title_and_duration() -> None:
     assert request.enter_pip is False
     assert request.snapshot_camera_entity == "camera.front_door_sub"
     assert request.snapshot_fallback is False
+    assert request.stream_type == "snapshot"
     assert request.title == "Doorbell"
 
 
@@ -129,6 +159,20 @@ def test_request_from_call_accepts_receiver_device_id_field() -> None:
     )
 
     assert request.device_ids == ("device-1",)
+
+
+def test_request_from_call_rejects_invalid_stream_type() -> None:
+    with pytest.raises(ServiceValidationError) as error:
+        _request_from_call(
+            FakeCall(
+                data={
+                    ATTR_CAMERA_ENTITY: "camera.front_door",
+                    ATTR_STREAM_TYPE: "webrtc",
+                }
+            )
+        )
+
+    assert error.value.code == "invalid_stream_type"
 
 
 def test_resolve_receiver_uses_single_paired_entry_without_target() -> None:
@@ -230,6 +274,169 @@ def test_camera_title_uses_friendly_name() -> None:
     )
 
     assert _camera_title(hass, "camera.front_door") == "Front Door"
+
+
+def test_show_camera_command_auto_prefers_hls(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setitem(
+        sys.modules,
+        "homeassistant.components.camera",
+        FakeCameraModule("/api/hls/front-door"),
+    )
+    monkeypatch.setitem(
+        sys.modules,
+        "homeassistant.exceptions",
+        FakeExceptionsModule("homeassistant.exceptions"),
+    )
+    monkeypatch.setitem(
+        sys.modules,
+        "homeassistant.helpers.network",
+        FakeNetworkModule("homeassistant.helpers.network"),
+    )
+    hass = FakeHass(
+        entries=[],
+        states={
+            "camera.front_door": FakeState(
+                {"friendly_name": "Front Door", "access_token": "snapshot-token"}
+            )
+        },
+    )
+
+    command = asyncio.run(
+        _async_show_camera_command(
+            hass,
+            _request_from_call(
+                FakeCall(data={ATTR_CAMERA_ENTITY: "camera.front_door"})
+            ),
+            title="Front Door",
+        )
+    )
+
+    assert command.stream_type == "hls"
+    assert command.url == "http://10.0.0.2:8123/api/hls/front-door"
+    assert command.preview_url == (
+        "http://10.0.0.2:8123/api/camera_proxy/camera.front_door"
+        "?token=snapshot-token"
+    )
+
+
+def test_show_camera_command_can_force_snapshot(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setitem(
+        sys.modules,
+        "homeassistant.helpers.network",
+        FakeNetworkModule("homeassistant.helpers.network"),
+    )
+    hass = FakeHass(
+        entries=[],
+        states={"camera.front_door": FakeState({"access_token": "snapshot-token"})},
+    )
+
+    command = asyncio.run(
+        _async_show_camera_command(
+            hass,
+            _request_from_call(
+                FakeCall(
+                    data={
+                        ATTR_CAMERA_ENTITY: "camera.front_door",
+                        ATTR_STREAM_TYPE: "snapshot",
+                    }
+                )
+            ),
+            title="Front Door",
+        ),
+    )
+
+    assert command.stream_type == "snapshot"
+    assert command.url == (
+        "http://10.0.0.2:8123/api/camera_proxy/camera.front_door"
+        "?token=snapshot-token"
+    )
+    assert command.preview_url is None
+
+
+def test_show_camera_command_auto_falls_back_to_snapshot(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setitem(
+        sys.modules,
+        "homeassistant.components.camera",
+        FakeCameraModule("raise"),
+    )
+    monkeypatch.setitem(
+        sys.modules,
+        "homeassistant.exceptions",
+        FakeExceptionsModule("homeassistant.exceptions"),
+    )
+    monkeypatch.setitem(
+        sys.modules,
+        "homeassistant.helpers.network",
+        FakeNetworkModule("homeassistant.helpers.network"),
+    )
+    hass = FakeHass(
+        entries=[],
+        states={"camera.front_door": FakeState({"access_token": "snapshot-token"})},
+    )
+
+    command = asyncio.run(
+        _async_show_camera_command(
+            hass,
+            _request_from_call(
+                FakeCall(data={ATTR_CAMERA_ENTITY: "camera.front_door"})
+            ),
+            title="Front Door",
+        )
+    )
+
+    assert command.stream_type == "snapshot"
+    assert command.url == (
+        "http://10.0.0.2:8123/api/camera_proxy/camera.front_door"
+        "?token=snapshot-token"
+    )
+
+
+def test_show_camera_command_forced_hls_does_not_fallback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setitem(
+        sys.modules,
+        "homeassistant.components.camera",
+        FakeCameraModule("raise"),
+    )
+    monkeypatch.setitem(
+        sys.modules,
+        "homeassistant.exceptions",
+        FakeExceptionsModule("homeassistant.exceptions"),
+    )
+    monkeypatch.setitem(
+        sys.modules,
+        "homeassistant.helpers.network",
+        FakeNetworkModule("homeassistant.helpers.network"),
+    )
+    hass = FakeHass(
+        entries=[],
+        states={"camera.front_door": FakeState({"access_token": "snapshot-token"})},
+    )
+
+    with pytest.raises(ServiceValidationError) as error:
+        asyncio.run(
+            _async_show_camera_command(
+                hass,
+                _request_from_call(
+                    FakeCall(
+                        data={
+                            ATTR_CAMERA_ENTITY: "camera.front_door",
+                            ATTR_STREAM_TYPE: "hls",
+                        }
+                    )
+                ),
+                title="Front Door",
+            ),
+        )
+
+    assert error.value.code == "camera_stream_unavailable"
 
 
 def test_camera_snapshot_url_uses_camera_proxy_token(

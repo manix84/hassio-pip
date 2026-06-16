@@ -848,8 +848,8 @@ Choose the simplest implementation that supports future expansion.
 Current development target:
 
 ```txt
-Phase 7
-Stream type options
+Phase 8
+Receiver entities and diagnostics
 ```
 
 Phase 1 is complete in `0.4.0`. It validated:
@@ -902,7 +902,7 @@ The Android TV main screen also reports whether discovery is advertising.
 
 The Home Assistant integration declares a Zeroconf matcher for `_ha-tv-pip._tcp.local.`, includes discovery setup, starts pairing, and stores the returned token after the user enters the TV-visible code. Local Python tests cover discovery metadata parsing, config-flow helpers, and receiver client error handling.
 
-Stage 5 Home Assistant service testing:
+Stage 7 Home Assistant stream type testing:
 
 ```yaml
 action: ha_tv_pip.show_camera
@@ -911,11 +911,12 @@ data:
   camera_entity: camera.front_door
   duration_seconds: 30
   enter_pip: true
+  stream_type: auto
   snapshot_fallback: true
   snapshot_camera_entity: camera.front_door_sub
 ```
 
-Use the Home Assistant device ID for `receiver_device_id` and a camera entity that exposes a TV-compatible HLS stream. `snapshot_fallback` is optional and enabled by default; it lets the receiver show a camera snapshot while the video stream loads. `snapshot_camera_entity` is optional and defaults to `camera_entity`, which is useful when a secondary camera entity provides a faster or lower-resolution still preview. Lower-resolution or H.264 camera streams are generally more reliable for TV popups than high-resolution main streams. The Android receiver enables Media3 decoder fallback and shows a clear unsupported-stream message, but it cannot replace transcoding for unsupported camera formats.
+Use the Home Assistant device ID for `receiver_device_id` and a camera entity that exposes a TV-compatible HLS stream. `stream_type` defaults to `auto`, which prefers HLS and falls back to a snapshot command if Home Assistant cannot resolve a stream. Advanced calls can force `stream_type: hls` or `stream_type: snapshot`. `snapshot_fallback` is optional and enabled by default; it lets the receiver show a camera snapshot while the video stream loads. `snapshot_camera_entity` is optional and defaults to `camera_entity`, which is useful when a secondary camera entity provides a faster or lower-resolution still preview. Lower-resolution or H.264 camera streams are generally more reliable for TV popups than high-resolution main streams. The Android receiver enables Media3 decoder fallback and shows a clear unsupported-stream message, but it cannot replace transcoding for unsupported camera formats.
 
 Receiver playback diagnostics:
 
@@ -939,3 +940,5 @@ data:
 Snapshot mode uses the Home Assistant camera proxy URL and the Android TV overlay renderer. It is intended for fast alerts and for cameras where live playback is unnecessary or unreliable.
 
 Stage 6 is complete in `0.23.0`. It includes `ha_tv_pip.show_snapshot` plus optional entity-based snapshot previews for `ha_tv_pip.show_camera`.
+
+Stage 7 is complete in `0.24.0`. It adds `stream_type: auto`, `stream_type: hls`, and `stream_type: snapshot` to `ha_tv_pip.show_camera`. Automatic mode prefers HLS, falls back to snapshot when stream resolution fails, and keeps the snapshot preview visible if receiver playback fails after an HLS URL is accepted.

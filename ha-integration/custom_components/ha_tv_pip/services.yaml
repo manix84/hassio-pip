@@ -43,6 +43,16 @@ show_camera:
           domain: camera
       name: Snapshot fallback camera entity
       description: Optional camera entity to use for the loading snapshot. Defaults to the main camera entity.
+    stream_type:
+      default: auto
+      selector:
+        select:
+          options:
+            - auto
+            - hls
+            - snapshot
+      name: Stream type
+      description: Choose automatic handling, force an HLS stream, or send a snapshot through the camera service.
     title:
       required: false
       selector:
