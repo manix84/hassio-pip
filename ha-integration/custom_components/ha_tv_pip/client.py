@@ -43,6 +43,24 @@ class ShowCameraCommand:
     preview_url: str | None = None
 
 
+@dataclass(frozen=True)
+class ReceiverStatus:
+    """Receiver status returned by the local HTTP API."""
+
+    app: str
+    version: str
+    device_id: str
+    device_name: str
+    api_version: int | None
+    control_running: bool
+    playback_state: str
+    display_mode: str
+    pairing_state: str | None
+    last_request: dict[str, Any] | None
+    error: str | None
+    raw: dict[str, Any]
+
+
 async def async_start_pairing(
     host: str,
     port: int,
@@ -133,6 +151,35 @@ async def async_show_camera(
     )
 
 
+async def async_get_receiver_status(host: str, port: int) -> ReceiverStatus:
+    """Fetch receiver status from the local API."""
+
+    response = await asyncio.to_thread(_get_json, host, port, "/status")
+    pairing = response.get("pairing")
+    last_request = response.get("lastRequest")
+    return ReceiverStatus(
+        app=str(response.get("app", "HA TV PiP Receiver")),
+        version=str(response.get("version", "")),
+        device_id=str(response.get("deviceId", "")),
+        device_name=str(response.get("deviceName", "")),
+        api_version=_optional_int(response.get("apiVersion")),
+        control_running=bool(response.get("controlRunning", False)),
+        playback_state=str(response.get("playbackState", "unknown")),
+        display_mode=str(response.get("displayMode", "unknown")),
+        pairing_state=str(pairing.get("state")) if isinstance(pairing, dict) else None,
+        last_request=last_request if isinstance(last_request, dict) else None,
+        error=str(response["error"]) if response.get("error") else None,
+        raw=response,
+    )
+
+
+async def async_close_receiver(host: str, port: int, *, token: str) -> bool:
+    """Ask the paired receiver to close the active display."""
+
+    response = await asyncio.to_thread(_post_json, host, port, "/close", {}, token)
+    return bool(response.get("accepted", False))
+
+
 def _post_json(
     host: str,
     port: int,
@@ -172,6 +219,30 @@ def _post_json(
     return parsed
 
 
+def _get_json(host: str, port: int, path: str) -> dict[str, Any]:
+    url = f"http://{host}:{port}{path}"
+    request = Request(url, method="GET")
+    try:
+        with urlopen(request, timeout=5) as response:  # noqa: S310
+            body = response.read().decode()
+    except HTTPError as error:
+        body = error.read().decode()
+        message = _error_message(body) or f"http_{error.code}"
+        raise ReceiverClientError(message) from error
+    except (TimeoutError, URLError) as error:
+        raise ReceiverClientError("cannot_connect") from error
+
+    try:
+        parsed = json.loads(body)
+    except json.JSONDecodeError as error:
+        raise ReceiverClientError("invalid_response") from error
+
+    if not isinstance(parsed, dict):
+        raise ReceiverClientError("invalid_response")
+
+    return parsed
+
+
 def _error_message(body: str) -> str | None:
     try:
         parsed = json.loads(body)
@@ -181,3 +252,12 @@ def _error_message(body: str) -> str | None:
         return None
     value = parsed.get("error")
     return str(value) if value else None
+
+
+def _optional_int(value: Any) -> int | None:
+    if value is None:
+        return None
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None

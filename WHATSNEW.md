@@ -1,5 +1,13 @@
 # What's New ✨
 
+## 0.25.0 - Stage 8 Receiver Entities 🩺
+
+- Added receiver status and connected entities for Home Assistant dashboards 🏠
+- Added receiver test and close buttons for quick receiver management 🎛️
+- Added diagnostics output with token and stream URL redaction 🔐
+- Added typed receiver client helpers for `/status` and `/close` 📡
+- Confirmed receiver entities appear correctly in Home Assistant ✅
+
 ## 0.24.0 - Stage 7 Stream Type Options 🎛️
 
 - Added `stream_type: auto`, `stream_type: hls`, and `stream_type: snapshot` to `ha_tv_pip.show_camera` 🏠

@@ -482,7 +482,9 @@ Initial implementation:
 
 ---
 
-# Phase 8: Receiver Entities and Diagnostics
+# Phase 8: Receiver Entities and Diagnostics ✅
+
+Status: Complete in `0.25.0`.
 
 ## Goal
 
@@ -493,11 +495,18 @@ Make each Android TV receiver visible and manageable from Home Assistant.
 Possible entities:
 
 ```txt
-sensor.living_room_tv_pip_status
-binary_sensor.living_room_tv_pip_connected
-button.living_room_tv_pip_test
-button.living_room_tv_pip_close
+sensor.receiver_status
+binary_sensor.receiver_connected
+button.receiver_test
+button.receiver_close
 ```
+
+Initial implementation:
+
+- Adds one status sensor per receiver.
+- Adds one connected binary sensor per receiver.
+- Adds test and close buttons per receiver.
+- Adds config entry diagnostics with token and stream URL redaction.
 
 ## Diagnostics
 
@@ -517,6 +526,13 @@ Include:
 - User can see whether each receiver is online.
 - User can test a receiver from Home Assistant.
 - Debug information is available without digging through logs.
+
+## Completion Notes
+
+- Completed and tested in Home Assistant with the paired receiver device.
+- Receiver status and connected entities are visible on the receiver device page.
+- Test and close buttons are available for quick receiver checks.
+- Config entry diagnostics include receiver status while redacting pairing tokens and active stream URLs.
 
 ---
 

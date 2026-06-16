@@ -37,6 +37,17 @@ npm run ha:build:dry-run
 The integration package uses Ruff for Python linting, MyPy for type checking, and pytest for tests. `npm run install:all` installs those tools into `ha-integration/.venv/`.
 The dry-run build packages the custom integration zip and will remain the integration build check until a fuller Home Assistant implementation exists.
 
+## Receiver Entities 🩺
+
+Each paired receiver creates:
+
+- Status sensor with playback state and receiver diagnostics.
+- Connected binary sensor based on the local `/status` endpoint.
+- Test button that sends a known public HLS stream to the receiver.
+- Close button that closes the active receiver display.
+
+The integration also exposes config entry diagnostics with pairing tokens and active stream URLs redacted.
+
 ## Camera Service 📹
 
 ```yaml

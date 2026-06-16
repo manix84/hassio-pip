@@ -30,6 +30,8 @@ Stage 6 is complete in `0.23.0`. Home Assistant automations can call `ha_tv_pip.
 
 Stage 7 is complete in `0.24.0`. `ha_tv_pip.show_camera` supports `stream_type: auto`, `stream_type: hls`, and `stream_type: snapshot`, with tested receiver-side snapshot fallback when an accepted video stream fails during playback.
 
+Stage 8 is complete in `0.25.0`. Each paired receiver now exposes Home Assistant status, connected, test, and close entities, plus redacted config entry diagnostics for troubleshooting.
+
 ## Monorepo Layout 🧱
 
 ```txt

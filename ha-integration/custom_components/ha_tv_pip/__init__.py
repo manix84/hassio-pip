@@ -4,7 +4,15 @@
 
 from typing import Any
 
-from .const import CONF_DEVICE_ID, CONF_HOST, CONF_NAME, CONF_PORT, CONF_VERSION, DOMAIN
+from .const import (
+    CONF_DEVICE_ID,
+    CONF_HOST,
+    CONF_NAME,
+    CONF_PORT,
+    CONF_VERSION,
+    DOMAIN,
+    PLATFORMS,
+)
 from .services import async_register_services
 
 __all__ = ["DOMAIN"]
@@ -30,11 +38,22 @@ async def async_setup_entry(hass: Any, entry: Any) -> bool:
 
     hass.data.setdefault(DOMAIN, {}).setdefault("entries", {})[entry.entry_id] = entry
     await async_register_services(hass)
+    config_entries = getattr(hass, "config_entries", None)
+    if config_entries is not None and hasattr(
+        config_entries,
+        "async_forward_entry_setups",
+    ):
+        await config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
 
 async def async_unload_entry(hass: Any, entry: Any) -> bool:
     """Unload a HA TV PiP config entry."""
 
+    config_entries = getattr(hass, "config_entries", None)
+    if config_entries is not None and hasattr(config_entries, "async_unload_platforms"):
+        unload_ok = await config_entries.async_unload_platforms(entry, PLATFORMS)
+        if not unload_ok:
+            return False
     hass.data.get(DOMAIN, {}).get("entries", {}).pop(entry.entry_id, None)
     return True
