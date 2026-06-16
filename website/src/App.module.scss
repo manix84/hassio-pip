@@ -194,6 +194,10 @@
   grid-template-columns: minmax(300px, 0.65fr) minmax(420px, 1.35fr);
 }
 
+.flowShowcase {
+  grid-template-columns: 1fr;
+}
+
 .solutionSteps {
   display: grid;
   gap: 1rem;

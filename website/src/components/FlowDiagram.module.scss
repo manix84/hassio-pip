@@ -1,6 +1,6 @@
 .flow {
   display: grid;
-  gap: 0.9rem;
+  gap: 1.75rem;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   list-style: none;
   margin: 2rem 0 0;
@@ -12,6 +12,8 @@
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text);
+  display: flex;
+  align-items: center;
   min-height: 88px;
   padding: 1rem;
   position: relative;
@@ -22,9 +24,11 @@
   content: "→";
   font-size: 1.5rem;
   position: absolute;
-  right: -0.72rem;
+  right: -1.35rem;
+  text-align: center;
   top: 50%;
   transform: translateY(-50%);
+  width: 1rem;
   z-index: 1;
 }
 
@@ -36,6 +40,7 @@
 
 @media (max-width: 820px) {
   .flow {
+    gap: 1.4rem;
     grid-template-columns: 1fr;
   }
 
