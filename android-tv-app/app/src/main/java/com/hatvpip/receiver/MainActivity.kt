@@ -656,34 +656,46 @@ private fun RowScope.SummaryCard(
     value: String,
     detail: String
 ) {
+    val colors = MaterialTheme.colorScheme
+    val glassBrush = Brush.linearGradient(
+        colors = listOf(
+            colors.surfaceVariant.copy(alpha = 0.72f),
+            colors.surface.copy(alpha = 0.62f),
+            colors.primaryContainer.copy(alpha = 0.18f)
+        )
+    )
+
     Card(
         modifier = Modifier
             .weight(1f)
             .height(112.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.72f)
+            containerColor = Color.Transparent
         ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.55f))
+        border = BorderStroke(1.dp, colors.outline.copy(alpha = 0.36f))
     ) {
         Column(
-            modifier = Modifier.padding(14.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(glassBrush)
+                .padding(14.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Text(
                 text = title,
-                color = MaterialTheme.colorScheme.primary,
+                color = colors.primary,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold
             )
             Text(
                 text = value,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = colors.onSurface,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
             Text(
                 text = detail,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = colors.onSurface,
                 fontSize = 13.sp
             )
         }
@@ -704,6 +716,13 @@ private fun SectionCard(
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
     val colors = MaterialTheme.colorScheme
+    val glassBrush = Brush.linearGradient(
+        colors = listOf(
+            colors.surfaceVariant.copy(alpha = if (isFocused) 0.82f else 0.64f),
+            colors.surface.copy(alpha = if (isFocused) 0.76f else 0.56f),
+            colors.primaryContainer.copy(alpha = if (isFocused) 0.32f else 0.18f)
+        )
+    )
 
     Card(
         modifier = modifier
@@ -715,15 +734,21 @@ private fun SectionCard(
             .bringIntoViewOnFocus()
             .focusable(interactionSource = interactionSource),
         colors = CardDefaults.cardColors(
-            containerColor = colors.surface.copy(alpha = if (isFocused) 0.88f else 0.72f)
+            containerColor = Color.Transparent
         ),
         border = BorderStroke(
             width = if (isFocused) 3.dp else 1.dp,
-            color = if (isFocused) colors.tertiary else colors.outline.copy(alpha = 0.55f)
+            color = if (isFocused) colors.tertiary else colors.outline.copy(alpha = 0.34f)
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = if (isFocused) 8.dp else 2.dp
         )
     ) {
         Column(
-            modifier = Modifier.padding(contentPadding.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(glassBrush)
+                .padding(contentPadding.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
