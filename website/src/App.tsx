@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./App.module.scss";
 import controlMockup from "./assets/home-assistant-control.png";
 import networkMockup from "./assets/local-network-pip.png";
@@ -11,6 +11,15 @@ import { FlowDiagram } from "./components/FlowDiagram";
 import { Section } from "./components/Section";
 import { StatusBadge } from "./components/StatusBadge";
 import { ThemeToggle, type ThemeMode } from "./components/ThemeToggle";
+import { supportedLocales, websiteContent, type WebsiteLocale } from "./locales";
+
+export {
+  faqItems,
+  supportedLocales,
+  translationTiers,
+  websiteContent,
+  type WebsiteLocale,
+} from "./locales";
 
 const githubUrl = "https://github.com/manix84/ha-tv-pip";
 const roadmapUrl =
@@ -23,6 +32,89 @@ const translationsUrl =
   "https://github.com/manix84/ha-tv-pip/blob/main/docs/translations.md";
 const releasesUrl = "https://github.com/manix84/ha-tv-pip/releases";
 const licenseUrl = "https://github.com/manix84/ha-tv-pip/blob/main/LICENSE";
+
+export const localePreferenceKey = "ha-tv-pip-locale";
+
+const routedLocaleCodes = new Set<WebsiteLocale>(
+  supportedLocales
+    .filter((locale) => locale.code !== "en")
+    .map((locale) => locale.code)
+);
+
+const supportedLocaleCodes = new Set<WebsiteLocale>(
+  supportedLocales.map((locale) => locale.code)
+);
+
+export function getRouteLocaleFromPath(pathname: string): WebsiteLocale | null {
+  const matchedRoutedLocale = pathname
+    .split("/")
+    .filter(Boolean)
+    .map((segment) => segment.toLowerCase())
+    .find((segment) => routedLocaleCodes.has(segment as WebsiteLocale));
+
+  return matchedRoutedLocale ? (matchedRoutedLocale as WebsiteLocale) : null;
+}
+
+export function getLocaleFromPath(pathname: string): WebsiteLocale {
+  return getRouteLocaleFromPath(pathname) ?? "en";
+}
+
+export function getPreferredLocale(
+  browserLanguages: readonly string[],
+  savedPreference?: string | null
+): WebsiteLocale {
+  const savedLocale = savedPreference?.toLowerCase();
+  if (supportedLocaleCodes.has(savedLocale as WebsiteLocale)) {
+    return savedLocale as WebsiteLocale;
+  }
+
+  for (const language of browserLanguages) {
+    const normalized = language.toLowerCase().replace("_", "-");
+    if (supportedLocaleCodes.has(normalized as WebsiteLocale)) {
+      return normalized as WebsiteLocale;
+    }
+
+    const baseLanguage = normalized.split("-")[0];
+    if (baseLanguage === "pt") {
+      return "pt-br";
+    }
+    if (supportedLocaleCodes.has(baseLanguage as WebsiteLocale)) {
+      return baseLanguage as WebsiteLocale;
+    }
+  }
+
+  return "en";
+}
+
+export function getInitialLocale(
+  pathname: string,
+  browserLanguages: readonly string[],
+  savedPreference?: string | null
+): WebsiteLocale {
+  return (
+    getRouteLocaleFromPath(pathname) ??
+    getPreferredLocale(browserLanguages, savedPreference)
+  );
+}
+
+export function getLocaleHref(pathname: string, locale: WebsiteLocale): string {
+  const segments = pathname.split("/").filter(Boolean);
+  const localeIndex = segments.findIndex((segment) =>
+    routedLocaleCodes.has(segment.toLowerCase() as WebsiteLocale)
+  );
+
+  if (localeIndex === -1) {
+    return locale === "en" ? "./" : `.${localePath(locale)}`;
+  }
+
+  const prefix = `/${segments.slice(0, localeIndex).join("/")}`;
+  const basePath = prefix === "/" ? "" : prefix;
+  return `${basePath}${localePath(locale)}`;
+}
+
+function localePath(locale: WebsiteLocale): string {
+  return supportedLocales.find((item) => item.code === locale)?.path ?? "/";
+}
 
 const automationExample = `
 alias: Show front door on TV
@@ -42,120 +134,15 @@ action:
       snapshot_camera_entity: camera.front_door_sub
 `;
 
-const features = [
-  {
-    title: "Android TV receiver app",
-    description:
-      "A Kotlin receiver app that owns playback, PiP behavior, and TV-friendly interaction.",
-    status: "complete" as const,
-  },
-  {
-    title: "Home Assistant custom integration",
-    description:
-      "A controller integration for discovery, pairing, services, and camera resolution.",
-    status: "complete" as const,
-  },
-  {
-    title: "Local-first control",
-    description:
-      "LAN receiver control with no cloud relay by default.",
-    status: "complete" as const,
-  },
-  {
-    title: "Automatic discovery",
-    description:
-      "mDNS discovery so Home Assistant can find receiver apps automatically.",
-    status: "complete" as const,
-  },
-  {
-    title: "Secure pairing",
-    description:
-      "TV-visible pairing flow so random LAN devices cannot trigger camera popups.",
-    status: "complete" as const,
-  },
-  {
-    title: "Camera stream support",
-    description:
-      "Home Assistant HLS camera streams with receiver-side compatibility feedback.",
-    status: "complete" as const,
-  },
-  {
-    title: "Snapshot support",
-    description:
-      "Still-image popups for fast alerts and fallback previews while video loads.",
-    status: "complete" as const,
-  },
-  {
-    title: "Remote receiver mode",
-    description:
-      "Outbound receiver transport for travel TVs without router port forwarding.",
-    status: "planned" as const,
-  },
-];
-
-const roadmapItems = [
-  "Local control endpoint",
-  "mDNS discovery",
-  "Device pairing",
-  "Home Assistant service",
-  "Snapshot support",
-  "WebRTC support",
-  "Remote mode",
-  "Play Store and HACS distribution",
-];
-
-export const faqItems = [
-  {
-    question: "Is HA TV PiP a cloud service?",
-    answer:
-      "No. Local control remains the default, and remote receiver mode connects your TV outbound to your own Home Assistant external URL. HA TV PiP does not run a hosted relay.",
-  },
-  {
-    question: "Do I need to open ports on my router?",
-    answer:
-      "No port forwarding to the TV is planned. For remote receiver mode, the TV opens an outbound WebSocket connection to Home Assistant.",
-  },
-  {
-    question: "Will this work with Nabu Casa?",
-    answer:
-      "Yes, the Home Assistant Cloud URL can be used as your Home Assistant external URL. That still does not make HA TV PiP itself a cloud service.",
-  },
-  {
-    question: "Why do some camera streams show snapshots or errors?",
-    answer:
-      "Android TV devices can reject unsupported codecs or very high-resolution streams. HA TV PiP supports snapshot fallbacks now and will keep improving stream selection and compatibility.",
-  },
-  {
-    question: "Can I hide the receiver app from my TV home screen?",
-    answer:
-      "Yes. The Home Assistant integration exposes Hide Launcher and Open Launcher controls so the app can behave more like an appliance after setup.",
-  },
-  {
-    question: "Will HA TV PiP be translated?",
-    answer:
-      "Yes. English is the source language. Tier 1 translations are planned for the Phase 10 polish pass before broad release.",
-  },
-];
-
-export const translationTiers = [
-  {
-    label: "Tier 1",
-    languages:
-      "English, German, Dutch, French, Spanish, Italian, Brazilian Portuguese, Polish",
-  },
-  {
-    label: "Tier 2",
-    languages:
-      "Swedish, Norwegian, Danish, Finnish, Czech, Hungarian, Turkish, Japanese, Korean",
-  },
-  {
-    label: "Tier 3",
-    languages:
-      "Simplified Chinese, Traditional Chinese, Indonesian, Hindi, Arabic, Ukrainian, Romanian, Greek",
-  },
-];
-
 function App() {
+  const [locale, setLocale] = useState<WebsiteLocale>(() =>
+    getInitialLocale(
+      window.location.pathname,
+      window.navigator.languages,
+      window.localStorage.getItem(localePreferenceKey)
+    )
+  );
+
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
     const saved = window.localStorage.getItem("ha-tv-pip-theme");
     return saved === "light" || saved === "dark" || saved === "auto"
@@ -172,52 +159,69 @@ function App() {
     document.documentElement.dataset.theme = themeMode;
   }, [themeMode]);
 
-  const visualCards = useMemo(
-    () => [
-      {
-        image: controlMockup,
-        title: "Automation control surface",
-        text: "A Home Assistant-friendly control plane for future receiver discovery, pairing, and service calls.",
-      },
-      {
-        image: networkMockup,
-        title: "Local-first receiver path",
-        text: "The TV app owns playback and PiP while Home Assistant decides what should appear.",
-      },
-    ],
-    []
-  );
+  useEffect(() => {
+    const routeLocale = getRouteLocaleFromPath(window.location.pathname);
+    if (routeLocale) {
+      window.localStorage.setItem(localePreferenceKey, routeLocale);
+      setLocale(routeLocale);
+      return;
+    }
+
+    window.localStorage.setItem(localePreferenceKey, locale);
+    if (locale !== "en") {
+      window.location.replace(getLocaleHref(window.location.pathname, locale));
+    }
+  }, [locale]);
+
+  const content = websiteContent[locale];
+  const visualCards = content.visualCards.map((card, index) => ({
+    ...card,
+    image: index === 0 ? controlMockup : networkMockup,
+  }));
 
   return (
     <main>
-      <ThemeToggle mode={themeMode} onChange={setThemeMode} />
+      <ThemeToggle labels={content.theme} mode={themeMode} onChange={setThemeMode} />
+      <nav className={styles.localeNav} aria-label={content.languageAriaLabel}>
+        {supportedLocales.map((item) => (
+          <a
+            aria-current={item.code === locale ? "page" : undefined}
+            href={getLocaleHref(window.location.pathname, item.code)}
+            key={item.code}
+            onClick={() => {
+              window.localStorage.setItem(localePreferenceKey, item.code);
+              setLocale(item.code);
+            }}
+          >
+            {item.label}
+          </a>
+        ))}
+      </nav>
       <section className={styles.hero}>
         <div className={styles.heroContent}>
           <div className={styles.heroText}>
-            <StatusBadge status="complete" />
-            <p className={styles.version}>Version {__PROJECT_VERSION__}</p>
-            <h1>Show Home Assistant camera feeds on your Android TV.</h1>
-            <p className={styles.subheading}>
-              HA TV PiP lets Home Assistant automations open security camera
-              feeds, snapshots, and alerts in Picture-in-Picture on Android TV
-              and Google TV devices.
+            <StatusBadge label={content.statusLabels.complete} status="complete" />
+            <p className={styles.version}>
+              {content.hero.versionLabel} {__PROJECT_VERSION__}
             </p>
+            <h1>{content.hero.title}</h1>
+            <p className={styles.subheading}>{content.hero.subtitle}</p>
             <div className={styles.actions}>
-              <Button href={githubUrl}>View on GitHub</Button>
+              <Button href={githubUrl}>{content.hero.ctaPrimary}</Button>
               <Button href={roadmapUrl} variant="secondary">
-                Read the Roadmap
+                {content.hero.ctaSecondary}
               </Button>
             </div>
           </div>
           <figure className={styles.heroProductVisual}>
             <img
-              alt="Living room Android TV showing a security camera feed in Picture-in-Picture"
+              alt={content.hero.alt}
               src={heroCleanMockup}
             />
             <figcaption className={styles.heroOverlay}>
-              <span className={styles.overlayKicker}>Android TV receiver</span>
-              <strong>Playing test HLS stream</strong>
-              <span>PiP mode ready</span>
+              <span className={styles.overlayKicker}>{content.hero.overlayKicker}</span>
+              <strong>{content.hero.overlayTitle}</strong>
+              <span>{content.hero.overlayState}</span>
             </figcaption>
             <div className={styles.signalPanel} aria-hidden="true">
               <div>
@@ -225,36 +229,32 @@ function App() {
                 <span />
                 <span />
               </div>
-              <p>Local automation path</p>
+              <p>{content.hero.signal}</p>
             </div>
           </figure>
         </div>
       </section>
 
       <Section
-        eyebrow="The problem"
-        title="Smart-home alerts deserve a better TV moment."
+        eyebrow={content.problem.eyebrow}
+        title={content.problem.title}
       >
-        <p className={styles.copy}>
-          Home Assistant can detect doorbells, motion, people, and camera
-          events, but showing those events naturally on a TV is still awkward.
-        </p>
+        <p className={styles.copy}>{content.problem.body}</p>
       </Section>
 
       <Section
-        eyebrow="The solution"
-        title="A receiver app for the TV, a controller in Home Assistant."
+        eyebrow={content.solution.eyebrow}
+        title={content.solution.title}
       >
         <div className={styles.solutionShowcase}>
           <div className={styles.solutionSteps}>
-            <p>Install the Android TV receiver app.</p>
-            <p>Install the Home Assistant integration.</p>
-            <p>Pair them locally.</p>
-            <p>Trigger camera popups from automations.</p>
+            {content.solution.steps.map((step) => (
+              <p key={step}>{step}</p>
+            ))}
           </div>
           <figure className={styles.imageCard}>
             <img
-              alt="Mockup showing Home Assistant controls connected to an Android TV PiP receiver"
+              alt={content.solution.imageAlt}
               src={controlMockup}
             />
           </figure>
@@ -262,22 +262,17 @@ function App() {
       </Section>
 
       <Section
-        eyebrow="How it works"
-        title="A local-first path from event to PiP popup."
+        eyebrow={content.flow.eyebrow}
+        title={content.flow.title}
       >
         <div className={styles.flowShowcase}>
           <FlowDiagram
             className={styles.compactFlow}
-            steps={[
-              "Home Assistant event",
-              "HA TV PiP integration",
-              "Android TV receiver app",
-              "PiP camera popup",
-            ]}
+            steps={content.flow.steps}
           />
           <figure className={styles.imageCard}>
             <img
-              alt="Mockup showing a local smart-home network sending a camera feed to Android TV PiP"
+              alt={content.visualAlt.network}
               src={networkMockup}
             />
           </figure>
@@ -285,8 +280,8 @@ function App() {
       </Section>
 
       <Section
-        eyebrow="Features"
-        title="Built in phases, designed as one experience."
+        eyebrow={content.featuresSection.eyebrow}
+        title={content.featuresSection.title}
       >
         <div className={styles.visualGrid}>
           {visualCards.map((card) => (
@@ -300,34 +295,30 @@ function App() {
           ))}
         </div>
         <div className={styles.featureGrid}>
-          {features.map((feature) => (
+          {content.features.map((feature) => (
             <FeatureCard
               key={feature.title}
               title={feature.title}
               description={feature.description}
               status={feature.status}
+              statusLabel={content.statusLabels[feature.status]}
             />
           ))}
         </div>
       </Section>
 
-      <Section eyebrow="Current status" title="Phase 9: Remote receiver mode complete">
+      <Section
+        eyebrow={content.currentStatus.eyebrow}
+        title={content.currentStatus.title}
+      >
         <div className={styles.statusPanel}>
           <div>
-            <p>
-              HA TV PiP now supports discovery, TV-visible pairing,
-              authenticated receiver control, camera stream popups, snapshots,
-              snapshot previews, receiver management, and remote receiver
-              transport.
-            </p>
-            <p>
-              Remote mode connects a TV outbound to the user's own Home
-              Assistant external URL. It is designed for external TVs without
-              turning HA TV PiP into a hosted cloud service.
-            </p>
+            {content.currentStatus.body.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
           </div>
           <img
-            alt="Promotional overview of HA TV PiP features beside an Android TV Picture-in-Picture mockup"
+            alt={content.visualAlt.phase}
             className={styles.phaseOneImage}
             src={phaseOnePromoMockup}
           />
@@ -335,26 +326,30 @@ function App() {
       </Section>
 
       <Section
-        eyebrow="Roadmap preview"
-        title="The path from MVP to daily-driver smart-home tool."
+        eyebrow={content.roadmap.eyebrow}
+        title={content.roadmap.title}
       >
         <ul className={styles.roadmap}>
-          {roadmapItems.map((item) => (
+          {content.roadmap.items.map((item) => (
             <li key={item}>{item}</li>
           ))}
         </ul>
       </Section>
 
-      <Section eyebrow="Example automation" title="Where this is headed.">
-        <CodeBlock code={automationExample} language="home-assistant-yaml" />
+      <Section eyebrow={content.example.eyebrow} title={content.example.title}>
+        <CodeBlock
+          code={automationExample}
+          labels={content.codeBlock}
+          language="home-assistant-yaml"
+        />
       </Section>
 
       <Section
-        eyebrow="FAQ"
-        title="Answers for setup worries and early troubleshooting."
+        eyebrow={content.faqSection.eyebrow}
+        title={content.faqSection.title}
       >
         <div className={styles.faqGrid}>
-          {faqItems.map((item) => (
+          {content.faqItems.map((item) => (
             <article className={styles.faqItem} key={item.question}>
               <h3>{item.question}</h3>
               <p>{item.answer}</p>
@@ -364,11 +359,11 @@ function App() {
       </Section>
 
       <Section
-        eyebrow="Translations"
-        title="Internationalization is part of the product plan."
+        eyebrow={content.translations.eyebrow}
+        title={content.translations.title}
       >
         <div className={styles.translationGrid}>
-          {translationTiers.map((tier) => (
+          {content.translations.tiers.map((tier) => (
             <article className={styles.translationItem} key={tier.label}>
               <strong>{tier.label}</strong>
               <p>{tier.languages}</p>
@@ -382,14 +377,14 @@ function App() {
           <strong>HA TV PiP</strong>
           <span>v{__PROJECT_VERSION__}</span>
         </div>
-        <nav aria-label="Footer links">
-          <a href={githubUrl}>GitHub</a>
-          <a href={roadmapUrl}>Roadmap</a>
-          <a href={architectureUrl}>Architecture</a>
-          <a href={developmentUrl}>Development docs</a>
-          <a href={translationsUrl}>Translations</a>
-          <a href={releasesUrl}>Releases</a>
-          <a href={licenseUrl}>License</a>
+        <nav aria-label={content.footerAriaLabel}>
+          <a href={githubUrl}>{content.footerLinks.github}</a>
+          <a href={roadmapUrl}>{content.footerLinks.roadmap}</a>
+          <a href={architectureUrl}>{content.footerLinks.architecture}</a>
+          <a href={developmentUrl}>{content.footerLinks.development}</a>
+          <a href={translationsUrl}>{content.footerLinks.translations}</a>
+          <a href={releasesUrl}>{content.footerLinks.releases}</a>
+          <a href={licenseUrl}>{content.footerLinks.license}</a>
         </nav>
       </footer>
     </main>

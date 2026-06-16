@@ -120,10 +120,13 @@ Preferred approach during the Phase 10 website polish pass:
 Current Phase 10 status:
 
 - Tier 1 locale routes are detected client-side.
+- Website language selection prefers the URL locale, then the user's saved override, then browser language detection.
+- Users can override the detected language from the website language selector.
 - The website build creates `dist/de/`, `dist/nl/`, `dist/fr/`, `dist/es/`, `dist/it/`, `dist/pt-br/`, and `dist/pl/` entry points for GitHub Pages.
-- Non-English routes currently show English fallback copy with a visible notice until native-reviewed translations are added.
+- Tier 1 website copy exists in separate TypeScript locale modules.
+- Native-speaker review is still required before broad release.
 
-Required website translation content:
+Website translation content now covered:
 
 - Hero and project summary.
 - FAQ.

@@ -4,6 +4,13 @@ import styles from "./CodeBlock.module.scss";
 type CodeBlockProps = {
   code: string;
   language?: string;
+  labels?: {
+    copyAriaLabel: string;
+    copyFailed: string;
+    copied: string;
+    copyTitle: string;
+    toolbar: string;
+  };
 };
 
 type CopyState = "idle" | "success" | "error";
@@ -88,7 +95,15 @@ function highlightCode(code: string, language: string) {
   return code.split("\n").map((line, index) => highlightYamlLine(line, index));
 }
 
-export function CodeBlock({ code, language = "yaml" }: CodeBlockProps) {
+const defaultLabels = {
+  copyAriaLabel: "Copy Home Assistant YAML to clipboard",
+  copyFailed: "Copy failed",
+  copied: "Copied",
+  copyTitle: "Copy YAML",
+  toolbar: "Home Assistant YAML"
+};
+
+export function CodeBlock({ code, labels = defaultLabels, language = "yaml" }: CodeBlockProps) {
   const [copyState, setCopyState] = useState<CopyState>("idle");
   const trimmedCode = useMemo(() => code.trim(), [code]);
   const highlightedCode = useMemo(
@@ -120,18 +135,22 @@ export function CodeBlock({ code, language = "yaml" }: CodeBlockProps) {
   }
 
   const feedbackText =
-    copyState === "success" ? "Copied" : copyState === "error" ? "Copy failed" : "";
+    copyState === "success"
+      ? labels.copied
+      : copyState === "error"
+        ? labels.copyFailed
+        : "";
 
   return (
     <div className={styles.codeFrame}>
       <div className={styles.toolbar}>
-        <span>Home Assistant YAML</span>
+        <span>{labels.toolbar}</span>
         <button
-          aria-label="Copy Home Assistant YAML to clipboard"
+          aria-label={labels.copyAriaLabel}
           className={styles.copyButton}
           data-state={copyState}
           onClick={copyToClipboard}
-          title="Copy YAML"
+          title={labels.copyTitle}
           type="button"
         >
           <CopyIcon />

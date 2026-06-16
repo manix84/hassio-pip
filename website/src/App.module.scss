@@ -1,3 +1,38 @@
+.localeNav {
+  align-items: center;
+  backdrop-filter: blur(18px);
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  justify-content: flex-end;
+  max-width: min(900px, calc(100% - 7rem));
+  padding: 0.45rem;
+  position: fixed;
+  right: 5.4rem;
+  top: 1rem;
+  z-index: 20;
+}
+
+.localeNav a {
+  border-radius: 6px;
+  color: var(--text-soft);
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1;
+  padding: 0.45rem 0.55rem;
+  text-decoration: none;
+}
+
+.localeNav a:hover,
+.localeNav a:focus-visible,
+.localeNav a[aria-current="page"] {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
 .hero {
   background: var(--hero-bg);
   min-height: 92vh;
@@ -397,6 +432,13 @@
 }
 
 @media (max-width: 980px) {
+  .localeNav {
+    max-width: calc(100% - 2rem);
+    position: static;
+    justify-content: flex-start;
+    margin: 1rem;
+  }
+
   .heroContent,
   .statusPanel {
     grid-template-columns: 1fr;

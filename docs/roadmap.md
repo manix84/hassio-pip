@@ -678,8 +678,9 @@ Preferred direction:
 - Home Assistant config/options flow Tier 1 translation files exist for German, Dutch, French, Spanish, Italian, Brazilian Portuguese, and Polish.
 - Home Assistant entity names now expose translation keys with Tier 1 translated names.
 - Home Assistant service names, descriptions, and field labels are mirrored into translation metadata with Tier 1 labels.
-- Website Tier 1 static locale routes are generated at build time, with English fallback copy until native-reviewed website translations are added.
-- Remaining translation work includes full website localized copy and final native-speaker review.
+- Website Tier 1 static locale routes are generated at build time with localized TypeScript content modules.
+- Website locale selection uses URL locale first, then saved user override, then browser language detection.
+- Remaining translation work includes final native-speaker review.
 
 ## Success Criteria
 

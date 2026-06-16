@@ -8,6 +8,16 @@ const labels: Record<StatusKind, string> = {
   future: "Future"
 };
 
-export function StatusBadge({ status }: { status: StatusKind }) {
-  return <span className={`${styles.badge} ${styles[status]}`}>{labels[status]}</span>;
+export function StatusBadge({
+  label,
+  status
+}: {
+  label?: string;
+  status: StatusKind;
+}) {
+  return (
+    <span className={`${styles.badge} ${styles[status]}`}>
+      {label ?? labels[status]}
+    </span>
+  );
 }

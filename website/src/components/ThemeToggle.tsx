@@ -3,15 +3,23 @@ import styles from "./ThemeToggle.module.scss";
 export type ThemeMode = "auto" | "light" | "dark";
 
 type ThemeToggleProps = {
+  labels?: Record<ThemeMode, string> & { ariaLabel: string };
   mode: ThemeMode;
   onChange: (mode: ThemeMode) => void;
 };
 
 const modes: ThemeMode[] = ["auto", "light", "dark"];
 
-export function ThemeToggle({ mode, onChange }: ThemeToggleProps) {
+const defaultLabels: Record<ThemeMode, string> & { ariaLabel: string } = {
+  ariaLabel: "Theme selector",
+  auto: "auto",
+  light: "light",
+  dark: "dark"
+};
+
+export function ThemeToggle({ labels = defaultLabels, mode, onChange }: ThemeToggleProps) {
   return (
-    <div className={styles.toggle} aria-label="Theme selector">
+    <div className={styles.toggle} aria-label={labels.ariaLabel}>
       {modes.map((themeMode) => (
         <button
           aria-pressed={mode === themeMode}
@@ -20,7 +28,7 @@ export function ThemeToggle({ mode, onChange }: ThemeToggleProps) {
           onClick={() => onChange(themeMode)}
           type="button"
         >
-          {themeMode}
+          {labels[themeMode]}
         </button>
       ))}
     </div>
