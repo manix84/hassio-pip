@@ -333,6 +333,8 @@ class PlayerActivity : ComponentActivity() {
         const val EXTRA_MESSAGE_COLOR = "com.hatvpip.receiver.extra.MESSAGE_COLOR"
         const val EXTRA_MESSAGE_SIZE = "com.hatvpip.receiver.extra.MESSAGE_SIZE"
         const val EXTRA_BACKGROUND_COLOR = "com.hatvpip.receiver.extra.BACKGROUND_COLOR"
+        const val EXTRA_WIDTH = "com.hatvpip.receiver.extra.WIDTH"
+        const val EXTRA_HEIGHT = "com.hatvpip.receiver.extra.HEIGHT"
         const val EXTRA_DURATION_SECONDS = "com.hatvpip.receiver.extra.DURATION_SECONDS"
         const val EXTRA_ENTER_PIP = "com.hatvpip.receiver.extra.ENTER_PIP"
         const val TEST_STREAM_URL = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
@@ -351,6 +353,8 @@ class PlayerActivity : ComponentActivity() {
                 putExtra(EXTRA_MESSAGE_COLOR, command.style.messageColor)
                 putExtra(EXTRA_MESSAGE_SIZE, command.style.messageSize)
                 putExtra(EXTRA_BACKGROUND_COLOR, command.style.backgroundColor)
+                command.style.width?.let { putExtra(EXTRA_WIDTH, it) }
+                command.style.height?.let { putExtra(EXTRA_HEIGHT, it) }
                 command.durationSeconds?.let { putExtra(EXTRA_DURATION_SECONDS, it) }
                 putExtra(EXTRA_ENTER_PIP, command.enterPip)
             }
@@ -376,7 +380,17 @@ private fun Intent.toShowCommand(): ShowCommand =
             titleSize = getIntExtra(PlayerActivity.EXTRA_TITLE_SIZE, 24).coerceIn(10, 48),
             messageColor = getStringExtra(PlayerActivity.EXTRA_MESSAGE_COLOR) ?: "#fbf5f5",
             messageSize = getIntExtra(PlayerActivity.EXTRA_MESSAGE_SIZE, 18).coerceIn(10, 40),
-            backgroundColor = getStringExtra(PlayerActivity.EXTRA_BACKGROUND_COLOR) ?: "#0f0e0e"
+            backgroundColor = getStringExtra(PlayerActivity.EXTRA_BACKGROUND_COLOR) ?: "#0f0e0e",
+            width = if (hasExtra(PlayerActivity.EXTRA_WIDTH)) {
+                getIntExtra(PlayerActivity.EXTRA_WIDTH, 0).takeIf { it > 0 }
+            } else {
+                null
+            },
+            height = if (hasExtra(PlayerActivity.EXTRA_HEIGHT)) {
+                getIntExtra(PlayerActivity.EXTRA_HEIGHT, 0).takeIf { it > 0 }
+            } else {
+                null
+            }
         ),
         durationSeconds = if (hasExtra(PlayerActivity.EXTRA_DURATION_SECONDS)) {
             getIntExtra(PlayerActivity.EXTRA_DURATION_SECONDS, 0).takeIf { it > 0 }

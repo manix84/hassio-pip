@@ -114,6 +114,8 @@ def test_show_camera_payload_includes_notification_style() -> None:
             message_color="#fbf5f5",
             message_size=18,
             background_color="#0f0e0e",
+            width=720,
+            height=360,
         )
     )
 
@@ -130,6 +132,8 @@ def test_show_camera_payload_includes_notification_style() -> None:
         "messageColor": "#fbf5f5",
         "messageSize": 18,
         "backgroundColor": "#0f0e0e",
+        "width": 720,
+        "height": 360,
     }
 
 

@@ -22,6 +22,7 @@ from custom_components.ha_tv_pip.services import (
     ATTR_DEVICE_ID,
     ATTR_DURATION_SECONDS,
     ATTR_ENTER_PIP,
+    ATTR_HEIGHT,
     ATTR_MESSAGE,
     ATTR_MESSAGE_COLOR,
     ATTR_MESSAGE_SIZE,
@@ -33,6 +34,7 @@ from custom_components.ha_tv_pip.services import (
     ATTR_TITLE,
     ATTR_TITLE_COLOR,
     ATTR_TITLE_SIZE,
+    ATTR_WIDTH,
     ServiceValidationError,
     _absolute_stream_url,
     _async_show_camera_command,
@@ -173,6 +175,8 @@ def test_request_from_call_accepts_overlay_message_style() -> None:
                 ATTR_MESSAGE_COLOR: "#fbf5f5",
                 ATTR_MESSAGE_SIZE: 20,
                 ATTR_BACKGROUND_COLOR: "#0f0e0e",
+                ATTR_WIDTH: 720,
+                ATTR_HEIGHT: 360,
             }
         )
     )
@@ -184,6 +188,8 @@ def test_request_from_call_accepts_overlay_message_style() -> None:
     assert request.message_color == "#fbf5f5"
     assert request.message_size == 20
     assert request.background_color == "#0f0e0e"
+    assert request.width == 720
+    assert request.height == 360
 
 
 def test_request_from_call_accepts_receiver_device_id_field() -> None:
@@ -227,6 +233,8 @@ def test_notification_request_from_call_accepts_style_defaults_and_target() -> N
                 ATTR_MESSAGE_COLOR: "#fbf5f5",
                 ATTR_MESSAGE_SIZE: 18,
                 ATTR_BACKGROUND_COLOR: "#0f0e0e",
+                ATTR_WIDTH: 512,
+                ATTR_HEIGHT: 240,
             },
             target={ATTR_DEVICE_ID: "device-1"},
         )
@@ -242,6 +250,8 @@ def test_notification_request_from_call_accepts_style_defaults_and_target() -> N
     assert request.message_color == "#fbf5f5"
     assert request.message_size == 18
     assert request.background_color == "#0f0e0e"
+    assert request.width == 512
+    assert request.height == 240
     assert request.device_ids == ("device-1",)
 
 
@@ -252,6 +262,15 @@ def test_notification_request_rejects_invalid_color() -> None:
         )
 
     assert error.value.code == "invalid_color"
+
+
+def test_notification_request_rejects_invalid_overlay_size() -> None:
+    with pytest.raises(ServiceValidationError) as error:
+        _notification_request_from_call(
+            FakeCall(data={ATTR_WIDTH: 200}),
+        )
+
+    assert error.value.code == "invalid_overlay_size"
 
 
 def test_resolve_receiver_uses_single_paired_entry_without_target() -> None:
@@ -406,7 +425,13 @@ def test_show_camera_command_auto_prefers_hls(
         _async_show_camera_command(
             hass,
             _request_from_call(
-                FakeCall(data={ATTR_CAMERA_ENTITY: "camera.front_door"})
+                FakeCall(
+                    data={
+                        ATTR_CAMERA_ENTITY: "camera.front_door",
+                        ATTR_WIDTH: 800,
+                        ATTR_HEIGHT: 450,
+                    }
+                )
             ),
             title="Front Door",
         )
@@ -418,6 +443,9 @@ def test_show_camera_command_auto_prefers_hls(
         "http://10.0.0.2:8123/api/camera_proxy/camera.front_door"
         "?token=snapshot-token"
     )
+    assert command.width == 800
+    assert command.height == 450
+    assert command.message is None
 
 
 def test_show_camera_command_uses_external_urls_for_remote_receiver(

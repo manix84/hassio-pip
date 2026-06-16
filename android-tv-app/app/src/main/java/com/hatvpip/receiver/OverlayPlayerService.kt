@@ -60,7 +60,13 @@ class OverlayPlayerService : Service() {
                     titleSize = intent?.getIntExtra(PlayerActivity.EXTRA_TITLE_SIZE, 24)?.coerceIn(10, 48) ?: 24,
                     messageColor = intent?.getStringExtra(PlayerActivity.EXTRA_MESSAGE_COLOR) ?: "#fbf5f5",
                     messageSize = intent?.getIntExtra(PlayerActivity.EXTRA_MESSAGE_SIZE, 18)?.coerceIn(10, 40) ?: 18,
-                    backgroundColor = intent?.getStringExtra(PlayerActivity.EXTRA_BACKGROUND_COLOR) ?: "#0f0e0e"
+                    backgroundColor = intent?.getStringExtra(PlayerActivity.EXTRA_BACKGROUND_COLOR) ?: "#0f0e0e",
+                    width = intent?.takeIf {
+                        it.hasExtra(PlayerActivity.EXTRA_WIDTH)
+                    }?.getIntExtra(PlayerActivity.EXTRA_WIDTH, 0)?.takeIf { it > 0 },
+                    height = intent?.takeIf {
+                        it.hasExtra(PlayerActivity.EXTRA_HEIGHT)
+                    }?.getIntExtra(PlayerActivity.EXTRA_HEIGHT, 0)?.takeIf { it > 0 }
                 )
                 streamType = when (intent?.getStringExtra(PlayerActivity.EXTRA_STREAM_TYPE)) {
                     StreamType.Snapshot.wireName -> StreamType.Snapshot
@@ -125,8 +131,8 @@ class OverlayPlayerService : Service() {
         root.addView(errorTextView)
 
         val params = WindowManager.LayoutParams(
-            if (streamType == StreamType.Notification) NOTIFICATION_WIDTH_PX else OVERLAY_WIDTH_PX,
-            if (streamType == StreamType.Notification) WindowManager.LayoutParams.WRAP_CONTENT else OVERLAY_HEIGHT_PX,
+            overlayWidth(),
+            overlayHeight(),
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
@@ -166,7 +172,11 @@ class OverlayPlayerService : Service() {
             setPadding(24, 20, 24, 20)
             layoutParams = FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
+                if (streamType == StreamType.Notification && style.height != null) {
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                } else {
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                },
                 notificationCardGravity()
             )
         }
@@ -365,6 +375,20 @@ class OverlayPlayerService : Service() {
             NotificationPosition.TopLeft -> Gravity.TOP or Gravity.START
             NotificationPosition.BottomRight -> Gravity.BOTTOM or Gravity.END
             NotificationPosition.BottomLeft -> Gravity.BOTTOM or Gravity.START
+        }
+
+    private fun overlayWidth(): Int =
+        style.width ?: if (streamType == StreamType.Notification) {
+            NOTIFICATION_WIDTH_PX
+        } else {
+            OVERLAY_WIDTH_PX
+        }
+
+    private fun overlayHeight(): Int =
+        style.height ?: if (streamType == StreamType.Notification) {
+            WindowManager.LayoutParams.WRAP_CONTENT
+        } else {
+            OVERLAY_HEIGHT_PX
         }
 
     private fun notificationCardGravity(): Int =

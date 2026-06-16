@@ -113,6 +113,26 @@ show_camera:
         text:
       name: Background color
       description: Hex color for the optional text overlay background.
+    width:
+      required: false
+      selector:
+        number:
+          min: 240
+          max: 1600
+          mode: box
+          unit_of_measurement: px
+      name: Width
+      description: Optional overlay width in pixels. Defaults to the receiver's sensible popup width.
+    height:
+      required: false
+      selector:
+        number:
+          min: 120
+          max: 900
+          mode: box
+          unit_of_measurement: px
+      name: Height
+      description: Optional overlay height in pixels. Media popups default to 640x360; text-only notifications default to content height.
 show_snapshot:
   fields:
     receiver_device_id:
@@ -205,6 +225,26 @@ show_snapshot:
         text:
       name: Background color
       description: Hex color for the optional text overlay background.
+    width:
+      required: false
+      selector:
+        number:
+          min: 240
+          max: 1600
+          mode: box
+          unit_of_measurement: px
+      name: Width
+      description: Optional overlay width in pixels. Defaults to the receiver's sensible popup width.
+    height:
+      required: false
+      selector:
+        number:
+          min: 120
+          max: 900
+          mode: box
+          unit_of_measurement: px
+      name: Height
+      description: Optional overlay height in pixels. Media popups default to 640x360; text-only notifications default to content height.
 show_notification:
   fields:
     receiver_device_id:
@@ -290,3 +330,23 @@ show_notification:
         text:
       name: Background color
       description: Hex color for the notification background.
+    width:
+      required: false
+      selector:
+        number:
+          min: 240
+          max: 1600
+          mode: box
+          unit_of_measurement: px
+      name: Width
+      description: Optional notification width in pixels. Defaults to 512 pixels.
+    height:
+      required: false
+      selector:
+        number:
+          min: 120
+          max: 900
+          mode: box
+          unit_of_measurement: px
+      name: Height
+      description: Optional notification height in pixels. Defaults to content height.

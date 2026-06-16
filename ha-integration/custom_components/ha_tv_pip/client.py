@@ -48,6 +48,8 @@ class ShowCameraCommand:
     message_color: str | None = None
     message_size: int | None = None
     background_color: str | None = None
+    width: int | None = None
+    height: int | None = None
 
 
 def show_camera_payload(command: ShowCameraCommand) -> dict[str, Any]:
@@ -77,6 +79,10 @@ def show_camera_payload(command: ShowCameraCommand) -> dict[str, Any]:
         payload["messageSize"] = command.message_size
     if command.background_color is not None:
         payload["backgroundColor"] = command.background_color
+    if command.width is not None:
+        payload["width"] = command.width
+    if command.height is not None:
+        payload["height"] = command.height
     return payload
 
 

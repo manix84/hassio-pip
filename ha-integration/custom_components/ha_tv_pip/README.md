@@ -132,9 +132,11 @@ data:
   message_color: "#fbf5f5"
   message_size: 18
   background_color: "#0f0e0e"
+  width: 512
+  height: 240
 ```
 
-The service sends a styled text notification to the paired receiver as `streamType: notification`. It is useful for alert-style messages that do not need a camera stream or snapshot. Position values are `top_right`, `top_left`, `bottom_right`, and `bottom_left`; colors must be six-digit hex values. Notification cards use rounded corners on the TV.
+The service sends a styled text notification to the paired receiver as `streamType: notification`. It is useful for alert-style messages that do not need a camera stream or snapshot. Position values are `top_right`, `top_left`, `bottom_right`, and `bottom_left`; colors must be six-digit hex values. Optional `width` and `height` values are pixels; text-only notifications default to `512px` wide and content height, while media popups default to `640x360`. Notification cards use rounded corners on the TV.
 
 ## Remote Receiver Mode 🌍
 

@@ -808,6 +808,7 @@ Stage 11 adds a richer overlay command model inspired by PiPup-style notificatio
 - ✅ Support popup corner position.
 - ✅ Support title, message, and background colors.
 - ✅ Support title and message text sizes.
+- ✅ Support optional overlay width and height with sensible defaults.
 - ✅ Validate color, size, position, duration, and receiver target inputs.
 - 🚧 Add optional image/snapshot notification media in a later Stage 11 slice.
 - 🚧 Add website examples and richer automation snippets in a later Stage 11 slice.
@@ -827,6 +828,8 @@ Current optional fields:
   "messageColor": "#fbf5f5",
   "messageSize": 18,
   "backgroundColor": "#0f0e0e",
+  "width": 512,
+  "height": 240,
   "durationSeconds": 15,
   "enterPip": true
 }
@@ -839,6 +842,7 @@ Current optional fields:
 - `message` is the smaller body text.
 - `titleColor`, `messageColor`, and `backgroundColor` should accept validated hex colors only.
 - `titleSize` and `messageSize` should be clamped to TV-readable ranges.
+- `width` and `height` are optional pixel dimensions. Text-only notifications default to `512px` wide and content height; media popups default to `640x360`.
 - These options can be reused by camera/snapshot overlays when `message` is provided.
 - Defaults should remain readable and Home Assistant-friendly without requiring users to configure every field.
 

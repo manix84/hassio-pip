@@ -44,6 +44,7 @@ ATTR_DEVICE_ID = "device_id"
 ATTR_DURATION_SECONDS = "duration_seconds"
 ATTR_ENTER_PIP = "enter_pip"
 ATTR_BACKGROUND_COLOR = "background_color"
+ATTR_HEIGHT = "height"
 ATTR_MESSAGE = "message"
 ATTR_MESSAGE_COLOR = "message_color"
 ATTR_MESSAGE_SIZE = "message_size"
@@ -55,6 +56,7 @@ ATTR_STREAM_TYPE = "stream_type"
 ATTR_TITLE = "title"
 ATTR_TITLE_COLOR = "title_color"
 ATTR_TITLE_SIZE = "title_size"
+ATTR_WIDTH = "width"
 CAMERA_DOMAIN = "camera"
 COLOR_PATTERN = re.compile(r"^#[0-9a-fA-F]{6}$")
 DEFAULT_NOTIFICATION_BACKGROUND_COLOR = "#0f0e0e"
@@ -78,6 +80,7 @@ ERROR_MESSAGES = {
     "invalid_notification_size": (
         "Notification text sizes are outside the supported range."
     ),
+    "invalid_overlay_size": "Overlay width or height is outside the supported range.",
     "invalid_position": (
         "Notification position must be top_right, top_left, bottom_right, "
         "or bottom_left."
@@ -124,6 +127,8 @@ class ShowCameraRequest:
     message_color: str
     message_size: int
     background_color: str
+    width: int | None
+    height: int | None
     snapshot_camera_entity: str | None
     snapshot_fallback: bool
     stream_type: str
@@ -145,6 +150,8 @@ class ShowNotificationRequest:
     message_color: str
     message_size: int
     background_color: str
+    width: int | None
+    height: int | None
     device_ids: tuple[str, ...]
 
 
@@ -199,6 +206,14 @@ async def async_register_services(hass: Any) -> None:
             ATTR_BACKGROUND_COLOR,
             default=DEFAULT_NOTIFICATION_BACKGROUND_COLOR,
         ): str,
+        vol.Optional(ATTR_WIDTH): vol.All(
+            vol.Coerce(int),
+            vol.Range(min=240, max=1600),
+        ),
+        vol.Optional(ATTR_HEIGHT): vol.All(
+            vol.Coerce(int),
+            vol.Range(min=120, max=900),
+        ),
     }
 
     camera_schema = vol.Schema(
@@ -258,6 +273,14 @@ async def async_register_services(hass: Any) -> None:
                 ATTR_BACKGROUND_COLOR,
                 default=DEFAULT_NOTIFICATION_BACKGROUND_COLOR,
             ): str,
+            vol.Optional(ATTR_WIDTH): vol.All(
+                vol.Coerce(int),
+                vol.Range(min=240, max=1600),
+            ),
+            vol.Optional(ATTR_HEIGHT): vol.All(
+                vol.Coerce(int),
+                vol.Range(min=120, max=900),
+            ),
         }
     )
 
@@ -402,6 +425,8 @@ async def async_handle_show_notification(hass: Any, call: Any) -> None:
             message_color=request.message_color,
             message_size=request.message_size,
             background_color=request.background_color,
+            width=request.width,
+            height=request.height,
         )
         if await remote.async_send_show(device_id=receiver.device_id, command=command):
             return
@@ -458,6 +483,8 @@ def _request_from_call(call: Any) -> ShowCameraRequest:
             data.get(ATTR_BACKGROUND_COLOR),
             DEFAULT_NOTIFICATION_BACKGROUND_COLOR,
         ),
+        width=_optional_overlay_dimension(data.get(ATTR_WIDTH), 240, 1600),
+        height=_optional_overlay_dimension(data.get(ATTR_HEIGHT), 120, 900),
         title=_optional_text(data.get(ATTR_TITLE)),
         snapshot_camera_entity=_optional_text(data.get(ATTR_SNAPSHOT_CAMERA_ENTITY)),
         snapshot_fallback=bool(data.get(ATTR_SNAPSHOT_FALLBACK, True)),
@@ -499,6 +526,8 @@ def _notification_request_from_call(call: Any) -> ShowNotificationRequest:
             data.get(ATTR_BACKGROUND_COLOR),
             DEFAULT_NOTIFICATION_BACKGROUND_COLOR,
         ),
+        width=_optional_overlay_dimension(data.get(ATTR_WIDTH), 240, 1600),
+        height=_optional_overlay_dimension(data.get(ATTR_HEIGHT), 120, 900),
         device_ids=device_ids,
     )
 
@@ -807,14 +836,30 @@ def _notification_size(value: Any, minimum: int, maximum: int) -> int:
 
 
 def _presentation_payload(request: ShowCameraRequest) -> dict[str, Any]:
-    if request.message is None:
-        return {}
-    return {
-        "message": request.message,
-        "position": request.position,
-        "title_color": request.title_color,
-        "title_size": request.title_size,
-        "message_color": request.message_color,
-        "message_size": request.message_size,
-        "background_color": request.background_color,
-    }
+    payload: dict[str, Any] = {}
+    if request.width is not None:
+        payload["width"] = request.width
+    if request.height is not None:
+        payload["height"] = request.height
+    if request.message is not None:
+        payload.update(
+            {
+                "message": request.message,
+                "position": request.position,
+                "title_color": request.title_color,
+                "title_size": request.title_size,
+                "message_color": request.message_color,
+                "message_size": request.message_size,
+                "background_color": request.background_color,
+            }
+        )
+    return payload
+
+
+def _optional_overlay_dimension(value: Any, minimum: int, maximum: int) -> int | None:
+    if value is None:
+        return None
+    size = int(value)
+    if not minimum <= size <= maximum:
+        raise ServiceValidationError("invalid_overlay_size")
+    return size

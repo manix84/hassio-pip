@@ -133,6 +133,12 @@
         },
         "title_size": {
           "name": "Title size"
+        },
+        "width": {
+          "name": "Width"
+        },
+        "height": {
+          "name": "Height"
         }
       }
     },
@@ -175,6 +181,12 @@
         },
         "title_size": {
           "name": "Title size"
+        },
+        "width": {
+          "name": "Width"
+        },
+        "height": {
+          "name": "Height"
         }
       }
     },
@@ -214,6 +226,12 @@
         },
         "title_size": {
           "name": "Title size"
+        },
+        "width": {
+          "name": "Width"
+        },
+        "height": {
+          "name": "Height"
         }
       }
     }
