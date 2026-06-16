@@ -1,5 +1,12 @@
 # What's New ✨
 
+## Unreleased - Phase 10 Android TV UX Polish 🎨
+
+- Started a TV-first receiver dashboard with summary cards, primary PiP controls, launcher controls, remote receiver settings, and diagnostics separated from everyday actions 📺
+- Moved verbose endpoint, discovery, and compatibility details into a dedicated diagnostics section 🧰
+- Improved D-pad startup focus by keeping `Play Test Video` in the first action group 🎮
+- Marked manual remote receiver token entry as an advanced fallback while Stage 10 designs easier Home Assistant-assisted setup 🔐
+
 ## 0.28.0 - Phase 9 Documentation And FAQ Polish 📚
 
 - Marked Phase 9 remote receiver transport as complete in the roadmap ✅

@@ -17,7 +17,12 @@ class FakeConfigFlow:
         super().__init_subclass__()
 
 
+class FakeOptionsFlow:
+    pass
+
+
 config_entries.ConfigFlow = FakeConfigFlow  # type: ignore[attr-defined]
+config_entries.OptionsFlow = FakeOptionsFlow  # type: ignore[attr-defined]
 voluptuous.Schema = lambda schema: schema  # type: ignore[attr-defined]
 voluptuous.Required = lambda key: key  # type: ignore[attr-defined]
 voluptuous.Optional = lambda key, default=None: key  # type: ignore[attr-defined]

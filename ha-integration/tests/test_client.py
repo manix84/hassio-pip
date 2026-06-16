@@ -7,10 +7,12 @@ from custom_components.ha_tv_pip.client import (
     _error_message,
     _get_json,
     _post_json,
+    async_clear_remote_configuration,
     async_close_receiver,
     async_get_receiver_status,
     async_open_receiver,
     async_set_launcher_visible,
+    async_set_remote_configuration,
     show_camera_payload,
 )
 
@@ -208,6 +210,55 @@ def test_async_set_launcher_visible_returns_receiver_state(monkeypatch) -> None:
             )
         )
         is False
+    )
+
+
+def test_async_set_remote_configuration_returns_accepted(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    async def fake_to_thread(func, *args):  # type: ignore[no-untyped-def]
+        assert args[2] == "/management/remote"
+        assert args[3]["homeAssistantUrl"] == "https://example.ui.nabu.casa"
+        assert args[3]["accessToken"] == "ha-token"
+        return {"accepted": True}
+
+    monkeypatch.setattr(
+        "custom_components.ha_tv_pip.client.asyncio.to_thread",
+        fake_to_thread,
+    )
+
+    assert (
+        asyncio.run(
+            async_set_remote_configuration(
+                "10.0.0.236",
+                8765,
+                token="pairing-token",
+                home_assistant_url="https://example.ui.nabu.casa",
+                access_token="ha-token",
+            )
+        )
+        is True
+    )
+
+
+def test_async_clear_remote_configuration_returns_accepted(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    async def fake_to_thread(func, *args):  # type: ignore[no-untyped-def]
+        assert args[2] == "/management/remote"
+        assert args[3] == {"clear": True}
+        return {"accepted": True}
+
+    monkeypatch.setattr(
+        "custom_components.ha_tv_pip.client.asyncio.to_thread",
+        fake_to_thread,
+    )
+
+    assert (
+        asyncio.run(
+            async_clear_remote_configuration(
+                "10.0.0.236",
+                8765,
+                token="pairing-token",
+            )
+        )
+        is True
     )
 
 

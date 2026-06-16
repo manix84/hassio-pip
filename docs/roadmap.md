@@ -617,15 +617,40 @@ This is also the main translation implementation pass. Tier 1 languages should b
 
 ## Android TV App
 
+- Redesign the main screen as a TV-first receiver dashboard.
+- Separate primary PiP controls, launcher controls, remote receiver settings, and diagnostics.
+- Make D-pad focus and scrolling predictable on 1080p and 4K TVs.
+- Keep verbose endpoint, discovery, and compatibility data in a diagnostics area instead of the top of the screen.
 - Prepare Play Store release.
 - Add app icon and banner.
 - Add onboarding screen.
 - Add pairing screen.
 - Add troubleshooting screen.
+- Simplify remote receiver setup so normal users do not need to type long URLs or long-lived tokens with a TV remote.
+- Treat manual remote receiver token entry as an advanced fallback, not the target setup UX.
 - Move user-facing strings into Android resources.
 - Add Tier 1 Android translations.
 - Add privacy-friendly messaging.
 - Add crash-safe logging.
+
+## Initial Android UX Polish
+
+- Main receiver screen now starts with app state and primary PiP controls instead of raw diagnostics.
+- Receiver health is summarized in TV-readable status cards.
+- Pairing, launcher controls, remote receiver settings, and diagnostics are split into separate sections.
+- Remote receiver token entry is masked on screen.
+
+## Remote Setup Direction
+
+Remote setup should become Home Assistant-assisted after local pairing.
+
+Preferred direction:
+
+- Home Assistant discovers and pairs the receiver locally.
+- The integration detects the user's external Home Assistant URL where available.
+- Home Assistant provisions remote receiver settings over the authenticated local receiver connection.
+- Users should not need to type long URLs or access tokens on the TV for the normal path.
+- If Home Assistant authentication cannot safely be provisioned, keep manual setup available under advanced troubleshooting only.
 
 ## Home Assistant Integration
 

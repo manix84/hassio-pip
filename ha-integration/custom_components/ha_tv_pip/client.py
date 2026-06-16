@@ -233,6 +233,49 @@ async def async_set_launcher_visible(
     return bool(response.get("launcherVisible", visible))
 
 
+async def async_set_remote_configuration(
+    host: str,
+    port: int,
+    *,
+    token: str,
+    home_assistant_url: str,
+    access_token: str,
+) -> bool:
+    """Store remote receiver connection settings on the paired receiver."""
+
+    response = await asyncio.to_thread(
+        _post_json,
+        host,
+        port,
+        "/management/remote",
+        {
+            "homeAssistantUrl": home_assistant_url,
+            "accessToken": access_token,
+        },
+        token,
+    )
+    return bool(response.get("accepted", False))
+
+
+async def async_clear_remote_configuration(
+    host: str,
+    port: int,
+    *,
+    token: str,
+) -> bool:
+    """Clear remote receiver connection settings on the paired receiver."""
+
+    response = await asyncio.to_thread(
+        _post_json,
+        host,
+        port,
+        "/management/remote",
+        {"clear": True},
+        token,
+    )
+    return bool(response.get("accepted", False))
+
+
 def _post_json(
     host: str,
     port: int,

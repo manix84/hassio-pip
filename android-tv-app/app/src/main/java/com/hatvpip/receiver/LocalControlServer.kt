@@ -21,6 +21,7 @@ class LocalControlServer(
     private val onShow: (ShowCommand) -> Unit,
     private val onClose: () -> Unit,
     private val onOpenManagement: () -> Unit,
+    private val onRemoteSettingsChanged: () -> Unit = {},
     private val onPairingChanged: () -> Unit = {},
     private val onStarted: (Int) -> Unit = {}
 ) {
@@ -86,6 +87,7 @@ class LocalControlServer(
             request.method == "POST" && request.path == "/close" -> closeResponse(request)
             request.method == "POST" && request.path == "/management/open" -> managementOpenResponse(request)
             request.method == "POST" && request.path == "/management/launcher" -> managementLauncherResponse(request)
+            request.method == "POST" && request.path == "/management/remote" -> managementRemoteResponse(request)
             request.path in KNOWN_ENDPOINTS -> HttpResponse.json(
                 status = 405,
                 body = JSONObject()
@@ -121,6 +123,7 @@ class LocalControlServer(
                         .put(endpoint("POST", "/close", "Close the active display"))
                         .put(endpoint("POST", "/management/open", "Open receiver management UI"))
                         .put(endpoint("POST", "/management/launcher", "Show or hide launcher icon"))
+                        .put(endpoint("POST", "/management/remote", "Store remote receiver settings"))
                 )
         )
 
@@ -154,6 +157,7 @@ class LocalControlServer(
                 JSONObject()
                     .put("launcherVisible", LauncherVisibility.isVisible(context))
                     .put("openPath", "/management/open")
+                    .put("remotePath", "/management/remote")
             )
             .put(
                 "discovery",
@@ -330,6 +334,55 @@ class LocalControlServer(
         )
     }
 
+    private fun managementRemoteResponse(request: HttpRequest): HttpResponse {
+        val authFailure = authorizeRequest(body = request.body, request = request)
+        if (authFailure != null) return authFailure
+
+        val json = runCatching { JSONObject(request.body.ifBlank { "{}" }) }.getOrElse {
+            return HttpResponse.json(
+                status = 400,
+                body = JSONObject().put("error", "Invalid remote configuration payload")
+            )
+        }
+        val clear = json.optBoolean("clear", false)
+        if (clear) {
+            RemoteConnectionSettings.clear(context)
+            onRemoteSettingsChanged()
+            return HttpResponse.json(
+                status = 202,
+                body = JSONObject()
+                    .put("accepted", true)
+                    .put("remoteEnabled", false)
+            )
+        }
+
+        val homeAssistantUrl = json.optString("homeAssistantUrl").trim()
+        val accessToken = json.optString("accessToken").trim()
+        if (homeAssistantUrl.isBlank() || accessToken.isBlank()) {
+            return HttpResponse.json(
+                status = 400,
+                body = JSONObject()
+                    .put("error", "`homeAssistantUrl` and `accessToken` are required")
+            )
+        }
+
+        RemoteConnectionSettings.save(
+            context,
+            RemoteConnectionConfig(
+                homeAssistantUrl = homeAssistantUrl,
+                accessToken = accessToken
+            )
+        )
+        onRemoteSettingsChanged()
+        return HttpResponse.json(
+            status = 202,
+            body = JSONObject()
+                .put("accepted", true)
+                .put("remoteEnabled", true)
+                .put("homeAssistantUrl", homeAssistantUrl)
+        )
+    }
+
     private fun authorizeRequest(body: String, request: HttpRequest?): HttpResponse? {
         val pairing = PairingState.snapshot(context)
         if (pairing.pairingRequired) {
@@ -413,7 +466,8 @@ class LocalControlServer(
             "/show",
             "/close",
             "/management/open",
-            "/management/launcher"
+            "/management/launcher",
+            "/management/remote"
         )
     }
 }
@@ -428,7 +482,7 @@ private fun allowedMethodsFor(path: String): JSONArray =
     JSONArray().apply {
         when (path) {
             "/", "/status" -> put("GET")
-            "/pair/start", "/pair/confirm", "/show", "/close" -> put("POST")
+            "/pair/start", "/pair/confirm", "/show", "/close", "/management/open", "/management/launcher", "/management/remote" -> put("POST")
         }
     }
 

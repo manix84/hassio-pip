@@ -14,6 +14,7 @@ from .const import (
     PLATFORMS,
 )
 from .remote import async_setup_remote_api
+from .remote_setup import async_sync_remote_setup
 from .services import async_register_services
 
 __all__ = ["DOMAIN"]
@@ -40,6 +41,7 @@ async def async_setup_entry(hass: Any, entry: Any) -> bool:
     hass.data.setdefault(DOMAIN, {}).setdefault("entries", {})[entry.entry_id] = entry
     await async_register_services(hass)
     await async_setup_remote_api(hass)
+    await async_sync_remote_setup(hass, entry)
     config_entries = getattr(hass, "config_entries", None)
     if config_entries is not None and hasattr(
         config_entries,

@@ -27,6 +27,7 @@ class LocalControlService : Service() {
             onShow = ::showPlayer,
             onClose = ::closePlayer,
             onOpenManagement = ::openManagement,
+            onRemoteSettingsChanged = ::refreshRemoteSettings,
             onPairingChanged = ::refreshDiscovery,
             onStarted = { port ->
                 discoveryAdvertiser?.start(port)
@@ -151,6 +152,10 @@ class LocalControlService : Service() {
                         Intent.FLAG_ACTIVITY_CLEAR_TOP
                 )
         )
+    }
+
+    private fun refreshRemoteSettings() {
+        remoteReceiverClient?.reconnect()
     }
 
     companion object {

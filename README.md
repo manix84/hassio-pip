@@ -34,6 +34,8 @@ Stage 8 is complete in `0.26.0`. Each paired receiver now exposes Home Assistant
 
 Phase 9 is complete in `0.27.0`. Remote receiver mode lets a TV connect outbound to the user's own Home Assistant WebSocket API, so Home Assistant can send PiP commands to an external TV without router port forwarding. This is not a HA TV PiP cloud service; the Home Assistant integration remains local-first and declares `iot_class: local_push`.
 
+Phase 10 is in progress. The Android TV app is moving from a developer-style status page to a TV-first receiver dashboard with clear PiP controls, launcher controls, remote receiver status, and diagnostics kept out of the way of everyday actions.
+
 ## Monorepo Layout 🧱
 
 ```txt

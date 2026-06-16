@@ -10,40 +10,54 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private var compatibility by mutableStateOf<DeviceCompatibility?>(null)
@@ -201,6 +215,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
+@OptIn(ExperimentalFoundationApi::class)
 private fun MainScreen(
     compatibility: DeviceCompatibility,
     endpointInfo: ControlEndpointInfo,
@@ -222,90 +237,272 @@ private fun MainScreen(
     val scrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
-        playButtonFocusRequester.requestFocus()
+        repeat(INITIAL_FOCUS_ATTEMPTS) {
+            delay(INITIAL_FOCUS_RETRY_MS)
+            if (playButtonFocusRequester.requestFocus()) return@LaunchedEffect
+        }
     }
 
-    Surface(
+    val colors = MaterialTheme.colorScheme
+    val backgroundGradient = Brush.verticalGradient(
+        colors = listOf(
+            colors.background,
+            colors.primaryContainer.copy(alpha = 0.32f),
+            colors.tertiaryContainer.copy(alpha = 0.24f),
+            colors.background
+        )
+    )
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-        color = MaterialTheme.colorScheme.background
+            .background(backgroundGradient)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .padding(horizontal = 56.dp, vertical = 36.dp),
-            verticalArrangement = Arrangement.Top,
+                .padding(horizontal = 48.dp, vertical = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp),
             horizontalAlignment = Alignment.Start
         ) {
-            Text(
-                text = "HA TV PiP Receiver",
-                color = MaterialTheme.colorScheme.onBackground,
-                fontSize = 34.sp,
-                fontWeight = FontWeight.Bold
+            ReceiverHeader(
+                pairingSnapshot = pairingSnapshot,
+                remoteSnapshot = remoteSnapshot,
+                launcherVisible = launcherVisible
             )
-            Spacer(modifier = Modifier.height(10.dp))
-            Text(
-                text = "Stage 2 MVP: local HTTP control on port ${LocalControlServer.DEFAULT_PORT}, test HLS playback, and TV-safe display modes.",
-                color = MaterialTheme.colorScheme.onBackground,
-                fontSize = 18.sp
+
+            PrimaryActions(
+                compatibility = compatibility,
+                playButtonFocusRequester = playButtonFocusRequester,
+                onPlayTestVideo = onPlayTestVideo,
+                onRequestOverlayPermission = onRequestOverlayPermission,
+                onStopOverlay = onStopOverlay
             )
-            Spacer(modifier = Modifier.height(20.dp))
-            CompatibilityStatus(compatibility = compatibility)
-            Spacer(modifier = Modifier.height(18.dp))
-            ControlEndpointStatus(
-                endpointInfo = endpointInfo,
+
+            StatusOverview(
+                compatibility = compatibility,
                 controlSnapshot = controlSnapshot,
-                discoverySnapshot = discoverySnapshot
+                discoverySnapshot = discoverySnapshot,
+                pairingSnapshot = pairingSnapshot,
+                remoteSnapshot = remoteSnapshot
             )
-            Spacer(modifier = Modifier.height(18.dp))
-            PairingStatusPanel(pairingSnapshot = pairingSnapshot)
-            Spacer(modifier = Modifier.height(18.dp))
+
+            PairingStatusPanel(
+                pairingSnapshot = pairingSnapshot,
+                onResetPairing = onResetPairing
+            )
+
             ReceiverManagementPanel(
                 launcherVisible = launcherVisible,
                 onSetLauncherVisible = onSetLauncherVisible
             )
-            Spacer(modifier = Modifier.height(18.dp))
+
             RemoteConnectionPanel(
                 remoteConfig = remoteConfig,
                 remoteSnapshot = remoteSnapshot,
                 onSaveRemoteConfig = onSaveRemoteConfig,
                 onClearRemoteConfig = onClearRemoteConfig
             )
-            Spacer(modifier = Modifier.height(24.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+
+            DiagnosticsPanel(
+                endpointInfo = endpointInfo,
+                controlSnapshot = controlSnapshot,
+                discoverySnapshot = discoverySnapshot,
+                compatibility = compatibility
+            )
+        }
+    }
+}
+
+@Composable
+private fun ReceiverHeader(
+    pairingSnapshot: PairingSnapshot?,
+    remoteSnapshot: RemoteConnectionSnapshot,
+    launcherVisible: Boolean
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Text(
+            text = "HA TV PiP Receiver",
+            color = MaterialTheme.colorScheme.onBackground,
+            fontSize = 34.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = "Receiver is ${pairingSnapshot?.state?.wireName ?: "unknown"} | Remote ${remoteSnapshot.status.wireName} | Launcher ${if (launcherVisible) "visible" else "hidden"}",
+            color = MaterialTheme.colorScheme.onBackground,
+            fontSize = 17.sp
+        )
+    }
+}
+
+@Composable
+private fun PrimaryActions(
+    compatibility: DeviceCompatibility,
+    playButtonFocusRequester: FocusRequester,
+    onPlayTestVideo: () -> Unit,
+    onRequestOverlayPermission: () -> Unit,
+    onStopOverlay: () -> Unit
+) {
+    SectionCard(title = "PiP controls") {
+        Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+            TvActionButton(
+                text = "Play Test Video",
+                onClick = onPlayTestVideo,
+                modifier = Modifier
+                    .focusRequester(playButtonFocusRequester),
+                minWidth = 220
+            )
+            if (compatibility.canRequestOverlayPermission) {
                 TvActionButton(
-                    text = "Play Test Video",
-                    onClick = onPlayTestVideo,
-                    modifier = Modifier
-                        .focusRequester(playButtonFocusRequester)
-                        // Explicit focusability makes D-pad startup focus predictable on TV launchers.
-                        .focusable(),
+                    text = "Overlay Settings",
+                    onClick = onRequestOverlayPermission,
                     minWidth = 220
                 )
-                if (compatibility.canRequestOverlayPermission) {
-                    TvActionButton(
-                        text = "Open Overlay Settings",
-                        onClick = onRequestOverlayPermission,
-                        minWidth = 260
-                    )
-                }
-                if (compatibility.overlayPermission == CompatibilityState.Granted) {
-                    TvActionButton(
-                        text = "Stop Overlay",
-                        onClick = onStopOverlay,
-                        minWidth = 180
-                    )
-                }
-                if (pairingSnapshot?.state == PairingStatus.Paired) {
-                    TvActionButton(
-                        text = "Reset Pairing",
-                        onClick = onResetPairing,
-                        minWidth = 190
-                    )
-                }
             }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+            if (compatibility.overlayPermission == CompatibilityState.Granted) {
+                TvActionButton(
+                    text = "Stop Overlay",
+                    onClick = onStopOverlay,
+                    minWidth = 180
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun StatusOverview(
+    compatibility: DeviceCompatibility,
+    controlSnapshot: ControlServerSnapshot,
+    discoverySnapshot: DiscoverySnapshot,
+    pairingSnapshot: PairingSnapshot?,
+    remoteSnapshot: RemoteConnectionSnapshot
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
+    ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+            SummaryCard(
+                title = "Local",
+                value = if (controlSnapshot.running) "Running" else "Stopped",
+                detail = "Port ${controlSnapshot.port}"
+            )
+            SummaryCard(
+                title = "Discovery",
+                value = if (discoverySnapshot.running) "Advertising" else "Stopped",
+                detail = discoverySnapshot.serviceType
+            )
+            SummaryCard(
+                title = "Pairing",
+                value = pairingSnapshot?.state?.wireName ?: "unknown",
+                detail = pairingSnapshot?.pairedClientName ?: "No paired client"
+            )
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+            SummaryCard(
+                title = "Display",
+                value = compatibility.recommendedMode.label,
+                detail = "Overlay ${compatibility.overlayPermission.label}"
+            )
+            SummaryCard(
+                title = "Remote",
+                value = remoteSnapshot.status.wireName,
+                detail = remoteSnapshot.lastError ?: "External receiver"
+            )
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalFoundationApi::class)
+private fun RowScope.SummaryCard(
+    title: String,
+    value: String,
+    detail: String
+) {
+    Card(
+        modifier = Modifier
+            .weight(1f)
+            .height(112.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.72f)
+        ),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.55f))
+    ) {
+        Column(
+            modifier = Modifier.padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Text(
+                text = title,
+                color = MaterialTheme.colorScheme.primary,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = value,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = detail,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = 13.sp
+            )
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalFoundationApi::class)
+private fun SectionCard(
+    title: String,
+    focusableSection: Boolean = false,
+    modifier: Modifier = Modifier.fillMaxWidth(),
+    contentPadding: Int = 18,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+    val colors = MaterialTheme.colorScheme
+    val focusModifier = if (focusableSection) {
+        Modifier
+            .bringIntoViewOnFocus()
+            .focusable(interactionSource = interactionSource)
+    } else {
+        Modifier
+    }
+
+    Card(
+        modifier = modifier
+            .then(focusModifier),
+        colors = CardDefaults.cardColors(
+            containerColor = colors.surface.copy(alpha = if (isFocused) 0.88f else 0.72f)
+        ),
+        border = BorderStroke(
+            width = if (isFocused) 3.dp else 1.dp,
+            color = if (isFocused) colors.tertiary else colors.outline.copy(alpha = 0.55f)
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(contentPadding.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = title,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold
+            )
+            content()
         }
     }
 }
@@ -324,19 +521,10 @@ private fun RemoteConnectionPanel(
         mutableStateOf(remoteConfig.accessToken)
     }
 
-    Column(
-        modifier = Modifier.widthIn(max = 760.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(
-            text = "Remote receiver",
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
+    SectionCard(title = "Remote receiver") {
         Text(
             text = "State: ${remoteSnapshot.status.wireName}",
-            color = MaterialTheme.colorScheme.onBackground,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 16.sp
         )
         remoteSnapshot.lastError?.let { error ->
@@ -347,22 +535,27 @@ private fun RemoteConnectionPanel(
             )
         }
         Text(
-            text = "Use your Home Assistant external URL and a long-lived access token. This connects outbound to your own Home Assistant instance; it is not a HA TV PiP cloud service.",
-            color = MaterialTheme.colorScheme.onBackground,
+            text = "Home Assistant can provision this for you. Manual setup remains available here for advanced troubleshooting. Remote mode connects outbound to your own Home Assistant instance; it is not a HA TV PiP cloud service.",
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 15.sp
         )
         OutlinedTextField(
             value = homeAssistantUrl,
             onValueChange = { homeAssistantUrl = it },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .bringIntoViewOnFocus(),
             label = { Text("Home Assistant URL") },
             singleLine = true
         )
         OutlinedTextField(
             value = accessToken,
             onValueChange = { accessToken = it },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .bringIntoViewOnFocus(),
             label = { Text("Long-lived access token") },
+            visualTransformation = PasswordVisualTransformation(),
             singleLine = true
         )
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -392,24 +585,15 @@ private fun ReceiverManagementPanel(
     launcherVisible: Boolean,
     onSetLauncherVisible: (Boolean) -> Unit
 ) {
-    Column(
-        modifier = Modifier.widthIn(max = 760.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(
-            text = "Receiver management",
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
+    SectionCard(title = "Launcher controls") {
         Text(
             text = "Launcher icon: ${if (launcherVisible) "visible" else "hidden"}",
-            color = MaterialTheme.colorScheme.onBackground,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 16.sp
         )
         Text(
             text = "If hidden, Home Assistant can reopen this screen with the Open Launcher button. You can also recover from Android Settings > Apps > HA TV PiP.",
-            color = MaterialTheme.colorScheme.onBackground,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 15.sp
         )
         TvActionButton(
@@ -420,24 +604,37 @@ private fun ReceiverManagementPanel(
     }
 }
 
+@Composable
+@OptIn(ExperimentalFoundationApi::class)
+private fun Modifier.bringIntoViewOnFocus(): Modifier {
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+    val coroutineScope = rememberCoroutineScope()
+
+    return bringIntoViewRequester(bringIntoViewRequester)
+        .onFocusChanged { focusState ->
+            if (focusState.isFocused) {
+                coroutineScope.launch {
+                    delay(80)
+                    bringIntoViewRequester.bringIntoView()
+                }
+            }
+        }
+}
+
 private const val CONTROL_STATUS_REFRESH_MS = 1_000L
+private const val INITIAL_FOCUS_ATTEMPTS = 8
+private const val INITIAL_FOCUS_RETRY_MS = 120L
 
 @Composable
-private fun PairingStatusPanel(pairingSnapshot: PairingSnapshot?) {
+private fun PairingStatusPanel(
+    pairingSnapshot: PairingSnapshot?,
+    onResetPairing: () -> Unit
+) {
     val snapshot = pairingSnapshot ?: return
-    Column(
-        modifier = Modifier.widthIn(max = 760.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(
-            text = "Pairing",
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
+    SectionCard(title = "Pairing") {
         Text(
             text = "State: ${snapshot.state.wireName}",
-            color = MaterialTheme.colorScheme.onBackground,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 16.sp
         )
         snapshot.pendingCode?.let { code ->
@@ -451,15 +648,22 @@ private fun PairingStatusPanel(pairingSnapshot: PairingSnapshot?) {
         snapshot.pendingClientName?.let { clientName ->
             Text(
                 text = "Waiting for: $clientName",
-                color = MaterialTheme.colorScheme.onBackground,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 15.sp
             )
         }
         snapshot.pairedClientName?.let { clientName ->
             Text(
                 text = "Paired with: $clientName",
-                color = MaterialTheme.colorScheme.onBackground,
+                color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 15.sp
+            )
+        }
+        if (snapshot.state == PairingStatus.Paired) {
+            TvActionButton(
+                text = "Reset Pairing",
+                onClick = onResetPairing,
+                minWidth = 190
             )
         }
     }
@@ -478,7 +682,9 @@ private fun TvActionButton(
 
     Button(
         onClick = onClick,
-        modifier = modifier.widthIn(min = minWidth.dp),
+        modifier = modifier
+            .bringIntoViewOnFocus()
+            .widthIn(min = minWidth.dp),
         interactionSource = interactionSource,
         border = BorderStroke(
             width = if (isFocused) 4.dp else 1.dp,
@@ -498,54 +704,38 @@ private fun TvActionButton(
 }
 
 @Composable
-private fun ControlEndpointStatus(
+private fun DiagnosticsPanel(
     endpointInfo: ControlEndpointInfo,
     controlSnapshot: ControlServerSnapshot,
-    discoverySnapshot: DiscoverySnapshot
+    discoverySnapshot: DiscoverySnapshot,
+    compatibility: DeviceCompatibility
 ) {
-    Column(
-        modifier = Modifier.widthIn(max = 760.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+    SectionCard(
+        title = "Diagnostics",
+        focusableSection = true
     ) {
         val lastRequest = controlSnapshot.lastRequest
         val runningLabel = if (controlSnapshot.running) "running" else "stopped"
 
-        Text(
-            text = "Local control endpoint",
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = endpointInfo.displayAddress,
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 16.sp
-        )
-        Text(
-            text = "State: $runningLabel | Uptime: ${
+        DiagnosticRow(label = "Endpoint", value = endpointInfo.displayAddress)
+        DiagnosticRow(
+            label = "Local control",
+            value = "State: $runningLabel | Uptime: ${
                 controlSnapshot.uptimeSeconds(System.currentTimeMillis())
-            }s | Requests: ${controlSnapshot.requestCount}",
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 15.sp
+            }s | Requests: ${controlSnapshot.requestCount}"
         )
         if (lastRequest != null) {
-            Text(
-                text = "Last: ${lastRequest.method} ${lastRequest.path} -> ${lastRequest.status}",
-                color = MaterialTheme.colorScheme.onBackground,
-                fontSize = 15.sp
+            DiagnosticRow(
+                label = "Last request",
+                value = "${lastRequest.method} ${lastRequest.path} -> ${lastRequest.status}"
             )
         }
-        Text(
-            text = "Discovery: ${if (discoverySnapshot.running) "advertising" else "stopped"} | ${discoverySnapshot.serviceType}",
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 15.sp
+        DiagnosticRow(
+            label = "Discovery",
+            value = "${if (discoverySnapshot.running) "advertising" else "stopped"} | ${discoverySnapshot.serviceType}"
         )
         discoverySnapshot.serviceName?.let { serviceName ->
-            Text(
-                text = "Service: $serviceName",
-                color = MaterialTheme.colorScheme.onBackground,
-                fontSize = 15.sp
-            )
+            DiagnosticRow(label = "Service", value = serviceName)
         }
         discoverySnapshot.errorMessage?.let { error ->
             Text(
@@ -554,46 +744,26 @@ private fun ControlEndpointStatus(
                 fontSize = 15.sp
             )
         }
+        DiagnosticRow(label = "Android", value = compatibility.androidVersionLabel)
+        DiagnosticRow(label = "Native PiP", value = compatibility.nativePictureInPicture.label)
+        DiagnosticRow(label = "Compatibility", value = compatibility.statusText)
     }
 }
 
 @Composable
-private fun CompatibilityStatus(compatibility: DeviceCompatibility) {
-    Column(
-        modifier = Modifier.widthIn(max = 760.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
+private fun DiagnosticRow(label: String, value: String) {
+    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(
-            text = "Device compatibility",
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 20.sp,
+            modifier = Modifier.width(130.dp),
+            text = label,
+            color = MaterialTheme.colorScheme.primary,
+            fontSize = 15.sp,
             fontWeight = FontWeight.Bold
         )
         Text(
-            text = compatibility.androidVersionLabel,
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 16.sp
-        )
-        Text(
-            text = "Native PiP: ${compatibility.nativePictureInPicture.label}",
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 16.sp
-        )
-        Text(
-            text = "Overlay permission: ${compatibility.overlayPermission.label}",
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 16.sp
-        )
-        Text(
-            text = "Recommended mode: ${compatibility.recommendedMode.label}",
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = compatibility.statusText,
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 16.sp
+            text = value,
+            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = 15.sp
         )
     }
 }

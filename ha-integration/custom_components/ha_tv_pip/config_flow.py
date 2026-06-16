@@ -17,12 +17,18 @@ from .const import (
     CONF_NAME,
     CONF_PAIRING,
     CONF_PORT,
+    CONF_REMOTE_ACCESS_TOKEN,
+    CONF_REMOTE_HOME_ASSISTANT_URL,
     CONF_TOKEN,
     CONF_VERSION,
     DEFAULT_PORT,
     DOMAIN,
 )
 from .discovery import ReceiverDiscovery, parse_discovery_properties
+from .remote_setup import (
+    async_sync_remote_setup_values,
+    suggested_remote_home_assistant_url,
+)
 
 _LOGGER = logging.getLogger(__name__)
 PAIRING_CLIENT_ID = "home-assistant"
@@ -43,6 +49,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
     VERSION = 1
     _discovered_receiver: ReceiverDiscovery | None = None
     _pairing_receiver: ReceiverDiscovery | None = None
+
+    @staticmethod
+    def async_get_options_flow(config_entry: Any) -> Any:
+        """Return the options flow for a configured receiver."""
+
+        return ReceiverOptionsFlow(config_entry)
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> Any:
         """Handle manual setup when Zeroconf discovery is unavailable."""
@@ -192,6 +204,73 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
                 CONF_NAME: receiver.name,
                 CONF_HOST: receiver.host,
                 CONF_PORT: str(receiver.port),
+            },
+            errors=errors,
+        )
+
+class ReceiverOptionsFlow(config_entries.OptionsFlow):  # type: ignore[misc]
+    """Options flow for remote receiver provisioning."""
+
+    def __init__(self, config_entry: Any) -> None:
+        self.config_entry = config_entry
+
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> Any:
+        """Configure remote receiver provisioning from Home Assistant."""
+
+        errors: dict[str, str] = {}
+        suggested_url = suggested_remote_home_assistant_url(self.hass)
+        current_url = str(
+            self.config_entry.options.get(
+                CONF_REMOTE_HOME_ASSISTANT_URL,
+                suggested_url,
+            )
+        ).strip()
+        current_token = str(
+            self.config_entry.options.get(CONF_REMOTE_ACCESS_TOKEN, "")
+        ).strip()
+
+        if user_input is not None:
+            raw_remote_url = str(
+                user_input.get(CONF_REMOTE_HOME_ASSISTANT_URL, "")
+            ).strip()
+            remote_token = str(user_input.get(CONF_REMOTE_ACCESS_TOKEN, "")).strip()
+            remote_url = raw_remote_url or (suggested_url if remote_token else "")
+
+            if bool(remote_url) != bool(remote_token):
+                errors["base"] = "remote_fields_required"
+            else:
+                options: dict[str, str] = {}
+                if remote_url and remote_token:
+                    options[CONF_REMOTE_HOME_ASSISTANT_URL] = remote_url
+                    options[CONF_REMOTE_ACCESS_TOKEN] = remote_token
+
+                await async_sync_remote_setup_values(
+                    self.hass,
+                    self.config_entry,
+                    remote_url,
+                    remote_token,
+                )
+                return self.async_create_entry(title="", data=options)
+
+            current_url = raw_remote_url or suggested_url
+            current_token = remote_token
+
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(
+                        CONF_REMOTE_HOME_ASSISTANT_URL,
+                        default=current_url,
+                    ): str,
+                    vol.Optional(
+                        CONF_REMOTE_ACCESS_TOKEN,
+                        default=current_token,
+                    ): str,
+                }
+            ),
+            description_placeholders={
+                "suggested_url": suggested_url or "not configured"
             },
             errors=errors,
         )
