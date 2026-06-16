@@ -50,6 +50,7 @@ ha-tv-pip/
 │   ├── architecture.md
 │   ├── roadmap.md
 │   ├── development.md
+│   ├── play-store.md
 │   └── translations.md
 ├── examples/
 │   └── home-assistant-automations/
@@ -184,7 +185,7 @@ ha-tv-pip-integration-vX.Y.Z.zip
 
 The stable `ha-tv-pip-integration.zip` asset is for HACS. That zip contains `custom_components/ha_tv_pip/` at its root so HACS-style installs do not include the monorepo wrapper path.
 
-Play Store deployment is not implemented yet.
+Play Store deployment is not implemented yet. Release-prep notes for listing copy, privacy wording, screenshots, signing, and release notes live in `docs/play-store.md`.
 
 ## HACS Installation 🧩
 

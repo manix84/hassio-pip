@@ -621,7 +621,7 @@ This is also the main translation implementation pass. Tier 1 languages should b
 - ✅ Separate primary PiP controls, launcher controls, remote receiver settings, and diagnostics.
 - ✅ Make D-pad focus and scrolling more predictable for TV remotes.
 - ✅ Keep verbose endpoint, discovery, and compatibility data in a diagnostics area instead of the top of the screen.
-- ⏳ Prepare Play Store release.
+- ✅ Prepare Play Store release materials.
 - ✅ Add app icon and banner.
 - ✅ Add onboarding, pairing, and troubleshooting UX.
 - ✅ Simplify remote receiver setup so normal users do not need to type long URLs or long-lived tokens with a TV remote.
@@ -648,6 +648,7 @@ This is also the main translation implementation pass. Tier 1 languages should b
 - All dashboard sections are focusable containers, with D-pad navigation moving from section to controls and back in a predictable order.
 - `Reset Pairing` and `Clear Remote` now show confirmation warnings before taking destructive action.
 - Active pairing requests now show a TV-side pairing popup with the six-digit code while keeping the code visible in the Pairing dashboard section as a fallback.
+- Play Store listing copy, privacy wording, screenshot/graphics checklist, signing guidance, and release-note guidance are documented in `docs/play-store.md`.
 
 ## Remote Setup Direction
 

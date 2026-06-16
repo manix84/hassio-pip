@@ -590,7 +590,7 @@ Build the release APK:
 npm run android:assemble:release
 ```
 
-The release build currently produces an unsigned APK. Play Store deployment and signing automation are intentionally out of scope.
+The release build currently produces an unsigned APK. Play Store deployment and signing automation are intentionally out of scope. Play Store listing, privacy, screenshot, signing, and release-note prep is tracked in `docs/play-store.md`.
 
 ## Integration Local Packaging
 

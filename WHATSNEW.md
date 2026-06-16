@@ -18,6 +18,7 @@
 - Added a stable `ha-tv-pip-integration.zip` release asset for HACS while keeping the versioned integration zip 📦
 - Added HACS custom-repository install docs 📝
 - Changed release automation to run on pushes to `main`, creating or updating the versioned GitHub Release with Android and HACS assets 🚀
+- Added Play Store release-prep materials covering listing copy, privacy wording, screenshots, signing, and release notes 📺
 
 ## 0.28.0 - Phase 9 Documentation And FAQ Polish 📚
 
