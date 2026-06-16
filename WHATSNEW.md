@@ -4,6 +4,7 @@
 
 - Added `ha_tv_pip.show_snapshot` to display camera snapshots from Home Assistant 🏠
 - Added Android TV snapshot overlay rendering for `streamType: snapshot` 📺
+- Added optional entity-based snapshot fallback previews while video streams load 🖼️
 - Reused pairing, bearer-token auth, receiver targeting, and duration timeouts for snapshots 🔐
 - Confirmed camera feeds and snapshot feeds both work on the Chromecast test receiver ✅
 

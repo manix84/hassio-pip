@@ -253,6 +253,7 @@ class LocalControlServer(
                 .put("title", command.title)
                 .put("url", command.url)
                 .put("streamType", command.streamType.wireName)
+                .put("previewUrl", command.previewUrl)
                 .put("durationSeconds", command.durationSeconds)
                 .put("enterPip", command.enterPip)
         )

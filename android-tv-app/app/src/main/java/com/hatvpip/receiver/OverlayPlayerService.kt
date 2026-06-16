@@ -27,6 +27,7 @@ class OverlayPlayerService : Service() {
     private var errorTextView: TextView? = null
     private var title: String = "HA TV PiP"
     private var url: String = PlayerActivity.TEST_STREAM_URL
+    private var previewUrl: String? = null
     private var streamType: StreamType = StreamType.Hls
     private var durationSeconds: Int? = null
     private val autoCloseHandler = Handler(Looper.getMainLooper())
@@ -43,6 +44,7 @@ class OverlayPlayerService : Service() {
             else -> {
                 title = intent?.getStringExtra(PlayerActivity.EXTRA_TITLE) ?: title
                 url = intent?.getStringExtra(PlayerActivity.EXTRA_URL) ?: url
+                previewUrl = intent?.getStringExtra(PlayerActivity.EXTRA_PREVIEW_URL)
                 streamType = when (intent?.getStringExtra(PlayerActivity.EXTRA_STREAM_TYPE)) {
                     StreamType.Snapshot.wireName -> StreamType.Snapshot
                     else -> StreamType.Hls
@@ -73,7 +75,7 @@ class OverlayPlayerService : Service() {
             setBackgroundColor(android.graphics.Color.BLACK)
         }
         if (streamType == StreamType.Snapshot) {
-            addSnapshotView(root)
+            addSnapshotView(root, url, updateStateOnLoad = true)
         } else {
             addPlayerView(root)
         }
@@ -124,11 +126,19 @@ class OverlayPlayerService : Service() {
     }
 
     private fun addPlayerView(root: FrameLayout) {
+        val previewImageView = previewUrl?.let { imageUrl ->
+            addSnapshotView(root, imageUrl, updateStateOnLoad = false)
+        }
+        lateinit var playerView: PlayerView
         val overlayPlayer = buildReceiverPlayer(this).also { exoPlayer ->
             exoPlayer.addListener(
                 object : Player.Listener {
                     override fun onPlaybackStateChanged(playbackState: Int) {
                         val playerError = exoPlayer.playerError
+                        if (playerError == null && playbackState == Player.STATE_READY) {
+                            playerView.alpha = 1f
+                            previewImageView?.visibility = ImageView.GONE
+                        }
                         updatePlaybackState(
                             status = playerError?.let { PlaybackStatus.Error }
                                 ?: playbackState.toPlaybackStatus(),
@@ -139,6 +149,10 @@ class OverlayPlayerService : Service() {
 
                     override fun onIsPlayingChanged(isPlaying: Boolean) {
                         val playerError = exoPlayer.playerError
+                        if (playerError == null && isPlaying) {
+                            playerView.alpha = 1f
+                            previewImageView?.visibility = ImageView.GONE
+                        }
                         updatePlaybackState(
                             status = playerError?.let { PlaybackStatus.Error }
                                 ?: exoPlayer.playbackState.toPlaybackStatus(),
@@ -167,19 +181,23 @@ class OverlayPlayerService : Service() {
         }
         player = overlayPlayer
 
-        root.addView(
-            PlayerView(this).apply {
-                layoutParams = FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-                )
-                useController = false
-                this.player = overlayPlayer
-            }
-        )
+        playerView = PlayerView(this).apply {
+            layoutParams = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            useController = false
+            this.player = overlayPlayer
+            alpha = if (previewImageView == null) 1f else 0.01f
+        }
+        root.addView(playerView)
     }
 
-    private fun addSnapshotView(root: FrameLayout) {
+    private fun addSnapshotView(
+        root: FrameLayout,
+        imageUrl: String,
+        updateStateOnLoad: Boolean
+    ): ImageView {
         val imageView = ImageView(this).apply {
             layoutParams = FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -193,33 +211,38 @@ class OverlayPlayerService : Service() {
 
         Thread {
             runCatching {
-                URL(url).openStream().use { stream ->
+                URL(imageUrl).openStream().use { stream ->
                     BitmapFactory.decodeStream(stream)
                         ?: error("Snapshot response was not a supported image")
                 }
             }.onSuccess { bitmap ->
                 mainHandler.post {
                     imageView.setImageBitmap(bitmap)
-                    updatePlaybackState(
-                        status = PlaybackStatus.Ready,
-                        isPlaying = false,
-                        errorMessage = null
-                    )
+                    if (updateStateOnLoad) {
+                        updatePlaybackState(
+                            status = PlaybackStatus.Ready,
+                            isPlaying = false,
+                            errorMessage = null
+                        )
+                    }
                 }
             }.onFailure { error ->
                 mainHandler.post {
                     val message = error.message ?: "unknown snapshot error"
-                    updatePlaybackState(
-                        status = PlaybackStatus.Error,
-                        isPlaying = false,
-                        errorMessage = message
-                    )
-                    errorTextView?.text = "Snapshot unavailable"
-                    errorTextView?.visibility = TextView.VISIBLE
-                    AppLog.error("Snapshot overlay failed: $message", error)
+                    if (updateStateOnLoad) {
+                        updatePlaybackState(
+                            status = PlaybackStatus.Error,
+                            isPlaying = false,
+                            errorMessage = message
+                        )
+                        errorTextView?.text = "Snapshot unavailable"
+                        errorTextView?.visibility = TextView.VISIBLE
+                    }
+                    AppLog.error("Snapshot load failed: $message", error)
                 }
             }
         }.start()
+        return imageView
     }
 
     private fun removeOverlay() {

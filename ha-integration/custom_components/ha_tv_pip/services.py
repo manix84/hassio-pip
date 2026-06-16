@@ -40,6 +40,8 @@ ATTR_DEVICE_ID = "device_id"
 ATTR_DURATION_SECONDS = "duration_seconds"
 ATTR_ENTER_PIP = "enter_pip"
 ATTR_RECEIVER_DEVICE_ID = "receiver_device_id"
+ATTR_SNAPSHOT_CAMERA_ENTITY = "snapshot_camera_entity"
+ATTR_SNAPSHOT_FALLBACK = "snapshot_fallback"
 ATTR_TITLE = "title"
 CAMERA_DOMAIN = "camera"
 STREAM_TYPE_HLS = "hls"
@@ -84,6 +86,8 @@ class ShowCameraRequest:
     camera_entity: str
     duration_seconds: int | None
     enter_pip: bool
+    snapshot_camera_entity: str | None
+    snapshot_fallback: bool
     title: str | None
     device_ids: tuple[str, ...]
 
@@ -120,6 +124,8 @@ async def async_register_services(hass: Any) -> None:
     camera_schema = vol.Schema(
         {
             **base_schema,
+            vol.Optional(ATTR_SNAPSHOT_CAMERA_ENTITY): cv.entity_id,
+            vol.Optional(ATTR_SNAPSHOT_FALLBACK, default=True): bool,
             vol.Optional(ATTR_DURATION_SECONDS, default=30): vol.All(
                 vol.Coerce(int),
                 vol.Range(min=1, max=3600),
@@ -166,6 +172,11 @@ async def async_handle_show_camera(hass: Any, call: Any) -> None:
     _validate_camera_entity(hass, request.camera_entity)
     receiver = _resolve_receiver(hass, request)
     stream_url = await _async_camera_stream_url(hass, request.camera_entity)
+    preview_url = None
+    if request.snapshot_fallback:
+        preview_entity = request.snapshot_camera_entity or request.camera_entity
+        _validate_camera_entity(hass, preview_entity)
+        preview_url = _optional_camera_snapshot_url(hass, preview_entity)
     title = request.title or _camera_title(hass, request.camera_entity)
     _LOGGER.info(
         "Sending camera %s to receiver %s at %s:%s",
@@ -186,6 +197,7 @@ async def async_handle_show_camera(hass: Any, call: Any) -> None:
                 duration_seconds=request.duration_seconds,
                 enter_pip=request.enter_pip,
                 stream_type=STREAM_TYPE_HLS,
+                preview_url=preview_url,
             ),
         )
     except ReceiverClientError as error:
@@ -250,6 +262,8 @@ def _request_from_call(call: Any) -> ShowCameraRequest:
         duration_seconds=duration_seconds,
         enter_pip=bool(data.get(ATTR_ENTER_PIP, True)),
         title=_optional_text(data.get(ATTR_TITLE)),
+        snapshot_camera_entity=_optional_text(data.get(ATTR_SNAPSHOT_CAMERA_ENTITY)),
+        snapshot_fallback=bool(data.get(ATTR_SNAPSHOT_FALLBACK, True)),
         device_ids=device_ids,
     )
 
@@ -387,6 +401,18 @@ def _camera_snapshot_url(hass: Any, entity_id: str) -> str:
     path = f"/api/camera_proxy/{quote(entity_id, safe='')}"
     query = urlencode({"token": str(access_token)})
     return _absolute_stream_url(hass, f"{path}?{query}")
+
+
+def _optional_camera_snapshot_url(hass: Any, entity_id: str) -> str | None:
+    try:
+        return _camera_snapshot_url(hass, entity_id)
+    except ServiceValidationError as error:
+        _LOGGER.warning(
+            "Snapshot fallback unavailable for %s: %s",
+            entity_id,
+            error,
+        )
+        return None
 
 
 def _tuple_value(value: Any) -> tuple[str, ...]:

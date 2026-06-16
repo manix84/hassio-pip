@@ -40,6 +40,7 @@ class ShowCameraCommand:
     duration_seconds: int | None
     enter_pip: bool
     stream_type: str = "hls"
+    preview_url: str | None = None
 
 
 async def async_start_pairing(
@@ -119,6 +120,8 @@ async def async_show_camera(
     }
     if command.duration_seconds is not None:
         payload["durationSeconds"] = command.duration_seconds
+    if command.preview_url is not None:
+        payload["previewUrl"] = command.preview_url
 
     await asyncio.to_thread(
         _post_json,

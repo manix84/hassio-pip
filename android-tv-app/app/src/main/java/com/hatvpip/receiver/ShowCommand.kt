@@ -13,7 +13,8 @@ data class ShowCommand(
     val url: String,
     val streamType: StreamType,
     val durationSeconds: Int?,
-    val enterPip: Boolean
+    val enterPip: Boolean,
+    val previewUrl: String?
 ) {
     companion object {
         fun testVideo(): ShowCommand =
@@ -22,7 +23,8 @@ data class ShowCommand(
                 url = PlayerActivity.TEST_STREAM_URL,
                 streamType = StreamType.Hls,
                 durationSeconds = null,
-                enterPip = false
+                enterPip = false,
+                previewUrl = null
             )
 
         fun fromJson(body: String): Result<ShowCommand> =
@@ -47,13 +49,20 @@ data class ShowCommand(
                 } else {
                     null
                 }
+                val previewUrl = json.optString("previewUrl").trim().ifBlank { null }
+                if (previewUrl != null) {
+                    require(previewUrl.startsWith("http://") || previewUrl.startsWith("https://")) {
+                        "`previewUrl` must be an HTTP or HTTPS URL"
+                    }
+                }
 
                 ShowCommand(
                     title = json.optString("title", "HA TV PiP").ifBlank { "HA TV PiP" },
                     url = url,
                     streamType = streamType,
                     durationSeconds = durationSeconds,
-                    enterPip = json.optBoolean("enterPip", true)
+                    enterPip = json.optBoolean("enterPip", true),
+                    previewUrl = previewUrl
                 )
             }.recoverCatching { error ->
                 if (error is JSONException) {

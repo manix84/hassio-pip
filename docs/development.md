@@ -907,9 +907,11 @@ data:
   camera_entity: camera.front_door
   duration_seconds: 30
   enter_pip: true
+  snapshot_fallback: true
+  snapshot_camera_entity: camera.front_door_sub
 ```
 
-Use the Home Assistant device ID for `receiver_device_id` and a camera entity that exposes a TV-compatible HLS stream. Lower-resolution or H.264 camera streams are generally more reliable for TV popups than high-resolution main streams. The Android receiver enables Media3 decoder fallback and shows a clear unsupported-stream message, but it cannot replace transcoding for unsupported camera formats.
+Use the Home Assistant device ID for `receiver_device_id` and a camera entity that exposes a TV-compatible HLS stream. `snapshot_fallback` is optional and enabled by default; it lets the receiver show a camera snapshot while the video stream loads. `snapshot_camera_entity` is optional and defaults to `camera_entity`, which is useful when a secondary camera entity provides a faster or lower-resolution still preview. Lower-resolution or H.264 camera streams are generally more reliable for TV popups than high-resolution main streams. The Android receiver enables Media3 decoder fallback and shows a clear unsupported-stream message, but it cannot replace transcoding for unsupported camera formats.
 
 Receiver playback diagnostics:
 

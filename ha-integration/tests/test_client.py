@@ -30,6 +30,7 @@ def test_post_json_sets_bearer_token(monkeypatch) -> None:  # type: ignore[no-un
 
     def fake_urlopen(request, timeout):  # type: ignore[no-untyped-def]
         captured["authorization"] = request.headers.get("Authorization")
+        captured["body"] = request.data.decode()
         captured["timeout"] = timeout
         return FakeResponse()
 
@@ -43,12 +44,15 @@ def test_post_json_sets_bearer_token(monkeypatch) -> None:  # type: ignore[no-un
             "title": "Front Door",
             "url": "https://example.test/stream.m3u8",
             "streamType": "hls",
+            "previewUrl": "https://example.test/snapshot.jpg",
         },
         "secret-token",
     )
 
     assert response == {"accepted": True}
-    assert captured == {"authorization": "Bearer secret-token", "timeout": 5}
+    assert captured["authorization"] == "Bearer secret-token"
+    assert captured["timeout"] == 5
+    assert '"previewUrl": "https://example.test/snapshot.jpg"' in captured["body"]
 
 
 def test_post_json_sends_snapshot_stream_type(monkeypatch) -> None:  # type: ignore[no-untyped-def]
@@ -91,7 +95,9 @@ def test_show_camera_command_shape() -> None:
         url="https://example.test/stream.m3u8",
         duration_seconds=30,
         enter_pip=True,
+        preview_url="https://example.test/snapshot.jpg",
     )
 
     assert command.title == "Front Door"
     assert command.stream_type == "hls"
+    assert command.preview_url == "https://example.test/snapshot.jpg"

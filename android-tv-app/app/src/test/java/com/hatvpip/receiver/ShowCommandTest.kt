@@ -13,6 +13,7 @@ class ShowCommandTest {
               "title": "Front Door",
               "url": "https://example.com/front-door.m3u8",
               "streamType": "hls",
+              "previewUrl": "https://example.com/front-door.jpg",
               "durationSeconds": 30,
               "enterPip": true
             }
@@ -21,6 +22,7 @@ class ShowCommandTest {
 
         assertEquals("Front Door", command.title)
         assertEquals("https://example.com/front-door.m3u8", command.url)
+        assertEquals("https://example.com/front-door.jpg", command.previewUrl)
         assertEquals(StreamType.Hls, command.streamType)
         assertEquals(30, command.durationSeconds)
         assertTrue(command.enterPip)
@@ -51,6 +53,19 @@ class ShowCommandTest {
         assertEquals(StreamType.Snapshot, command.streamType)
         assertEquals("https://example.com/front-door.jpg", command.url)
         assertEquals(10, command.durationSeconds)
+    }
+
+    @Test
+    fun rejectsInvalidPreviewUrl() {
+        val result = ShowCommand.fromJson(
+            """{"url":"https://example.com/video.m3u8","previewUrl":"file:///tmp/image.jpg"}"""
+        )
+
+        assertTrue(result.isFailure)
+        assertEquals(
+            "`previewUrl` must be an HTTP or HTTPS URL",
+            result.exceptionOrNull()?.message
+        )
     }
 
     @Test

@@ -315,6 +315,7 @@ class PlayerActivity : ComponentActivity() {
         const val EXTRA_TITLE = "com.hatvpip.receiver.extra.TITLE"
         const val EXTRA_URL = "com.hatvpip.receiver.extra.URL"
         const val EXTRA_STREAM_TYPE = "com.hatvpip.receiver.extra.STREAM_TYPE"
+        const val EXTRA_PREVIEW_URL = "com.hatvpip.receiver.extra.PREVIEW_URL"
         const val EXTRA_DURATION_SECONDS = "com.hatvpip.receiver.extra.DURATION_SECONDS"
         const val EXTRA_ENTER_PIP = "com.hatvpip.receiver.extra.ENTER_PIP"
         const val TEST_STREAM_URL = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
@@ -325,6 +326,7 @@ class PlayerActivity : ComponentActivity() {
                 putExtra(EXTRA_TITLE, command.title)
                 putExtra(EXTRA_URL, command.url)
                 putExtra(EXTRA_STREAM_TYPE, command.streamType.wireName)
+                putExtra(EXTRA_PREVIEW_URL, command.previewUrl)
                 command.durationSeconds?.let { putExtra(EXTRA_DURATION_SECONDS, it) }
                 putExtra(EXTRA_ENTER_PIP, command.enterPip)
             }
@@ -339,6 +341,7 @@ private fun Intent.toShowCommand(): ShowCommand =
             StreamType.Snapshot.wireName -> StreamType.Snapshot
             else -> StreamType.Hls
         },
+        previewUrl = getStringExtra(PlayerActivity.EXTRA_PREVIEW_URL),
         durationSeconds = if (hasExtra(PlayerActivity.EXTRA_DURATION_SECONDS)) {
             getIntExtra(PlayerActivity.EXTRA_DURATION_SECONDS, 0).takeIf { it > 0 }
         } else {

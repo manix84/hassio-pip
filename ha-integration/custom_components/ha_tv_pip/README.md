@@ -46,9 +46,12 @@ data:
   camera_entity: camera.front_door
   duration_seconds: 30
   enter_pip: true
+  snapshot_fallback: true
+  snapshot_camera_entity: camera.front_door_sub
 ```
 
 The service resolves an HLS stream URL through Home Assistant's camera stream API and sends it to the paired receiver with the stored bearer token.
+When `snapshot_fallback` is enabled, the integration also sends a snapshot preview so the receiver can show a still image while the video stream loads. `snapshot_camera_entity` is optional and defaults to `camera_entity`; set it when a separate camera entity provides a better still image or substream preview.
 For cameras with multiple streams, use a TV-compatible H.264/HLS stream where possible. Lower-resolution secondary streams are often more reliable for TV popups than high-resolution main streams. The receiver enables Media3 decoder fallback, but unsupported camera codecs still need a compatible camera profile or future transcoding support.
 
 ## Snapshot Service 🖼️

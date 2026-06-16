@@ -30,6 +30,19 @@ show_camera:
         boolean:
       name: Enter PiP
       description: Ask the receiver to use PiP or overlay mode when available.
+    snapshot_fallback:
+      default: true
+      selector:
+        boolean:
+      name: Snapshot fallback
+      description: Show a camera snapshot while the video stream loads, when Home Assistant exposes one.
+    snapshot_camera_entity:
+      required: false
+      selector:
+        entity:
+          domain: camera
+      name: Snapshot fallback camera entity
+      description: Optional camera entity to use for the loading snapshot. Defaults to the main camera entity.
     title:
       required: false
       selector:

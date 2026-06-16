@@ -417,6 +417,7 @@ data:
 - `ha_tv_pip.show_snapshot` displays camera snapshots through the Android TV overlay renderer.
 - Snapshot commands use the same pairing, bearer-token auth, receiver targeting, and duration timeout as video commands.
 - Camera feeds and snapshot feeds were both tested successfully from Home Assistant before moving to Stage 7.
+- Video commands now support an optional entity-based snapshot preview fallback so a still image can be displayed while live playback loads.
 
 ---
 

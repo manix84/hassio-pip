@@ -19,6 +19,8 @@ from custom_components.ha_tv_pip.services import (
     ATTR_DURATION_SECONDS,
     ATTR_ENTER_PIP,
     ATTR_RECEIVER_DEVICE_ID,
+    ATTR_SNAPSHOT_CAMERA_ENTITY,
+    ATTR_SNAPSHOT_FALLBACK,
     ATTR_TITLE,
     ServiceValidationError,
     _absolute_stream_url,
@@ -91,6 +93,8 @@ def test_request_from_call_reads_target_and_defaults() -> None:
     assert request.device_ids == ("device-1",)
     assert request.duration_seconds == 30
     assert request.enter_pip is True
+    assert request.snapshot_camera_entity is None
+    assert request.snapshot_fallback is True
 
 
 def test_request_from_call_accepts_title_and_duration() -> None:
@@ -100,6 +104,8 @@ def test_request_from_call_accepts_title_and_duration() -> None:
                 ATTR_CAMERA_ENTITY: "camera.front_door",
                 ATTR_DURATION_SECONDS: 10,
                 ATTR_ENTER_PIP: False,
+                ATTR_SNAPSHOT_CAMERA_ENTITY: "camera.front_door_sub",
+                ATTR_SNAPSHOT_FALLBACK: False,
                 ATTR_TITLE: "Doorbell",
             }
         )
@@ -107,6 +113,8 @@ def test_request_from_call_accepts_title_and_duration() -> None:
 
     assert request.duration_seconds == 10
     assert request.enter_pip is False
+    assert request.snapshot_camera_entity == "camera.front_door_sub"
+    assert request.snapshot_fallback is False
     assert request.title == "Doorbell"
 
 

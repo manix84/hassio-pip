@@ -83,6 +83,7 @@ class LocalControlService : Service() {
                     .putExtra(PlayerActivity.EXTRA_TITLE, command.title)
                     .putExtra(PlayerActivity.EXTRA_URL, command.url)
                     .putExtra(PlayerActivity.EXTRA_STREAM_TYPE, command.streamType.wireName)
+                    .putExtra(PlayerActivity.EXTRA_PREVIEW_URL, command.previewUrl)
                     .apply {
                         command.durationSeconds?.let {
                             putExtra(PlayerActivity.EXTRA_DURATION_SECONDS, it)
