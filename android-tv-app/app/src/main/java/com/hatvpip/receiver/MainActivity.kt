@@ -9,6 +9,7 @@ import android.os.Looper
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -53,6 +54,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -358,29 +360,42 @@ private fun ReceiverHeader(
     remoteSnapshot: RemoteConnectionSnapshot,
     launcherVisible: Boolean
 ) {
-    Column(
+    Row(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Top
     ) {
-        Text(
-            text = stringResource(R.string.main_title),
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 34.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = stringResource(
-                R.string.main_status_summary,
-                pairingSnapshot?.state?.wireName ?: stringResource(R.string.status_unknown),
-                remoteHeaderStatus(remoteConfig, remoteSnapshot),
-                if (launcherVisible) {
-                    stringResource(R.string.status_visible)
-                } else {
-                    stringResource(R.string.status_hidden)
-                }
-            ),
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 17.sp
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.main_title),
+                color = MaterialTheme.colorScheme.onBackground,
+                fontSize = 34.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = stringResource(
+                    R.string.main_status_summary,
+                    pairingSnapshot?.state?.wireName ?: stringResource(R.string.status_unknown),
+                    remoteHeaderStatus(remoteConfig, remoteSnapshot),
+                    if (launcherVisible) {
+                        stringResource(R.string.status_visible)
+                    } else {
+                        stringResource(R.string.status_hidden)
+                    }
+                ),
+                color = MaterialTheme.colorScheme.onBackground,
+                fontSize = 17.sp
+            )
+        }
+        Image(
+            painter = painterResource(R.mipmap.ic_launcher_foreground),
+            contentDescription = stringResource(R.string.app_name),
+            modifier = Modifier
+                .width(92.dp)
+                .height(92.dp)
         )
     }
 }
