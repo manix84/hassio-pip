@@ -918,3 +918,16 @@ curl http://ANDROID_TV_IP:8765/status
 ```
 
 Check `playbackState`, `displayMode`, `url`, and `error` after triggering the service.
+
+Stage 6 snapshot service testing:
+
+```yaml
+action: ha_tv_pip.show_snapshot
+data:
+  receiver_device_id: living_room_tv
+  camera_entity: camera.front_door
+  duration_seconds: 10
+  enter_pip: true
+```
+
+Snapshot mode uses the Home Assistant camera proxy URL and the Android TV overlay renderer. It is intended for fast alerts and for cameras where live playback is unnecessary or unreliable.

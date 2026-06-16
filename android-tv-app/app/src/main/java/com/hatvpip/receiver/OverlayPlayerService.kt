@@ -2,6 +2,7 @@ package com.hatvpip.receiver
 
 import android.app.Service
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.graphics.PixelFormat
 import android.os.Handler
 import android.os.IBinder
@@ -10,12 +11,14 @@ import android.view.Gravity
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import java.net.URL
 
 class OverlayPlayerService : Service() {
     private lateinit var windowManager: WindowManager
@@ -24,8 +27,10 @@ class OverlayPlayerService : Service() {
     private var errorTextView: TextView? = null
     private var title: String = "HA TV PiP"
     private var url: String = PlayerActivity.TEST_STREAM_URL
+    private var streamType: StreamType = StreamType.Hls
     private var durationSeconds: Int? = null
     private val autoCloseHandler = Handler(Looper.getMainLooper())
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     override fun onCreate() {
         super.onCreate()
@@ -38,6 +43,10 @@ class OverlayPlayerService : Service() {
             else -> {
                 title = intent?.getStringExtra(PlayerActivity.EXTRA_TITLE) ?: title
                 url = intent?.getStringExtra(PlayerActivity.EXTRA_URL) ?: url
+                streamType = when (intent?.getStringExtra(PlayerActivity.EXTRA_STREAM_TYPE)) {
+                    StreamType.Snapshot.wireName -> StreamType.Snapshot
+                    else -> StreamType.Hls
+                }
                 durationSeconds = intent?.takeIf {
                     it.hasExtra(PlayerActivity.EXTRA_DURATION_SECONDS)
                 }?.getIntExtra(PlayerActivity.EXTRA_DURATION_SECONDS, 0)?.takeIf { it > 0 }
@@ -60,6 +69,61 @@ class OverlayPlayerService : Service() {
             removeOverlay()
         }
 
+        val root = FrameLayout(this).apply {
+            setBackgroundColor(android.graphics.Color.BLACK)
+        }
+        if (streamType == StreamType.Snapshot) {
+            addSnapshotView(root)
+        } else {
+            addPlayerView(root)
+        }
+
+        errorTextView = TextView(this).apply {
+            setTextColor(android.graphics.Color.WHITE)
+            setBackgroundColor(0xCC000000.toInt())
+            textSize = 14f
+            gravity = Gravity.CENTER
+            visibility = TextView.GONE
+            layoutParams = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        }
+        root.addView(errorTextView)
+
+        val params = WindowManager.LayoutParams(
+            OVERLAY_WIDTH_PX,
+            OVERLAY_HEIGHT_PX,
+            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+            PixelFormat.TRANSLUCENT
+        ).apply {
+            gravity = Gravity.TOP or Gravity.END
+            x = OVERLAY_MARGIN_PX
+            y = OVERLAY_MARGIN_PX
+        }
+
+        runCatching {
+            windowManager.addView(root, params)
+            overlayView = root
+            updatePlaybackState(
+                status = PlaybackStatus.Buffering,
+                isPlaying = false,
+                errorMessage = null
+            )
+            AppLog.playbackStart(url)
+            scheduleAutoClose()
+        }.onFailure { error ->
+            AppLog.error("Unable to show overlay fallback", error)
+            player?.release()
+            player = null
+            stopSelf()
+        }
+    }
+
+    private fun addPlayerView(root: FrameLayout) {
         val overlayPlayer = buildReceiverPlayer(this).also { exoPlayer ->
             exoPlayer.addListener(
                 object : Player.Listener {
@@ -103,62 +167,59 @@ class OverlayPlayerService : Service() {
         }
         player = overlayPlayer
 
-        val playerView = PlayerView(this).apply {
+        root.addView(
+            PlayerView(this).apply {
+                layoutParams = FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT
+                )
+                useController = false
+                this.player = overlayPlayer
+            }
+        )
+    }
+
+    private fun addSnapshotView(root: FrameLayout) {
+        val imageView = ImageView(this).apply {
             layoutParams = FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
-            useController = false
-            this.player = overlayPlayer
-        }
-
-        val root = FrameLayout(this).apply {
+            adjustViewBounds = true
+            scaleType = ImageView.ScaleType.FIT_CENTER
             setBackgroundColor(android.graphics.Color.BLACK)
-            addView(playerView)
         }
-        errorTextView = TextView(this).apply {
-            setTextColor(android.graphics.Color.WHITE)
-            setBackgroundColor(0xCC000000.toInt())
-            textSize = 14f
-            gravity = Gravity.CENTER
-            visibility = TextView.GONE
-            layoutParams = FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-        }
-        root.addView(errorTextView)
+        root.addView(imageView)
 
-        val params = WindowManager.LayoutParams(
-            OVERLAY_WIDTH_PX,
-            OVERLAY_HEIGHT_PX,
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
-                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
-            PixelFormat.TRANSLUCENT
-        ).apply {
-            gravity = Gravity.TOP or Gravity.END
-            x = OVERLAY_MARGIN_PX
-            y = OVERLAY_MARGIN_PX
-        }
-
-        runCatching {
-            windowManager.addView(root, params)
-            overlayView = root
-            updatePlaybackState(
-                status = PlaybackStatus.Buffering,
-                isPlaying = false,
-                errorMessage = null
-            )
-            AppLog.playbackStart(url)
-            scheduleAutoClose()
-        }.onFailure { error ->
-            AppLog.error("Unable to show overlay fallback", error)
-            overlayPlayer.release()
-            player = null
-            stopSelf()
-        }
+        Thread {
+            runCatching {
+                URL(url).openStream().use { stream ->
+                    BitmapFactory.decodeStream(stream)
+                        ?: error("Snapshot response was not a supported image")
+                }
+            }.onSuccess { bitmap ->
+                mainHandler.post {
+                    imageView.setImageBitmap(bitmap)
+                    updatePlaybackState(
+                        status = PlaybackStatus.Ready,
+                        isPlaying = false,
+                        errorMessage = null
+                    )
+                }
+            }.onFailure { error ->
+                mainHandler.post {
+                    val message = error.message ?: "unknown snapshot error"
+                    updatePlaybackState(
+                        status = PlaybackStatus.Error,
+                        isPlaying = false,
+                        errorMessage = message
+                    )
+                    errorTextView?.text = "Snapshot unavailable"
+                    errorTextView?.visibility = TextView.VISIBLE
+                    AppLog.error("Snapshot overlay failed: $message", error)
+                }
+            }
+        }.start()
     }
 
     private fun removeOverlay() {

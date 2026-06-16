@@ -335,7 +335,10 @@ private fun Intent.toShowCommand(): ShowCommand =
     ShowCommand(
         title = getStringExtra(PlayerActivity.EXTRA_TITLE) ?: "Test Video",
         url = getStringExtra(PlayerActivity.EXTRA_URL) ?: PlayerActivity.TEST_STREAM_URL,
-        streamType = StreamType.Hls,
+        streamType = when (getStringExtra(PlayerActivity.EXTRA_STREAM_TYPE)) {
+            StreamType.Snapshot.wireName -> StreamType.Snapshot
+            else -> StreamType.Hls
+        },
         durationSeconds = if (hasExtra(PlayerActivity.EXTRA_DURATION_SECONDS)) {
             getIntExtra(PlayerActivity.EXTRA_DURATION_SECONDS, 0).takeIf { it > 0 }
         } else {

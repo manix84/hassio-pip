@@ -35,6 +35,25 @@ class ShowCommandTest {
     }
 
     @Test
+    fun parsesSnapshotShowRequest() {
+        val command = ShowCommand.fromJson(
+            """
+            {
+              "title": "Front Door",
+              "url": "https://example.com/front-door.jpg",
+              "streamType": "snapshot",
+              "durationSeconds": 10,
+              "enterPip": true
+            }
+            """.trimIndent()
+        ).getOrThrow()
+
+        assertEquals(StreamType.Snapshot, command.streamType)
+        assertEquals("https://example.com/front-door.jpg", command.url)
+        assertEquals(10, command.durationSeconds)
+    }
+
+    @Test
     fun rejectsUnsupportedStreamType() {
         val result = ShowCommand.fromJson(
             """{"url":"https://example.com/video.mp4","streamType":"mp4"}"""

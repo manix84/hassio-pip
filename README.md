@@ -26,6 +26,8 @@ Stage 4 is complete in `0.18.0`. Discovered receivers use a TV-visible pairing c
 
 Stage 5 is complete in `0.21.0`. Home Assistant automations can call `ha_tv_pip.show_camera` for paired receivers, with Android TV overlay playback verified using a compatible camera stream. Some high-resolution or non-H.264 camera streams may still need future stream selection or transcoding support when their codec/profile is not Android TV-compatible.
 
+Stage 6 is complete in `0.22.0`. Home Assistant automations can call `ha_tv_pip.show_snapshot` to display fast camera snapshots on paired receivers using the same local auth and targeting path.
+
 ## Monorepo Layout 🧱
 
 ```txt
@@ -158,8 +160,9 @@ Play Store deployment is not implemented yet.
 Future phases will expand the Home Assistant custom integration and Android TV receiver control features:
 
 - Home Assistant service: `ha_tv_pip.show_camera` 📹
+- Home Assistant service: `ha_tv_pip.show_snapshot` 🖼️
 - HLS streams from Home Assistant 🎬
-- Snapshots and WebRTC support 🖼️
+- Future WebRTC support 🧵
 - HACS distribution 🧩
 - Long-term official Home Assistant integration track 🏠
 - Fire TV / Vega OS receiver support 🔥

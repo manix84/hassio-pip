@@ -4,7 +4,8 @@ import org.json.JSONException
 import org.json.JSONObject
 
 enum class StreamType(val wireName: String) {
-    Hls("hls")
+    Hls("hls"),
+    Snapshot("snapshot")
 }
 
 data class ShowCommand(
@@ -35,6 +36,7 @@ data class ShowCommand(
 
                 val streamType = when (val value = json.optString("streamType", "hls")) {
                     StreamType.Hls.wireName -> StreamType.Hls
+                    StreamType.Snapshot.wireName -> StreamType.Snapshot
                     else -> error("Unsupported `streamType`: $value")
                 }
 

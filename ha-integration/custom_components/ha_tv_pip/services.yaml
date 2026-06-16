@@ -36,3 +36,41 @@ show_camera:
         text:
       name: Title
       description: Optional display title. Defaults to the camera friendly name.
+show_snapshot:
+  fields:
+    receiver_device_id:
+      required: false
+      selector:
+        device:
+          integration: ha_tv_pip
+      name: Receiver device
+      description: Paired Android TV or Google TV receiver to display the snapshot on.
+    camera_entity:
+      required: true
+      selector:
+        entity:
+          domain: camera
+      name: Camera entity
+      description: Camera entity to capture a snapshot from.
+    duration_seconds:
+      default: 10
+      selector:
+        number:
+          min: 1
+          max: 3600
+          mode: box
+          unit_of_measurement: seconds
+      name: Duration
+      description: How long the receiver should keep the snapshot open.
+    enter_pip:
+      default: true
+      selector:
+        boolean:
+      name: Enter PiP
+      description: Ask the receiver to use overlay mode for the snapshot.
+    title:
+      required: false
+      selector:
+        text:
+      name: Title
+      description: Optional display title. Defaults to the camera friendly name.

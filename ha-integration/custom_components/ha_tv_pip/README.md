@@ -37,7 +37,7 @@ npm run ha:build:dry-run
 The integration package uses Ruff for Python linting, MyPy for type checking, and pytest for tests. `npm run install:all` installs those tools into `ha-integration/.venv/`.
 The dry-run build packages the custom integration zip and will remain the integration build check until a fuller Home Assistant implementation exists.
 
-## Service MVP 📹
+## Camera Service 📹
 
 ```yaml
 service: ha_tv_pip.show_camera
@@ -50,3 +50,16 @@ data:
 
 The service resolves an HLS stream URL through Home Assistant's camera stream API and sends it to the paired receiver with the stored bearer token.
 For cameras with multiple streams, use a TV-compatible H.264/HLS stream where possible. Lower-resolution secondary streams are often more reliable for TV popups than high-resolution main streams. The receiver enables Media3 decoder fallback, but unsupported camera codecs still need a compatible camera profile or future transcoding support.
+
+## Snapshot Service 🖼️
+
+```yaml
+service: ha_tv_pip.show_snapshot
+data:
+  receiver_device_id: living_room_tv
+  camera_entity: camera.front_door
+  duration_seconds: 10
+  enter_pip: true
+```
+
+The service resolves a Home Assistant camera proxy snapshot URL and sends it to the paired receiver as `streamType: snapshot`. Snapshot mode is useful for alerts where fast display is more important than live playback.

@@ -14,3 +14,4 @@ CONF_VERSION = "version"
 DEFAULT_PORT = 8765
 DISCOVERY_SERVICE_TYPE = "_ha-tv-pip._tcp.local."
 SERVICE_SHOW_CAMERA = "show_camera"
+SERVICE_SHOW_SNAPSHOT = "show_snapshot"

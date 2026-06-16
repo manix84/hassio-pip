@@ -73,12 +73,16 @@ class LocalControlService : Service() {
 
     private fun showPlayer(command: ShowCommand) {
         val compatibility = DeviceCompatibilityEvaluator.from(this)
-        if (command.enterPip && compatibility.recommendedMode == ReceiverDisplayMode.OverlayFallback) {
+        if (
+            command.streamType == StreamType.Snapshot ||
+            (command.enterPip && compatibility.recommendedMode == ReceiverDisplayMode.OverlayFallback)
+        ) {
             startService(
                 Intent(this, OverlayPlayerService::class.java)
                     .setAction(OverlayPlayerService.ACTION_SHOW)
                     .putExtra(PlayerActivity.EXTRA_TITLE, command.title)
                     .putExtra(PlayerActivity.EXTRA_URL, command.url)
+                    .putExtra(PlayerActivity.EXTRA_STREAM_TYPE, command.streamType.wireName)
                     .apply {
                         command.durationSeconds?.let {
                             putExtra(PlayerActivity.EXTRA_DURATION_SECONDS, it)

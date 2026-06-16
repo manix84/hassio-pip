@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
-from urllib.parse import urljoin, urlparse
+from urllib.parse import quote, urlencode, urljoin, urlparse
 
 from .client import ReceiverClientError, ShowCameraCommand, async_show_camera
 from .const import (
@@ -15,6 +15,7 @@ from .const import (
     CONF_TOKEN,
     DOMAIN,
     SERVICE_SHOW_CAMERA,
+    SERVICE_SHOW_SNAPSHOT,
 )
 
 if TYPE_CHECKING:
@@ -41,6 +42,8 @@ ATTR_ENTER_PIP = "enter_pip"
 ATTR_RECEIVER_DEVICE_ID = "receiver_device_id"
 ATTR_TITLE = "title"
 CAMERA_DOMAIN = "camera"
+STREAM_TYPE_HLS = "hls"
+STREAM_TYPE_SNAPSHOT = "snapshot"
 ERROR_MESSAGES = {
     "camera_not_found": "Camera entity was not found.",
     "camera_stream_unavailable": (
@@ -57,7 +60,11 @@ ERROR_MESSAGES = {
     ),
     "receiver_not_found": "No matching HA TV PiP receiver was found.",
     "receiver_not_paired": "The selected HA TV PiP receiver is not paired.",
+    "snapshot_unavailable": (
+        "Home Assistant could not create a snapshot URL for the camera."
+    ),
 }
+
 
 @dataclass(frozen=True)
 class ReceiverEntry:
@@ -96,38 +103,60 @@ class ServiceValidationError(HomeAssistantError):
 async def async_register_services(hass: Any) -> None:
     """Register HA TV PiP services once per Home Assistant instance."""
 
-    if hass.services.has_service(DOMAIN, SERVICE_SHOW_CAMERA):
-        return
-
     vol = __import__("voluptuous")
     cv = __import__(
         "homeassistant.helpers.config_validation",
         fromlist=["entity_id"],
     )
 
-    schema = vol.Schema(
+    base_schema = {
+        vol.Required(ATTR_CAMERA_ENTITY): cv.entity_id,
+        vol.Optional(ATTR_DEVICE_ID): vol.Any(str, [str]),
+        vol.Optional(ATTR_RECEIVER_DEVICE_ID): vol.Any(str, [str]),
+        vol.Optional(ATTR_ENTER_PIP, default=True): bool,
+        vol.Optional(ATTR_TITLE): str,
+    }
+
+    camera_schema = vol.Schema(
         {
-            vol.Required(ATTR_CAMERA_ENTITY): cv.entity_id,
-            vol.Optional(ATTR_DEVICE_ID): vol.Any(str, [str]),
-            vol.Optional(ATTR_RECEIVER_DEVICE_ID): vol.Any(str, [str]),
+            **base_schema,
             vol.Optional(ATTR_DURATION_SECONDS, default=30): vol.All(
                 vol.Coerce(int),
                 vol.Range(min=1, max=3600),
             ),
-            vol.Optional(ATTR_ENTER_PIP, default=True): bool,
-            vol.Optional(ATTR_TITLE): str,
+        }
+    )
+    snapshot_schema = vol.Schema(
+        {
+            **base_schema,
+            vol.Optional(ATTR_DURATION_SECONDS, default=10): vol.All(
+                vol.Coerce(int),
+                vol.Range(min=1, max=3600),
+            ),
         }
     )
 
     async def handle_show_camera(call: Any) -> None:
         await async_handle_show_camera(hass, call)
 
-    hass.services.async_register(
-        DOMAIN,
-        SERVICE_SHOW_CAMERA,
-        handle_show_camera,
-        schema=schema,
-    )
+    async def handle_show_snapshot(call: Any) -> None:
+        await async_handle_show_snapshot(hass, call)
+
+    if not hass.services.has_service(DOMAIN, SERVICE_SHOW_CAMERA):
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_SHOW_CAMERA,
+            handle_show_camera,
+            schema=camera_schema,
+        )
+
+    if not hass.services.has_service(DOMAIN, SERVICE_SHOW_SNAPSHOT):
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_SHOW_SNAPSHOT,
+            handle_show_snapshot,
+            schema=snapshot_schema,
+        )
 
 
 async def async_handle_show_camera(hass: Any, call: Any) -> None:
@@ -156,10 +185,45 @@ async def async_handle_show_camera(hass: Any, call: Any) -> None:
                 url=stream_url,
                 duration_seconds=request.duration_seconds,
                 enter_pip=request.enter_pip,
+                stream_type=STREAM_TYPE_HLS,
             ),
         )
     except ReceiverClientError as error:
         _LOGGER.error("Unable to send camera stream to %s: %s", receiver.name, error)
+        raise ServiceValidationError("receiver_command_failed", str(error)) from error
+
+
+async def async_handle_show_snapshot(hass: Any, call: Any) -> None:
+    """Handle `ha_tv_pip.show_snapshot` service calls."""
+
+    request = _request_from_call(call)
+    _validate_camera_entity(hass, request.camera_entity)
+    receiver = _resolve_receiver(hass, request)
+    snapshot_url = _camera_snapshot_url(hass, request.camera_entity)
+    title = request.title or _camera_title(hass, request.camera_entity)
+    _LOGGER.info(
+        "Sending snapshot %s to receiver %s at %s:%s",
+        request.camera_entity,
+        receiver.name,
+        receiver.host,
+        receiver.port,
+    )
+
+    try:
+        await async_show_camera(
+            receiver.host,
+            receiver.port,
+            token=receiver.token,
+            command=ShowCameraCommand(
+                title=title,
+                url=snapshot_url,
+                duration_seconds=request.duration_seconds,
+                enter_pip=request.enter_pip,
+                stream_type=STREAM_TYPE_SNAPSHOT,
+            ),
+        )
+    except ReceiverClientError as error:
+        _LOGGER.error("Unable to send camera snapshot to %s: %s", receiver.name, error)
         raise ServiceValidationError("receiver_command_failed", str(error)) from error
 
 
@@ -308,6 +372,21 @@ def _camera_title(hass: Any, entity_id: str) -> str:
     state = hass.states.get(entity_id)
     friendly_name = state.attributes.get("friendly_name") if state is not None else None
     return str(friendly_name or entity_id)
+
+
+def _camera_snapshot_url(hass: Any, entity_id: str) -> str:
+    state = hass.states.get(entity_id)
+    access_token = None if state is None else state.attributes.get("access_token")
+    if not access_token:
+        _LOGGER.error(
+            "Camera entity %s does not expose a snapshot access token",
+            entity_id,
+        )
+        raise ServiceValidationError("snapshot_unavailable")
+
+    path = f"/api/camera_proxy/{quote(entity_id, safe='')}"
+    query = urlencode({"token": str(access_token)})
+    return _absolute_stream_url(hass, f"{path}?{query}")
 
 
 def _tuple_value(value: Any) -> tuple[str, ...]:

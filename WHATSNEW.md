@@ -1,5 +1,12 @@
 # What's New ✨
 
+## 0.22.0 - Stage 6 Snapshot Support 🖼️
+
+- Added `ha_tv_pip.show_snapshot` to display camera snapshots from Home Assistant 🏠
+- Added Android TV snapshot overlay rendering for `streamType: snapshot` 📺
+- Reused pairing, bearer-token auth, receiver targeting, and duration timeouts for snapshots 🔐
+- Confirmed camera feeds and snapshot feeds both work on the Chromecast test receiver ✅
+
 ## 0.21.2 - Generic Stream Error Wording 🩺
 
 - Generalised unsupported-stream messages so they are not tied to one camera brand or setup 📺

@@ -51,6 +51,40 @@ def test_post_json_sets_bearer_token(monkeypatch) -> None:  # type: ignore[no-un
     assert captured == {"authorization": "Bearer secret-token", "timeout": 5}
 
 
+def test_post_json_sends_snapshot_stream_type(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    captured = {}
+
+    class FakeResponse:
+        def __enter__(self):  # type: ignore[no-untyped-def]
+            return self
+
+        def __exit__(self, *args):  # type: ignore[no-untyped-def]
+            return None
+
+        def read(self) -> bytes:
+            return b'{"accepted":true}'
+
+    def fake_urlopen(request, timeout):  # type: ignore[no-untyped-def]
+        captured["body"] = request.data.decode()
+        return FakeResponse()
+
+    monkeypatch.setattr("custom_components.ha_tv_pip.client.urlopen", fake_urlopen)
+
+    _post_json(
+        "10.0.0.236",
+        8765,
+        "/show",
+        {
+            "title": "Front Door",
+            "url": "https://example.test/snapshot.jpg",
+            "streamType": "snapshot",
+        },
+        "secret-token",
+    )
+
+    assert '"streamType": "snapshot"' in captured["body"]
+
+
 def test_show_camera_command_shape() -> None:
     command = ShowCameraCommand(
         title="Front Door",
@@ -60,3 +94,4 @@ def test_show_camera_command_shape() -> None:
     )
 
     assert command.title == "Front Door"
+    assert command.stream_type == "hls"

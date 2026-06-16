@@ -252,6 +252,7 @@ class LocalControlServer(
                 .put("replaced", replacedExistingPlayback)
                 .put("title", command.title)
                 .put("url", command.url)
+                .put("streamType", command.streamType.wireName)
                 .put("durationSeconds", command.durationSeconds)
                 .put("enterPip", command.enterPip)
         )

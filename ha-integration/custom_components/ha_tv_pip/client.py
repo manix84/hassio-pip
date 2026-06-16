@@ -39,6 +39,7 @@ class ShowCameraCommand:
     url: str
     duration_seconds: int | None
     enter_pip: bool
+    stream_type: str = "hls"
 
 
 async def async_start_pairing(
@@ -113,7 +114,7 @@ async def async_show_camera(
     payload: dict[str, Any] = {
         "title": command.title,
         "url": command.url,
-        "streamType": "hls",
+        "streamType": command.stream_type,
         "enterPip": command.enter_pip,
     }
     if command.duration_seconds is not None:

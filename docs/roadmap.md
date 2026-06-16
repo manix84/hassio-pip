@@ -380,6 +380,8 @@ action:
 
 # Phase 6: Snapshot Support
 
+Status: Complete in `0.22.0`.
+
 ## Goal
 
 Support still image popups for cameras or alerts where video is unnecessary or unreliable.
@@ -387,13 +389,13 @@ Support still image popups for cameras or alerts where video is unnecessary or u
 ## Service
 
 ```yaml
-ha_tv_pip.show_snapshot:
-  target:
-    device_id: living_room_tv
-  data:
-    camera_entity: camera.front_door
-    duration_seconds: 10
-    title: Front Door
+action: ha_tv_pip.show_snapshot
+data:
+  receiver_device_id: living_room_tv
+  camera_entity: camera.front_door
+  duration_seconds: 10
+  enter_pip: true
+  title: Front Door
 ```
 
 ## Behaviour
@@ -408,6 +410,13 @@ ha_tv_pip.show_snapshot:
 - Snapshot popups work even when live streaming is unavailable.
 - Snapshot mode is faster than video mode.
 - Snapshot mode is suitable for doorbell/person alerts.
+
+## Completion Notes
+
+- Completed and tested with Home Assistant triggering a paired Chromecast receiver.
+- `ha_tv_pip.show_snapshot` displays camera snapshots through the Android TV overlay renderer.
+- Snapshot commands use the same pairing, bearer-token auth, receiver targeting, and duration timeout as video commands.
+- Camera feeds and snapshot feeds were both tested successfully from Home Assistant before moving to Stage 7.
 
 ---
 

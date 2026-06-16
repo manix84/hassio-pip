@@ -22,6 +22,7 @@ from custom_components.ha_tv_pip.services import (
     ATTR_TITLE,
     ServiceValidationError,
     _absolute_stream_url,
+    _camera_snapshot_url,
     _camera_title,
     _request_from_call,
     _resolve_receiver,
@@ -221,3 +222,33 @@ def test_camera_title_uses_friendly_name() -> None:
     )
 
     assert _camera_title(hass, "camera.front_door") == "Front Door"
+
+
+def test_camera_snapshot_url_uses_camera_proxy_token(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    network_module = FakeNetworkModule("homeassistant.helpers.network")
+    monkeypatch.setitem(sys.modules, "homeassistant.helpers.network", network_module)
+    hass = FakeHass(
+        entries=[],
+        states={"camera.front_door": FakeState({"access_token": "snapshot-token"})},
+    )
+
+    assert _camera_snapshot_url(
+        hass,
+        "camera.front_door",
+    ) == (
+        "http://10.0.0.2:8123/api/camera_proxy/camera.front_door"
+        "?token=snapshot-token"
+    )
+
+
+def test_camera_snapshot_url_requires_access_token() -> None:
+    hass = FakeHass(
+        entries=[],
+        states={"camera.front_door": FakeState({})},
+    )
+
+    with pytest.raises(ServiceValidationError) as error:
+        _camera_snapshot_url(hass, "camera.front_door")
+    assert error.value.code == "snapshot_unavailable"
