@@ -10,6 +10,7 @@
     <string name="section_pairing">Pairing</string>
     <string name="section_diagnostics">Diagnostics</string>
     <string name="section_setup_guide">Setup guide</string>
+    <string name="section_status_overview">Status overview</string>
     <string name="section_troubleshooting">Troubleshooting</string>
 
     <string name="action_play_test_video">Play Test Video</string>

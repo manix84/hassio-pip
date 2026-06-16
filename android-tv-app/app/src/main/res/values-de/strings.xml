@@ -9,6 +9,7 @@
     <string name="section_pairing">Kopplung</string>
     <string name="section_diagnostics">Diagnose</string>
     <string name="section_setup_guide">Einrichtungsanleitung</string>
+    <string name="section_status_overview">Statusübersicht</string>
     <string name="section_troubleshooting">Fehlerbehebung</string>
     <string name="action_play_test_video">Testvideo abspielen</string>
     <string name="action_overlay_settings">Overlay-Einstellungen</string>

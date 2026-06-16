@@ -9,6 +9,7 @@
     <string name="section_pairing">Association</string>
     <string name="section_diagnostics">Diagnostics</string>
     <string name="section_setup_guide">Guide de configuration</string>
+    <string name="section_status_overview">Vue d’ensemble de l’état</string>
     <string name="section_troubleshooting">Dépannage</string>
     <string name="action_play_test_video">Lire la vidéo de test</string>
     <string name="action_overlay_settings">Paramètres de superposition</string>

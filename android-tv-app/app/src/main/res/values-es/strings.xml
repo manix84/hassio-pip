@@ -9,6 +9,7 @@
     <string name="section_pairing">Emparejamiento</string>
     <string name="section_diagnostics">Diagnóstico</string>
     <string name="section_setup_guide">Guía de configuración</string>
+    <string name="section_status_overview">Resumen de estado</string>
     <string name="section_troubleshooting">Solución de problemas</string>
     <string name="action_play_test_video">Reproducir vídeo de prueba</string>
     <string name="action_overlay_settings">Ajustes de superposición</string>

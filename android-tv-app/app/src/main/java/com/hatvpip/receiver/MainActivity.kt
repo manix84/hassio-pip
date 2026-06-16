@@ -52,6 +52,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -238,8 +239,38 @@ private fun MainScreen(
     onClearRemoteConfig: () -> Unit,
     onPlayTestVideo: () -> Unit
 ) {
+    val pipSectionFocusRequester = remember { FocusRequester() }
     val playButtonFocusRequester = remember { FocusRequester() }
+    val overlaySettingsFocusRequester = remember { FocusRequester() }
+    val stopOverlayFocusRequester = remember { FocusRequester() }
+    val setupSectionFocusRequester = remember { FocusRequester() }
+    val statusSectionFocusRequester = remember { FocusRequester() }
+    val pairingSectionFocusRequester = remember { FocusRequester() }
+    val resetPairingFocusRequester = remember { FocusRequester() }
+    val launcherSectionFocusRequester = remember { FocusRequester() }
+    val launcherButtonFocusRequester = remember { FocusRequester() }
+    val remoteSectionFocusRequester = remember { FocusRequester() }
+    val remoteClearFocusRequester = remember { FocusRequester() }
+    val remoteAdvancedFocusRequester = remember { FocusRequester() }
+    val remoteSaveFocusRequester = remember { FocusRequester() }
+    val troubleshootingSectionFocusRequester = remember { FocusRequester() }
+    val diagnosticsSectionFocusRequester = remember { FocusRequester() }
     val scrollState = rememberScrollState()
+    val primaryLastButtonFocusRequester = when {
+        compatibility.overlayPermission == CompatibilityState.Granted -> stopOverlayFocusRequester
+        compatibility.canRequestOverlayPermission -> overlaySettingsFocusRequester
+        else -> playButtonFocusRequester
+    }
+    val statusDownFocusRequester = if (pairingSnapshot != null) {
+        pairingSectionFocusRequester
+    } else {
+        launcherSectionFocusRequester
+    }
+    val launcherUpFocusRequester = when {
+        pairingSnapshot?.state == PairingStatus.Paired -> resetPairingFocusRequester
+        pairingSnapshot != null -> pairingSectionFocusRequester
+        else -> statusSectionFocusRequester
+    }
 
     LaunchedEffect(Unit) {
         repeat(INITIAL_FOCUS_ATTEMPTS) {
@@ -280,13 +311,40 @@ private fun MainScreen(
 
             PrimaryActions(
                 compatibility = compatibility,
+                sectionFocusRequester = pipSectionFocusRequester,
                 playButtonFocusRequester = playButtonFocusRequester,
+                overlaySettingsFocusRequester = overlaySettingsFocusRequester,
+                stopOverlayFocusRequester = stopOverlayFocusRequester,
+                downFromSectionFocusRequester = playButtonFocusRequester,
+                upFromPlayFocusRequester = pipSectionFocusRequester,
+                downFromPlayFocusRequester = if (compatibility.canRequestOverlayPermission) {
+                    overlaySettingsFocusRequester
+                } else if (compatibility.overlayPermission == CompatibilityState.Granted) {
+                    stopOverlayFocusRequester
+                } else {
+                    setupSectionFocusRequester
+                },
+                downFromOverlaySettingsFocusRequester = if (compatibility.overlayPermission == CompatibilityState.Granted) {
+                    stopOverlayFocusRequester
+                } else {
+                    setupSectionFocusRequester
+                },
+                upFromStopOverlayFocusRequester = if (compatibility.canRequestOverlayPermission) {
+                    overlaySettingsFocusRequester
+                } else {
+                    playButtonFocusRequester
+                },
+                downFromStopOverlayFocusRequester = setupSectionFocusRequester,
                 onPlayTestVideo = onPlayTestVideo,
                 onRequestOverlayPermission = onRequestOverlayPermission,
                 onStopOverlay = onStopOverlay
             )
 
-            SetupGuidePanel()
+            SetupGuidePanel(
+                sectionFocusRequester = setupSectionFocusRequester,
+                upFocusRequester = primaryLastButtonFocusRequester,
+                downFocusRequester = statusSectionFocusRequester
+            )
 
             StatusOverview(
                 compatibility = compatibility,
@@ -294,41 +352,73 @@ private fun MainScreen(
                 discoverySnapshot = discoverySnapshot,
                 pairingSnapshot = pairingSnapshot,
                 remoteConfig = remoteConfig,
-                remoteSnapshot = remoteSnapshot
+                remoteSnapshot = remoteSnapshot,
+                sectionFocusRequester = statusSectionFocusRequester,
+                upFocusRequester = setupSectionFocusRequester,
+                downFocusRequester = statusDownFocusRequester
             )
 
             PairingStatusPanel(
                 pairingSnapshot = pairingSnapshot,
+                sectionFocusRequester = pairingSectionFocusRequester,
+                resetPairingFocusRequester = resetPairingFocusRequester,
+                upFocusRequester = statusSectionFocusRequester,
+                downFocusRequester = launcherSectionFocusRequester,
                 onResetPairing = onResetPairing
             )
 
             ReceiverManagementPanel(
                 launcherVisible = launcherVisible,
+                sectionFocusRequester = launcherSectionFocusRequester,
+                launcherButtonFocusRequester = launcherButtonFocusRequester,
+                upFocusRequester = launcherUpFocusRequester,
+                downFocusRequester = remoteSectionFocusRequester,
                 onSetLauncherVisible = onSetLauncherVisible
             )
 
             RemoteConnectionPanel(
                 remoteConfig = remoteConfig,
                 remoteSnapshot = remoteSnapshot,
+                sectionFocusRequester = remoteSectionFocusRequester,
+                clearFocusRequester = remoteClearFocusRequester,
+                advancedFocusRequester = remoteAdvancedFocusRequester,
+                saveFocusRequester = remoteSaveFocusRequester,
+                upFocusRequester = launcherButtonFocusRequester,
+                downFocusRequester = troubleshootingSectionFocusRequester,
                 onSaveRemoteConfig = onSaveRemoteConfig,
                 onClearRemoteConfig = onClearRemoteConfig
             )
 
-            TroubleshootingPanel()
+            TroubleshootingPanel(
+                sectionFocusRequester = troubleshootingSectionFocusRequester,
+                upFocusRequester = remoteAdvancedFocusRequester,
+                downFocusRequester = diagnosticsSectionFocusRequester
+            )
 
             DiagnosticsPanel(
                 endpointInfo = endpointInfo,
                 controlSnapshot = controlSnapshot,
                 discoverySnapshot = discoverySnapshot,
-                compatibility = compatibility
+                compatibility = compatibility,
+                sectionFocusRequester = diagnosticsSectionFocusRequester,
+                upFocusRequester = troubleshootingSectionFocusRequester
             )
         }
     }
 }
 
 @Composable
-private fun SetupGuidePanel() {
-    SectionCard(title = stringResource(R.string.section_setup_guide)) {
+private fun SetupGuidePanel(
+    sectionFocusRequester: FocusRequester,
+    upFocusRequester: FocusRequester,
+    downFocusRequester: FocusRequester
+) {
+    SectionCard(
+        title = stringResource(R.string.section_setup_guide),
+        focusRequester = sectionFocusRequester,
+        upFocusRequester = upFocusRequester,
+        downFocusRequester = downFocusRequester
+    ) {
         GuidanceText(text = stringResource(R.string.setup_step_pair))
         GuidanceText(text = stringResource(R.string.setup_step_overlay))
         GuidanceText(text = stringResource(R.string.setup_step_remote))
@@ -336,8 +426,17 @@ private fun SetupGuidePanel() {
 }
 
 @Composable
-private fun TroubleshootingPanel() {
-    SectionCard(title = stringResource(R.string.section_troubleshooting)) {
+private fun TroubleshootingPanel(
+    sectionFocusRequester: FocusRequester,
+    upFocusRequester: FocusRequester,
+    downFocusRequester: FocusRequester
+) {
+    SectionCard(
+        title = stringResource(R.string.section_troubleshooting),
+        focusRequester = sectionFocusRequester,
+        upFocusRequester = upFocusRequester,
+        downFocusRequester = downFocusRequester
+    ) {
         GuidanceText(text = stringResource(R.string.troubleshooting_discovery))
         GuidanceText(text = stringResource(R.string.troubleshooting_remote))
         GuidanceText(text = stringResource(R.string.troubleshooting_launcher))
@@ -403,24 +502,41 @@ private fun ReceiverHeader(
 @Composable
 private fun PrimaryActions(
     compatibility: DeviceCompatibility,
+    sectionFocusRequester: FocusRequester,
     playButtonFocusRequester: FocusRequester,
+    overlaySettingsFocusRequester: FocusRequester,
+    stopOverlayFocusRequester: FocusRequester,
+    downFromSectionFocusRequester: FocusRequester,
+    upFromPlayFocusRequester: FocusRequester,
+    downFromPlayFocusRequester: FocusRequester,
+    downFromOverlaySettingsFocusRequester: FocusRequester,
+    upFromStopOverlayFocusRequester: FocusRequester,
+    downFromStopOverlayFocusRequester: FocusRequester,
     onPlayTestVideo: () -> Unit,
     onRequestOverlayPermission: () -> Unit,
     onStopOverlay: () -> Unit
 ) {
-    SectionCard(title = stringResource(R.string.section_pip_controls)) {
+    SectionCard(
+        title = stringResource(R.string.section_pip_controls),
+        focusRequester = sectionFocusRequester,
+        downFocusRequester = downFromSectionFocusRequester
+    ) {
         Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
             TvActionButton(
                 text = stringResource(R.string.action_play_test_video),
                 onClick = onPlayTestVideo,
-                modifier = Modifier
-                    .focusRequester(playButtonFocusRequester),
+                focusRequester = playButtonFocusRequester,
+                upFocusRequester = upFromPlayFocusRequester,
+                downFocusRequester = downFromPlayFocusRequester,
                 minWidth = 220
             )
             if (compatibility.canRequestOverlayPermission) {
                 TvActionButton(
                     text = stringResource(R.string.action_overlay_settings),
                     onClick = onRequestOverlayPermission,
+                    focusRequester = overlaySettingsFocusRequester,
+                    upFocusRequester = playButtonFocusRequester,
+                    downFocusRequester = downFromOverlaySettingsFocusRequester,
                     minWidth = 220
                 )
             }
@@ -430,6 +546,9 @@ private fun PrimaryActions(
                 TvActionButton(
                     text = stringResource(R.string.action_stop_overlay),
                     onClick = onStopOverlay,
+                    focusRequester = stopOverlayFocusRequester,
+                    upFocusRequester = upFromStopOverlayFocusRequester,
+                    downFocusRequester = downFromStopOverlayFocusRequester,
                     minWidth = 180
                 )
             }
@@ -444,48 +563,58 @@ private fun StatusOverview(
     discoverySnapshot: DiscoverySnapshot,
     pairingSnapshot: PairingSnapshot?,
     remoteConfig: RemoteConnectionConfig,
-    remoteSnapshot: RemoteConnectionSnapshot
+    remoteSnapshot: RemoteConnectionSnapshot,
+    sectionFocusRequester: FocusRequester,
+    upFocusRequester: FocusRequester,
+    downFocusRequester: FocusRequester
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(14.dp)
+    SectionCard(
+        title = stringResource(R.string.section_status_overview),
+        focusRequester = sectionFocusRequester,
+        upFocusRequester = upFocusRequester,
+        downFocusRequester = downFocusRequester
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-            SummaryCard(
-                title = stringResource(R.string.summary_local_title),
-                value = if (controlSnapshot.running) {
-                    stringResource(R.string.status_running)
-                } else {
-                    stringResource(R.string.status_stopped)
-                },
-                detail = stringResource(R.string.summary_port, controlSnapshot.port)
-            )
-            SummaryCard(
-                title = stringResource(R.string.summary_discovery_title),
-                value = if (discoverySnapshot.running) {
-                    stringResource(R.string.status_advertising)
-                } else {
-                    stringResource(R.string.status_stopped)
-                },
-                detail = discoverySnapshot.serviceType
-            )
-            SummaryCard(
-                title = stringResource(R.string.summary_pairing_title),
-                value = pairingSnapshot?.state?.wireName ?: stringResource(R.string.status_unknown),
-                detail = pairingSnapshot?.pairedClientName ?: stringResource(R.string.summary_no_paired_client)
-            )
-        }
-        Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-            SummaryCard(
-                title = stringResource(R.string.summary_display_title),
-                value = compatibility.recommendedMode.localizedLabel(),
-                detail = stringResource(R.string.summary_overlay_state, compatibility.overlayPermission.localizedLabel())
-            )
-            SummaryCard(
-                title = stringResource(R.string.summary_remote_title),
-                value = remoteSummaryValue(remoteConfig, remoteSnapshot),
-                detail = remoteSummaryDetail(remoteConfig, remoteSnapshot)
-            )
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                SummaryCard(
+                    title = stringResource(R.string.summary_local_title),
+                    value = if (controlSnapshot.running) {
+                        stringResource(R.string.status_running)
+                    } else {
+                        stringResource(R.string.status_stopped)
+                    },
+                    detail = stringResource(R.string.summary_port, controlSnapshot.port)
+                )
+                SummaryCard(
+                    title = stringResource(R.string.summary_discovery_title),
+                    value = if (discoverySnapshot.running) {
+                        stringResource(R.string.status_advertising)
+                    } else {
+                        stringResource(R.string.status_stopped)
+                    },
+                    detail = discoverySnapshot.serviceType
+                )
+                SummaryCard(
+                    title = stringResource(R.string.summary_pairing_title),
+                    value = pairingSnapshot?.state?.wireName ?: stringResource(R.string.status_unknown),
+                    detail = pairingSnapshot?.pairedClientName ?: stringResource(R.string.summary_no_paired_client)
+                )
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                SummaryCard(
+                    title = stringResource(R.string.summary_display_title),
+                    value = compatibility.recommendedMode.localizedLabel(),
+                    detail = stringResource(R.string.summary_overlay_state, compatibility.overlayPermission.localizedLabel())
+                )
+                SummaryCard(
+                    title = stringResource(R.string.summary_remote_title),
+                    value = remoteSummaryValue(remoteConfig, remoteSnapshot),
+                    detail = remoteSummaryDetail(remoteConfig, remoteSnapshot)
+                )
+            }
         }
     }
 }
@@ -565,25 +694,26 @@ private fun RowScope.SummaryCard(
 @OptIn(ExperimentalFoundationApi::class)
 private fun SectionCard(
     title: String,
-    focusableSection: Boolean = false,
     modifier: Modifier = Modifier.fillMaxWidth(),
+    focusRequester: FocusRequester? = null,
+    upFocusRequester: FocusRequester? = null,
+    downFocusRequester: FocusRequester? = null,
     contentPadding: Int = 18,
     content: @Composable ColumnScope.() -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
     val colors = MaterialTheme.colorScheme
-    val focusModifier = if (focusableSection) {
-        Modifier
-            .bringIntoViewOnFocus()
-            .focusable(interactionSource = interactionSource)
-    } else {
-        Modifier
-    }
 
     Card(
         modifier = modifier
-            .then(focusModifier),
+            .then(focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier)
+            .focusProperties {
+                upFocusRequester?.let { up = it }
+                downFocusRequester?.let { down = it }
+            }
+            .bringIntoViewOnFocus()
+            .focusable(interactionSource = interactionSource),
         colors = CardDefaults.cardColors(
             containerColor = colors.surface.copy(alpha = if (isFocused) 0.88f else 0.72f)
         ),
@@ -611,6 +741,12 @@ private fun SectionCard(
 private fun RemoteConnectionPanel(
     remoteConfig: RemoteConnectionConfig,
     remoteSnapshot: RemoteConnectionSnapshot,
+    sectionFocusRequester: FocusRequester,
+    clearFocusRequester: FocusRequester,
+    advancedFocusRequester: FocusRequester,
+    saveFocusRequester: FocusRequester,
+    upFocusRequester: FocusRequester,
+    downFocusRequester: FocusRequester,
     onSaveRemoteConfig: (RemoteConnectionConfig) -> Unit,
     onClearRemoteConfig: () -> Unit
 ) {
@@ -622,7 +758,16 @@ private fun RemoteConnectionPanel(
     }
     var showManualSetup by remember { mutableStateOf(false) }
 
-    SectionCard(title = stringResource(R.string.section_remote_receiver)) {
+    SectionCard(
+        title = stringResource(R.string.section_remote_receiver),
+        focusRequester = sectionFocusRequester,
+        upFocusRequester = upFocusRequester,
+        downFocusRequester = if (remoteConfig.enabled) {
+            clearFocusRequester
+        } else {
+            advancedFocusRequester
+        }
+    ) {
         RemoteReceiverStatusBanner(
             remoteConfig = remoteConfig,
             remoteSnapshot = remoteSnapshot
@@ -656,6 +801,9 @@ private fun RemoteConnectionPanel(
             TvActionButton(
                 text = stringResource(R.string.action_clear_remote),
                 onClick = onClearRemoteConfig,
+                focusRequester = clearFocusRequester,
+                upFocusRequester = sectionFocusRequester,
+                downFocusRequester = advancedFocusRequester,
                 minWidth = 190
             )
         }
@@ -666,6 +814,17 @@ private fun RemoteConnectionPanel(
                 stringResource(R.string.action_show_manual_remote_setup)
             },
             onClick = { showManualSetup = !showManualSetup },
+            focusRequester = advancedFocusRequester,
+            upFocusRequester = if (remoteConfig.enabled) {
+                clearFocusRequester
+            } else {
+                sectionFocusRequester
+            },
+            downFocusRequester = if (showManualSetup) {
+                null
+            } else {
+                downFocusRequester
+            },
             minWidth = 290
         )
         if (showManualSetup) {
@@ -698,6 +857,8 @@ private fun RemoteConnectionPanel(
                         )
                     )
                 },
+                focusRequester = saveFocusRequester,
+                downFocusRequester = downFocusRequester,
                 minWidth = 190
             )
         }
@@ -813,9 +974,18 @@ private fun StatusPill(
 @Composable
 private fun ReceiverManagementPanel(
     launcherVisible: Boolean,
+    sectionFocusRequester: FocusRequester,
+    launcherButtonFocusRequester: FocusRequester,
+    upFocusRequester: FocusRequester,
+    downFocusRequester: FocusRequester,
     onSetLauncherVisible: (Boolean) -> Unit
 ) {
-    SectionCard(title = stringResource(R.string.section_launcher_controls)) {
+    SectionCard(
+        title = stringResource(R.string.section_launcher_controls),
+        focusRequester = sectionFocusRequester,
+        upFocusRequester = upFocusRequester,
+        downFocusRequester = launcherButtonFocusRequester
+    ) {
         Text(
             text = stringResource(
                 R.string.launcher_icon_value,
@@ -836,6 +1006,9 @@ private fun ReceiverManagementPanel(
                 stringResource(R.string.action_show_launcher_icon)
             },
             onClick = { onSetLauncherVisible(!launcherVisible) },
+            focusRequester = launcherButtonFocusRequester,
+            upFocusRequester = sectionFocusRequester,
+            downFocusRequester = downFocusRequester,
             minWidth = 260
         )
     }
@@ -865,10 +1038,23 @@ private const val INITIAL_FOCUS_RETRY_MS = 120L
 @Composable
 private fun PairingStatusPanel(
     pairingSnapshot: PairingSnapshot?,
+    sectionFocusRequester: FocusRequester,
+    resetPairingFocusRequester: FocusRequester,
+    upFocusRequester: FocusRequester,
+    downFocusRequester: FocusRequester,
     onResetPairing: () -> Unit
 ) {
     val snapshot = pairingSnapshot ?: return
-    SectionCard(title = stringResource(R.string.section_pairing)) {
+    SectionCard(
+        title = stringResource(R.string.section_pairing),
+        focusRequester = sectionFocusRequester,
+        upFocusRequester = upFocusRequester,
+        downFocusRequester = if (snapshot.state == PairingStatus.Paired) {
+            resetPairingFocusRequester
+        } else {
+            downFocusRequester
+        }
+    ) {
         Text(
             text = stringResource(R.string.state_value, snapshot.state.wireName),
             color = MaterialTheme.colorScheme.onSurface,
@@ -900,6 +1086,9 @@ private fun PairingStatusPanel(
             TvActionButton(
                 text = stringResource(R.string.action_reset_pairing),
                 onClick = onResetPairing,
+                focusRequester = resetPairingFocusRequester,
+                upFocusRequester = sectionFocusRequester,
+                downFocusRequester = downFocusRequester,
                 minWidth = 190
             )
         }
@@ -911,6 +1100,9 @@ private fun TvActionButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    focusRequester: FocusRequester? = null,
+    upFocusRequester: FocusRequester? = null,
+    downFocusRequester: FocusRequester? = null,
     minWidth: Int
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -920,6 +1112,11 @@ private fun TvActionButton(
     Button(
         onClick = onClick,
         modifier = modifier
+            .then(focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier)
+            .focusProperties {
+                upFocusRequester?.let { up = it }
+                downFocusRequester?.let { down = it }
+            }
             .bringIntoViewOnFocus()
             .widthIn(min = minWidth.dp),
         interactionSource = interactionSource,
@@ -945,11 +1142,14 @@ private fun DiagnosticsPanel(
     endpointInfo: ControlEndpointInfo,
     controlSnapshot: ControlServerSnapshot,
     discoverySnapshot: DiscoverySnapshot,
-    compatibility: DeviceCompatibility
+    compatibility: DeviceCompatibility,
+    sectionFocusRequester: FocusRequester,
+    upFocusRequester: FocusRequester
 ) {
     SectionCard(
         title = stringResource(R.string.section_diagnostics),
-        focusableSection = true
+        focusRequester = sectionFocusRequester,
+        upFocusRequester = upFocusRequester
     ) {
         val lastRequest = controlSnapshot.lastRequest
         val runningLabel = if (controlSnapshot.running) {
