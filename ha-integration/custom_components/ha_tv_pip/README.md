@@ -18,7 +18,21 @@ Phase 9 added optional remote receiver transport over the user's own Home Assist
 
 Phase 10 adds distribution polish, Tier 1 translations, clearer docs, and preparation for HACS and longer-term official Home Assistant readiness ✨.
 
-Distribution goals are HACS first, then long-term official Home Assistant integration readiness once the integration is mature enough. HACS packaging prep remains part of the remaining Phase 10 work.
+Distribution goals are HACS first, then long-term official Home Assistant integration readiness once the integration is mature enough. The monorepo uses root `hacs.json` with `zip_release` so HACS installs the stable `ha-tv-pip-integration.zip` release asset instead of the raw monorepo tree.
+
+## HACS Installation 🧩
+
+Until HA TV PiP is accepted as a default HACS repository:
+
+1. In Home Assistant, open HACS.
+2. Open Custom repositories.
+3. Add `https://github.com/manix84/ha-tv-pip`.
+4. Select category `Integration`.
+5. Install HA TV PiP.
+6. Restart Home Assistant.
+7. Add the integration from Settings > Devices & services.
+
+The HACS release zip contains `custom_components/ha_tv_pip/` at the archive root. It does not include the monorepo path `ha-integration/custom_components/ha_tv_pip/`.
 
 ## Brand Images 🎨
 

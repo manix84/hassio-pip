@@ -665,7 +665,7 @@ Preferred direction:
 
 ## Home Assistant Integration
 
-- ⏳ Prepare for HACS distribution.
+- ✅ Prepare for HACS distribution.
 - ⏳ Work toward official Home Assistant integration readiness.
 - ✅ Add documentation.
 - ✅ Add example automations.
@@ -690,7 +690,7 @@ Preferred direction:
 ## Success Criteria
 
 - ⏳ User can install the app from the Android TV Play Store.
-- ⏳ User can install the integration through HACS.
+- ✅ User can install the integration through HACS as a custom repository using the stable release zip.
 - ✅ Setup is understandable without reading source code.
 
 ## Official Home Assistant Track

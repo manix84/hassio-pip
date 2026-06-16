@@ -14,6 +14,9 @@
 - Made dashboard sections selectable containers so D-pad navigation can move from section to controls and back more predictably 🎮
 - Added confirmation warnings before `Reset Pairing` and `Clear Remote` run destructive actions ⚠️
 - Completed manual Android TV D-pad testing on the receiver dashboard ✅
+- Added root `hacs.json` for HACS zip-release installation 🧩
+- Added a stable `ha-tv-pip-integration.zip` release asset for HACS while keeping the versioned integration zip 📦
+- Added HACS custom-repository install docs 📝
 
 ## 0.28.0 - Phase 9 Documentation And FAQ Polish 📚
 

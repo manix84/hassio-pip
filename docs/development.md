@@ -604,6 +604,7 @@ This creates:
 
 ```txt
 dist/ha-tv-pip-integration-vX.Y.Z.zip
+dist/ha-tv-pip-integration.zip
 ```
 
 The zip preserves the Home Assistant install path:
@@ -613,6 +614,8 @@ custom_components/ha_tv_pip/
 ```
 
 It does not include the monorepo wrapper path `ha-integration/custom_components/ha_tv_pip/`.
+
+The versioned zip is the human-readable release asset. The stable `ha-tv-pip-integration.zip` file is the HACS release asset referenced by root `hacs.json`.
 
 ## GitHub Release Assets
 
@@ -624,14 +627,40 @@ When a GitHub Release is published, `.github/workflows/release.yml`:
 4. Runs the version consistency check.
 5. Builds the Android release APK.
 6. Packages the Home Assistant integration zip.
-7. Uploads both files to the GitHub Release.
+7. Uploads the Android APK, versioned integration zip, and stable HACS integration zip to the GitHub Release.
 
 For version `1.2.3`, expected release assets are:
 
 ```txt
 ha-tv-pip-android-v1.2.3.apk
 ha-tv-pip-integration-v1.2.3.zip
+ha-tv-pip-integration.zip
 ```
+
+## HACS Distribution
+
+HACS expects custom integration repositories to provide a root `hacs.json` and installable integration content under `custom_components/<domain>/`. Because HA TV PiP is a monorepo, the default branch layout is not directly installable by HACS.
+
+The repo therefore uses root `hacs.json` with:
+
+```json
+{
+  "name": "HA TV PiP",
+  "zip_release": true,
+  "filename": "ha-tv-pip-integration.zip",
+  "hide_default_branch": true
+}
+```
+
+The release workflow uploads that stable zip on every GitHub Release. Its internal path is:
+
+```txt
+custom_components/ha_tv_pip/
+```
+
+For custom-repository installs, users should add `https://github.com/manix84/ha-tv-pip` in HACS as category `Integration`.
+
+Default HACS repository inclusion is a separate later step. Before submitting to the HACS default repository list, confirm the public GitHub repository has a description, topics, passing HACS validation, passing Hassfest validation, and at least one full GitHub Release.
 
 ---
 

@@ -182,7 +182,21 @@ ha-tv-pip-android-vX.Y.Z.apk
 ha-tv-pip-integration-vX.Y.Z.zip
 ```
 
+The release also uploads a stable `ha-tv-pip-integration.zip` asset for HACS. That zip contains `custom_components/ha_tv_pip/` at its root so HACS-style installs do not include the monorepo wrapper path.
+
 Play Store deployment is not implemented yet.
+
+## HACS Installation 🧩
+
+Until HA TV PiP is accepted as a default HACS repository, add it as a custom repository:
+
+1. Open Home Assistant.
+2. Go to HACS > Custom repositories.
+3. Add `https://github.com/manix84/ha-tv-pip`.
+4. Select category `Integration`.
+5. Install HA TV PiP.
+6. Restart Home Assistant.
+7. Add the integration from Settings > Devices & services, preferably using the discovered receiver card.
 
 ## Future Home Assistant Plan 🏠
 

@@ -1,4 +1,4 @@
-import { cpSync, existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
+import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve, join } from "node:path";
@@ -14,6 +14,7 @@ if (!version || typeof version !== "string") {
 const sourceDir = resolve("ha-integration/custom_components/ha_tv_pip");
 const distDir = resolve("dist");
 const outputPath = join(distDir, `ha-tv-pip-integration-v${version}.zip`);
+const hacsOutputPath = join(distDir, "ha-tv-pip-integration.zip");
 
 if (!existsSync(sourceDir)) {
   throw new Error(`Integration source directory does not exist: ${sourceDir}`);
@@ -21,6 +22,7 @@ if (!existsSync(sourceDir)) {
 
 mkdirSync(distDir, { recursive: true });
 rmSync(outputPath, { force: true });
+rmSync(hacsOutputPath, { force: true });
 
 const tempRoot = await mkdtemp(join(tmpdir(), "ha-tv-pip-integration-"));
 const targetDir = join(tempRoot, "custom_components/ha_tv_pip");
@@ -48,7 +50,9 @@ try {
     throw new Error(`zip exited with status ${zip.status}`);
   }
 
+  copyFileSync(outputPath, hacsOutputPath);
   console.log(`Created ${outputPath}`);
+  console.log(`Created ${hacsOutputPath}`);
 } finally {
   await rm(tempRoot, { recursive: true, force: true });
 }

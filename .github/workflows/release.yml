@@ -64,4 +64,5 @@ jobs:
           gh release upload "${{ github.event.release.tag_name }}" \
             "dist/ha-tv-pip-android-v${{ steps.version.outputs.version }}.apk" \
             "dist/ha-tv-pip-integration-v${{ steps.version.outputs.version }}.zip" \
+            "dist/ha-tv-pip-integration.zip" \
             --clobber
