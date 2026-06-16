@@ -52,5 +52,43 @@
         "title": "Configuration du récepteur distant"
       }
     }
+  },
+  "entity": {
+    "binary_sensor": {"connected": {"name": "Connecté"}},
+    "button": {
+      "close_pip": {"name": "Fermer le PiP"},
+      "open_launcher": {"name": "Ouvrir le lanceur"},
+      "sync_remote_config": {"name": "Synchroniser la configuration distante"},
+      "test_pip": {"name": "Tester le PiP"}
+    },
+    "sensor": {"status": {"name": "État"}},
+    "switch": {"hide_launcher": {"name": "Masquer le lanceur"}}
+  },
+  "services": {
+    "show_camera": {
+      "name": "Afficher la caméra",
+      "description": "Affiche un flux caméra Home Assistant ou une image sur un récepteur Android TV associé.",
+      "fields": {
+        "camera_entity": {"name": "Entité caméra"},
+        "duration_seconds": {"name": "Durée"},
+        "enter_pip": {"name": "Activer le PiP"},
+        "receiver_device_id": {"name": "Appareil récepteur"},
+        "snapshot_camera_entity": {"name": "Caméra d’image de secours"},
+        "snapshot_fallback": {"name": "Image de secours"},
+        "stream_type": {"name": "Type de flux"},
+        "title": {"name": "Titre"}
+      }
+    },
+    "show_snapshot": {
+      "name": "Afficher l’image",
+      "description": "Affiche une image caméra sur un récepteur Android TV associé.",
+      "fields": {
+        "camera_entity": {"name": "Entité caméra"},
+        "duration_seconds": {"name": "Durée"},
+        "enter_pip": {"name": "Activer le PiP"},
+        "receiver_device_id": {"name": "Appareil récepteur"},
+        "title": {"name": "Titre"}
+      }
+    }
   }
 }

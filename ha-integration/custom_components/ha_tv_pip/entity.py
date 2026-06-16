@@ -12,9 +12,17 @@ class ReceiverEntity:
 
     _attr_has_entity_name = True
 
-    def __init__(self, entry: Any, *, key: str, name: str) -> None:
+    def __init__(
+        self,
+        entry: Any,
+        *,
+        key: str,
+        name: str,
+        translation_key: str | None = None,
+    ) -> None:
         self.entry = entry
         self._attr_name = name
+        self._attr_translation_key = translation_key or key
         self._attr_unique_id = f"{entry.data[CONF_DEVICE_ID]}_{key}"
         self._attr_device_info = {
             "identifiers": {(DOMAIN, entry.data[CONF_DEVICE_ID])},

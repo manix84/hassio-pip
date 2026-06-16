@@ -52,5 +52,43 @@
         "title": "Configurazione ricevitore remoto"
       }
     }
+  },
+  "entity": {
+    "binary_sensor": {"connected": {"name": "Connesso"}},
+    "button": {
+      "close_pip": {"name": "Chiudi PiP"},
+      "open_launcher": {"name": "Apri launcher"},
+      "sync_remote_config": {"name": "Sincronizza configurazione remota"},
+      "test_pip": {"name": "Test PiP"}
+    },
+    "sensor": {"status": {"name": "Stato"}},
+    "switch": {"hide_launcher": {"name": "Nascondi launcher"}}
+  },
+  "services": {
+    "show_camera": {
+      "name": "Mostra videocamera",
+      "description": "Mostra uno stream o uno snapshot di una videocamera Home Assistant su un ricevitore Android TV associato.",
+      "fields": {
+        "camera_entity": {"name": "Entità videocamera"},
+        "duration_seconds": {"name": "Durata"},
+        "enter_pip": {"name": "Entra in PiP"},
+        "receiver_device_id": {"name": "Dispositivo ricevitore"},
+        "snapshot_camera_entity": {"name": "Videocamera snapshot di fallback"},
+        "snapshot_fallback": {"name": "Snapshot di fallback"},
+        "stream_type": {"name": "Tipo stream"},
+        "title": {"name": "Titolo"}
+      }
+    },
+    "show_snapshot": {
+      "name": "Mostra snapshot",
+      "description": "Mostra uno snapshot di videocamera su un ricevitore Android TV associato.",
+      "fields": {
+        "camera_entity": {"name": "Entità videocamera"},
+        "duration_seconds": {"name": "Durata"},
+        "enter_pip": {"name": "Entra in PiP"},
+        "receiver_device_id": {"name": "Dispositivo ricevitore"},
+        "title": {"name": "Titolo"}
+      }
+    }
   }
 }

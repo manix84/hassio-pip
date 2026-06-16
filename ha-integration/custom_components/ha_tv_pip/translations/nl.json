@@ -52,5 +52,43 @@
         "title": "Remote receiver instellen"
       }
     }
+  },
+  "entity": {
+    "binary_sensor": {"connected": {"name": "Verbonden"}},
+    "button": {
+      "close_pip": {"name": "PiP sluiten"},
+      "open_launcher": {"name": "Launcher openen"},
+      "sync_remote_config": {"name": "Remote config synchroniseren"},
+      "test_pip": {"name": "PiP testen"}
+    },
+    "sensor": {"status": {"name": "Status"}},
+    "switch": {"hide_launcher": {"name": "Launcher verbergen"}}
+  },
+  "services": {
+    "show_camera": {
+      "name": "Camera tonen",
+      "description": "Toon een Home Assistant-camerastream of snapshot op een gekoppelde Android TV receiver.",
+      "fields": {
+        "camera_entity": {"name": "Camera-entiteit"},
+        "duration_seconds": {"name": "Duur"},
+        "enter_pip": {"name": "PiP openen"},
+        "receiver_device_id": {"name": "Receiverapparaat"},
+        "snapshot_camera_entity": {"name": "Snapshot-fallbackcamera"},
+        "snapshot_fallback": {"name": "Snapshot-fallback"},
+        "stream_type": {"name": "Streamtype"},
+        "title": {"name": "Titel"}
+      }
+    },
+    "show_snapshot": {
+      "name": "Snapshot tonen",
+      "description": "Toon een camerasnapshot op een gekoppelde Android TV receiver.",
+      "fields": {
+        "camera_entity": {"name": "Camera-entiteit"},
+        "duration_seconds": {"name": "Duur"},
+        "enter_pip": {"name": "PiP openen"},
+        "receiver_device_id": {"name": "Receiverapparaat"},
+        "title": {"name": "Titel"}
+      }
+    }
   }
 }

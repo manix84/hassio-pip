@@ -52,5 +52,43 @@
         "title": "Konfiguracja odbiornika zdalnego"
       }
     }
+  },
+  "entity": {
+    "binary_sensor": {"connected": {"name": "Połączony"}},
+    "button": {
+      "close_pip": {"name": "Zamknij PiP"},
+      "open_launcher": {"name": "Otwórz launcher"},
+      "sync_remote_config": {"name": "Synchronizuj konfigurację zdalną"},
+      "test_pip": {"name": "Testuj PiP"}
+    },
+    "sensor": {"status": {"name": "Stan"}},
+    "switch": {"hide_launcher": {"name": "Ukryj launcher"}}
+  },
+  "services": {
+    "show_camera": {
+      "name": "Pokaż kamerę",
+      "description": "Pokazuje strumień lub snapshot kamery Home Assistant na sparowanym odbiorniku Android TV.",
+      "fields": {
+        "camera_entity": {"name": "Encja kamery"},
+        "duration_seconds": {"name": "Czas trwania"},
+        "enter_pip": {"name": "Włącz PiP"},
+        "receiver_device_id": {"name": "Urządzenie odbiornika"},
+        "snapshot_camera_entity": {"name": "Kamera snapshotu awaryjnego"},
+        "snapshot_fallback": {"name": "Snapshot awaryjny"},
+        "stream_type": {"name": "Typ strumienia"},
+        "title": {"name": "Tytuł"}
+      }
+    },
+    "show_snapshot": {
+      "name": "Pokaż snapshot",
+      "description": "Pokazuje snapshot kamery na sparowanym odbiorniku Android TV.",
+      "fields": {
+        "camera_entity": {"name": "Encja kamery"},
+        "duration_seconds": {"name": "Czas trwania"},
+        "enter_pip": {"name": "Włącz PiP"},
+        "receiver_device_id": {"name": "Urządzenie odbiornika"},
+        "title": {"name": "Tytuł"}
+      }
+    }
   }
 }

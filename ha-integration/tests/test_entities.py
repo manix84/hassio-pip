@@ -79,6 +79,7 @@ def test_sensor_setup_adds_status_sensor() -> None:
 
     assert len(added) == 1
     assert added[0]._attr_unique_id == "device-1_status"
+    assert added[0]._attr_translation_key == "status"
 
 
 def test_binary_sensor_setup_adds_connected_sensor() -> None:
@@ -88,6 +89,7 @@ def test_binary_sensor_setup_adds_connected_sensor() -> None:
 
     assert len(added) == 1
     assert added[0]._attr_unique_id == "device-1_connected"
+    assert added[0]._attr_translation_key == "connected"
 
 
 def test_button_setup_adds_open_test_and_close_buttons() -> None:
@@ -107,6 +109,12 @@ def test_button_setup_adds_open_test_and_close_buttons() -> None:
         "Test PiP",
         "Close PiP",
     ]
+    assert [entity._attr_translation_key for entity in added] == [
+        "open_launcher",
+        "sync_remote_config",
+        "test_pip",
+        "close_pip",
+    ]
     assert added[0]._attr_entity_category == "config"
     assert added[1]._attr_entity_category == "config"
     assert not hasattr(added[2], "_attr_entity_category")
@@ -121,6 +129,7 @@ def test_switch_setup_adds_launcher_visibility_switch() -> None:
     assert len(added) == 1
     assert added[0]._attr_unique_id == "device-1_hide_launcher"
     assert added[0]._attr_name == "Hide Launcher"
+    assert added[0]._attr_translation_key == "hide_launcher"
     assert added[0]._attr_entity_category == "config"
 
 

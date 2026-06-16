@@ -91,7 +91,9 @@ Current status:
 
 - English config-flow strings exist in `strings.json` and `translations/en.json`.
 - Tier 1 translation files exist for config-flow and options-flow strings.
-- Service descriptions, entity names, and diagnostics wording should be expanded as the integration matures.
+- Entity names expose translation keys with Tier 1 translated names.
+- Service names, descriptions, and field labels are mirrored into translation metadata with Tier 1 labels.
+- Diagnostics wording should be expanded as the integration matures.
 
 Required during Phase 10 before HACS readiness:
 
@@ -114,6 +116,12 @@ Preferred approach during the Phase 10 website polish pass:
 - Generate static locale routes such as `/de/`, `/nl/`, and `/pt-br/`.
 - Keep GitHub Pages deployment simple.
 - Do not add analytics or authentication for translation support.
+
+Current Phase 10 status:
+
+- Tier 1 locale routes are detected client-side.
+- The website build creates `dist/de/`, `dist/nl/`, `dist/fr/`, `dist/es/`, `dist/it/`, `dist/pt-br/`, and `dist/pl/` entry points for GitHub Pages.
+- Non-English routes currently show English fallback copy with a visible notice until native-reviewed translations are added.
 
 Required website translation content:
 
