@@ -4,7 +4,7 @@ HA TV PiP is pre-release local-first software. It does not collect, sell, or sha
 
 ## Current Phase 🧪
 
-The Android TV app can play a public test HLS stream, advertise itself on the local network, and accept paired local commands from Home Assistant. It does not use analytics, telemetry, cloud relay, or maintainer-operated services.
+The Android TV app can play HLS streams and snapshots, advertise itself on the local network, accept paired local commands from Home Assistant, and optionally connect outbound to the user's own Home Assistant external URL for remote receiver mode. It does not use analytics, telemetry, a HA TV PiP cloud relay, or maintainer-operated services.
 
 ## Data Collection 📦
 
@@ -14,12 +14,12 @@ The Android app may write local Android log messages for development and debuggi
 
 ## Network Access 🌐
 
-The Android app uses network access to load configured HLS streams, advertise and serve its local control endpoint on the LAN, and receive paired local commands.
+The Android app uses network access to load configured HLS streams and snapshots, advertise and serve its local control endpoint on the LAN, receive paired local commands, and optionally maintain an outbound WebSocket connection to the user's own Home Assistant instance for remote receiver mode.
 
-The Home Assistant integration stores receiver host, port, device id, receiver name, version, pairing state, API version, and a local bearer token in Home Assistant config entry data. Camera entity support is planned for Stage 5.
+The Home Assistant integration stores receiver host, port, device id, receiver name, version, pairing state, API version, and a local bearer token in Home Assistant config entry data. Camera stream and snapshot URLs are resolved inside Home Assistant and sent to paired receivers when the user triggers a service.
 
 ## Future Phases 🚧
 
-Future phases may add Home Assistant camera stream playback, snapshots, WebRTC, and remote receiver modes. Privacy behavior should be updated before those features are released.
+Current development includes Home Assistant camera stream playback, snapshots, and optional remote receiver mode. Remote receiver mode connects the Android TV app outbound to the user's own Home Assistant external URL; HA TV PiP does not operate a hosted cloud relay. Privacy behavior should be updated again before WebRTC or any third-party relay feature is released.
 
 The intended direction is local-first control with no cloud relay by default.

@@ -545,7 +545,7 @@ Include:
 
 # Phase 9: Remote Access
 
-Status: In progress.
+Status: Complete in `0.27.0`.
 
 ## Goal
 
@@ -595,6 +595,16 @@ HA TV PiP should not become a hosted cloud relay. Remote mode uses the user's ow
 - Local mode remains available and preferred when on the same LAN.
 - Home Assistant continues to classify the integration as local-first rather than cloud-owned infrastructure.
 
+## Completion Notes
+
+- Implemented and tested the first remote receiver transport slice.
+- Android TV can connect outbound to the user's own Home Assistant WebSocket API.
+- Home Assistant can register authenticated remote receivers by matching the existing receiver pairing token.
+- `ha_tv_pip.show_camera` and `ha_tv_pip.show_snapshot` use the remote WebSocket connection when present and local HTTP otherwise.
+- Remote stream and snapshot URLs use Home Assistant's external URL.
+- `/status` reports remote receiver state for diagnostics.
+- Documentation explicitly describes remote mode as user-owned Home Assistant connectivity, not a hosted HA TV PiP cloud service.
+
 ---
 
 # Phase 10: App Store / Distribution Polish
@@ -603,6 +613,8 @@ HA TV PiP should not become a hosted cloud relay. Remote mode uses the user's ow
 
 Make the app and integration easy for normal Home Assistant users to install.
 
+This is also the main translation implementation pass. Tier 1 languages should be completed before broad release; Tier 2 and Tier 3 languages can follow later.
+
 ## Android TV App
 
 - Prepare Play Store release.
@@ -610,6 +622,8 @@ Make the app and integration easy for normal Home Assistant users to install.
 - Add onboarding screen.
 - Add pairing screen.
 - Add troubleshooting screen.
+- Move user-facing strings into Android resources.
+- Add Tier 1 Android translations.
 - Add privacy-friendly messaging.
 - Add crash-safe logging.
 
@@ -620,6 +634,8 @@ Make the app and integration easy for normal Home Assistant users to install.
 - Add documentation.
 - Add example automations.
 - Add diagnostics.
+- Expand Home Assistant translation files.
+- Add Tier 1 Home Assistant translations.
 - Add issue templates.
 - Add release notes.
 
@@ -654,6 +670,9 @@ Provide a static project landing page suitable for GitHub Pages.
 - Current project status.
 - Roadmap preview.
 - Example automation.
+- FAQ section.
+- Translation planning section.
+- Tier 1 website translation content.
 - Release and documentation links.
 
 ## Out of Scope
@@ -669,6 +688,8 @@ Provide a static project landing page suitable for GitHub Pages.
 - Website builds successfully.
 - Website reflects current MVP status honestly.
 - Website can be deployed to GitHub Pages.
+- Website includes FAQ and translation planning content.
+- Tier 1 translations are in place before broad release.
 
 ---
 

@@ -30,9 +30,9 @@ Stage 6 is complete in `0.23.0`. Home Assistant automations can call `ha_tv_pip.
 
 Stage 7 is complete in `0.24.0`. `ha_tv_pip.show_camera` supports `stream_type: auto`, `stream_type: hls`, and `stream_type: snapshot`, with tested receiver-side snapshot fallback when an accepted video stream fails during playback.
 
-Stage 8 is complete in `0.25.0`. Each paired receiver now exposes Home Assistant status, connected, test, close, and launcher management entities, plus redacted config entry diagnostics for troubleshooting. Home Assistant can hide or restore the Android TV launcher icon and reopen the receiver UI without ADB.
+Stage 8 is complete in `0.26.0`. Each paired receiver now exposes Home Assistant status, connected, test, close, and launcher management entities, plus redacted config entry diagnostics for troubleshooting. Home Assistant can hide or restore the Android TV launcher icon and reopen the receiver UI without ADB.
 
-Phase 9 is in progress. Remote receiver mode lets a TV connect outbound to the user's own Home Assistant WebSocket API, so Home Assistant can send PiP commands to an external TV without router port forwarding. This is not a HA TV PiP cloud service; the Home Assistant integration remains local-first and declares `iot_class: local_push`.
+Phase 9 is complete in `0.27.0`. Remote receiver mode lets a TV connect outbound to the user's own Home Assistant WebSocket API, so Home Assistant can send PiP commands to an external TV without router port forwarding. This is not a HA TV PiP cloud service; the Home Assistant integration remains local-first and declares `iot_class: local_push`.
 
 ## Monorepo Layout 🧱
 
@@ -47,7 +47,8 @@ ha-tv-pip/
 ├── docs/
 │   ├── architecture.md
 │   ├── roadmap.md
-│   └── development.md
+│   ├── development.md
+│   └── translations.md
 ├── examples/
 │   └── home-assistant-automations/
 ├── README.md
@@ -160,6 +161,14 @@ Phase 9 adds optional outbound remote connectivity for travel TVs and external r
 - Local LAN control remains available and preferred when the TV is at home.
 
 Remote mode is for sending notifications to an external TV. It does not make HA TV PiP a cloud service and does not require port forwarding to the TV.
+
+## Translation Plan 🌍
+
+Translation planning has started across the Android TV app, Home Assistant integration, and website, but the main translation implementation pass belongs to Phase 10 distribution polish.
+
+English is the source language. Tier 1 translation targets are German, Dutch, French, Spanish, Italian, Brazilian Portuguese, and Polish, and should be in place before a broad release. Tier 2 and Tier 3 languages can follow after the product polish pass.
+
+See `docs/translations.md` for the full language plan.
 
 ## Releases 📦
 

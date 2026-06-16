@@ -38,6 +38,14 @@ The repository is intentionally structured as a monorepo.
 
 The Android TV application, Home Assistant integration, and website should remain independently buildable and deployable.
 
+Translation planning lives in:
+
+```txt
+docs/translations.md
+```
+
+New user-facing strings should be designed with translation in mind even before translated files exist. The main translation implementation pass is planned for Phase 10 distribution polish.
+
 ---
 
 # Development Philosophy
@@ -931,8 +939,8 @@ Choose the simplest implementation that supports future expansion.
 Current development target:
 
 ```txt
-Phase 8
-Receiver entities and diagnostics
+Phase 9
+Remote receiver transport
 ```
 
 Phase 1 is complete in `0.4.0`. It validated:
@@ -1000,6 +1008,26 @@ data:
 ```
 
 Use the Home Assistant device ID for `receiver_device_id` and a camera entity that exposes a TV-compatible HLS stream. `stream_type` defaults to `auto`, which prefers HLS and falls back to a snapshot command if Home Assistant cannot resolve a stream. Advanced calls can force `stream_type: hls` or `stream_type: snapshot`. `snapshot_fallback` is optional and enabled by default; it lets the receiver show a camera snapshot while the video stream loads. `snapshot_camera_entity` is optional and defaults to `camera_entity`, which is useful when a secondary camera entity provides a faster or lower-resolution still preview. Lower-resolution or H.264 camera streams are generally more reliable for TV popups than high-resolution main streams. The Android receiver enables Media3 decoder fallback and shows a clear unsupported-stream message, but it cannot replace transcoding for unsupported camera formats.
+
+Stage 8 is complete in `0.26.0`. It includes receiver status, connected, test, close, diagnostics, Hide Launcher, and Open Launcher controls.
+
+Phase 9 remote receiver testing:
+
+```sh
+curl http://ANDROID_TV_IP:8765/status
+```
+
+Check the `remote` object:
+
+```json
+{
+  "status": "disabled"
+}
+```
+
+After entering a Home Assistant external URL and long-lived access token in the Android TV app, the status should move through `connecting` to `connected`.
+
+Remote mode uses Home Assistant's own WebSocket API and the existing receiver pairing token. It should not be described as a HA TV PiP cloud service.
 
 Receiver playback diagnostics:
 

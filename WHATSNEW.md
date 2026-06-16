@@ -1,6 +1,13 @@
 # What's New ✨
 
-## Unreleased - Phase 9 Remote Receiver Transport 🌍
+## 0.28.0 - Phase 9 Documentation And FAQ Polish 📚
+
+- Marked Phase 9 remote receiver transport as complete in the roadmap ✅
+- Added website FAQ content for setup worries, stream compatibility, remote mode, and translations ❓
+- Added translation planning for Android, Home Assistant, and website language support 🌍
+- Added extra remote transport fallback and runtime-state tests 🧪
+
+## 0.27.0 - Phase 9 Remote Receiver Transport 🌍
 
 - Added Home Assistant WebSocket registration for outbound remote receivers 🏠
 - Added Android TV remote receiver client settings for Home Assistant external URL and long-lived access token 📺
@@ -8,7 +15,7 @@
 - Kept local HTTP control as the fallback when no remote receiver connection is active 🏠
 - Kept HA TV PiP local-first: this is not a hosted HA TV PiP cloud service ✅
 
-## Unreleased - Stage 8 Receiver Management Extension 🧰
+## 0.26.0 - Stage 8 Receiver Management Extension 🧰
 
 - Added a Hide Launcher switch for Home Assistant 🏠
 - Added an Open Launcher button so Home Assistant can reopen the app after the launcher icon is hidden 📺

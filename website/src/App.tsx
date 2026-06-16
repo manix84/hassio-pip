@@ -19,6 +19,8 @@ const architectureUrl =
   "https://github.com/manix84/ha-tv-pip/blob/main/docs/architecture.md";
 const developmentUrl =
   "https://github.com/manix84/ha-tv-pip/blob/main/docs/development.md";
+const translationsUrl =
+  "https://github.com/manix84/ha-tv-pip/blob/main/docs/translations.md";
 const releasesUrl = "https://github.com/manix84/ha-tv-pip/releases";
 const licenseUrl = "https://github.com/manix84/ha-tv-pip/blob/main/LICENSE";
 
@@ -84,10 +86,10 @@ const features = [
     status: "complete" as const,
   },
   {
-    title: "Future remote receiver mode",
+    title: "Remote receiver mode",
     description:
-      "A later outbound connection mode for travel TVs without router port forwarding.",
-    status: "future" as const,
+      "Outbound receiver transport for travel TVs without router port forwarding.",
+    status: "planned" as const,
   },
 ];
 
@@ -100,6 +102,57 @@ const roadmapItems = [
   "WebRTC support",
   "Remote mode",
   "Play Store and HACS distribution",
+];
+
+export const faqItems = [
+  {
+    question: "Is HA TV PiP a cloud service?",
+    answer:
+      "No. Local control remains the default, and remote receiver mode connects your TV outbound to your own Home Assistant external URL. HA TV PiP does not run a hosted relay.",
+  },
+  {
+    question: "Do I need to open ports on my router?",
+    answer:
+      "No port forwarding to the TV is planned. For remote receiver mode, the TV opens an outbound WebSocket connection to Home Assistant.",
+  },
+  {
+    question: "Will this work with Nabu Casa?",
+    answer:
+      "Yes, the Home Assistant Cloud URL can be used as your Home Assistant external URL. That still does not make HA TV PiP itself a cloud service.",
+  },
+  {
+    question: "Why do some camera streams show snapshots or errors?",
+    answer:
+      "Android TV devices can reject unsupported codecs or very high-resolution streams. HA TV PiP supports snapshot fallbacks now and will keep improving stream selection and compatibility.",
+  },
+  {
+    question: "Can I hide the receiver app from my TV home screen?",
+    answer:
+      "Yes. The Home Assistant integration exposes Hide Launcher and Open Launcher controls so the app can behave more like an appliance after setup.",
+  },
+  {
+    question: "Will HA TV PiP be translated?",
+    answer:
+      "Yes. English is the source language. Tier 1 translations are planned for the Phase 10 polish pass before broad release.",
+  },
+];
+
+export const translationTiers = [
+  {
+    label: "Tier 1",
+    languages:
+      "English, German, Dutch, French, Spanish, Italian, Brazilian Portuguese, Polish",
+  },
+  {
+    label: "Tier 2",
+    languages:
+      "Swedish, Norwegian, Danish, Finnish, Czech, Hungarian, Turkish, Japanese, Korean",
+  },
+  {
+    label: "Tier 3",
+    languages:
+      "Simplified Chinese, Traditional Chinese, Indonesian, Hindi, Arabic, Ukrainian, Romanian, Greek",
+  },
 ];
 
 function App() {
@@ -258,17 +311,19 @@ function App() {
         </div>
       </Section>
 
-      <Section eyebrow="Current status" title="Stage 6: Snapshot support complete">
+      <Section eyebrow="Current status" title="Phase 9: Remote receiver mode complete">
         <div className={styles.statusPanel}>
           <div>
             <p>
-              HA TV PiP now supports local discovery, TV-visible pairing,
-              authenticated receiver control, camera stream popups, snapshot
-              popups, and snapshot previews while video streams load.
+              HA TV PiP now supports discovery, TV-visible pairing,
+              authenticated receiver control, camera stream popups, snapshots,
+              snapshot previews, receiver management, and remote receiver
+              transport.
             </p>
             <p>
-              Current development is moving into stream type options and better
-              fallback handling before distribution polish.
+              Remote mode connects a TV outbound to the user's own Home
+              Assistant external URL. It is designed for external TVs without
+              turning HA TV PiP into a hosted cloud service.
             </p>
           </div>
           <img
@@ -294,6 +349,34 @@ function App() {
         <CodeBlock code={automationExample} language="home-assistant-yaml" />
       </Section>
 
+      <Section
+        eyebrow="FAQ"
+        title="Answers for setup worries and early troubleshooting."
+      >
+        <div className={styles.faqGrid}>
+          {faqItems.map((item) => (
+            <article className={styles.faqItem} key={item.question}>
+              <h3>{item.question}</h3>
+              <p>{item.answer}</p>
+            </article>
+          ))}
+        </div>
+      </Section>
+
+      <Section
+        eyebrow="Translations"
+        title="Internationalization is part of the product plan."
+      >
+        <div className={styles.translationGrid}>
+          {translationTiers.map((tier) => (
+            <article className={styles.translationItem} key={tier.label}>
+              <strong>{tier.label}</strong>
+              <p>{tier.languages}</p>
+            </article>
+          ))}
+        </div>
+      </Section>
+
       <footer className={styles.footer}>
         <div>
           <strong>HA TV PiP</strong>
@@ -304,6 +387,7 @@ function App() {
           <a href={roadmapUrl}>Roadmap</a>
           <a href={architectureUrl}>Architecture</a>
           <a href={developmentUrl}>Development docs</a>
+          <a href={translationsUrl}>Translations</a>
           <a href={releasesUrl}>Releases</a>
           <a href={licenseUrl}>License</a>
         </nav>

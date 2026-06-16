@@ -52,3 +52,9 @@ The GitHub Actions website workflow builds the site on pull requests and deploys
 ## Version 📌
 
 The displayed version comes from the root `package.json` at build time through `vite.config.ts`.
+
+## FAQ And Translations 🌍
+
+The landing page includes a FAQ for setup concerns, privacy expectations, remote receiver mode, and common stream compatibility questions.
+
+Translation planning is documented in `../docs/translations.md`. The Phase 10 polish pass should add Tier 1 static locale routes without adding a heavy framework or backend.

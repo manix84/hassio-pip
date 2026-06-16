@@ -157,6 +157,12 @@ Remote receiver mode is optional and local-first remains the default.
 
 The receiver connects outbound to the user's own Home Assistant instance. HA TV PiP does not provide or depend on a hosted cloud relay.
 
+## Translations 🌍
+
+English is the source language.
+
+During the Phase 10 polish pass, user-facing Compose strings should move into Android string resources under `app/src/main/res/values/strings.xml`, with Tier 1 translations added before broad release. See `../docs/translations.md`.
+
 ## Stream Configuration 🎬
 
 The test stream URL is defined in `PlayerActivity.TEST_STREAM_URL`.

@@ -53,6 +53,7 @@ This separation allows playback behaviour to evolve independently from Home Assi
 ## Secondary Goals
 
 - Remote receiver support.
+- Internationalization across Android, Home Assistant, and website.
 - HACS distribution.
 - Long-term official Home Assistant integration readiness.
 - Play Store distribution.
@@ -501,6 +502,20 @@ Last Error
 ```
 
 The goal is to allow troubleshooting without requiring users to inspect source code or application logs.
+
+---
+
+# Internationalization
+
+English is the source language.
+
+The Android TV app should use Android string resources for user-facing UI.
+
+The Home Assistant integration should use `strings.json` and `translations/*.json`.
+
+The website should use lightweight static locale content and routes when translation work starts.
+
+Translation implementation belongs to the Phase 10 polish pass. Tier 1 languages from `docs/translations.md` should be in place before broad release, with Tier 2 and Tier 3 languages added later.
 
 ---
 

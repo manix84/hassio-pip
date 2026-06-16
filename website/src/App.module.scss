@@ -319,6 +319,44 @@
   padding: 1rem;
 }
 
+.faqGrid,
+.translationGrid {
+  display: grid;
+  gap: 1rem;
+}
+
+.faqGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.translationGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.faqItem,
+.translationItem {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-soft);
+  padding: 1rem;
+}
+
+.faqItem h3,
+.translationItem strong {
+  color: var(--text);
+  display: block;
+  font-size: 1.05rem;
+  line-height: 1.35;
+  margin: 0 0 0.55rem;
+}
+
+.faqItem p,
+.translationItem p {
+  line-height: 1.65;
+  margin: 0;
+}
+
 .footer {
   align-items: center;
   border-top: 1px solid var(--border);
@@ -367,6 +405,8 @@
   .solutionSteps,
   .featureGrid,
   .roadmap,
+  .faqGrid,
+  .translationGrid,
   .visualGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -387,6 +427,8 @@
   .solutionSteps,
   .featureGrid,
   .roadmap,
+  .faqGrid,
+  .translationGrid,
   .visualGrid {
     grid-template-columns: 1fr;
   }
