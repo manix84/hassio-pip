@@ -89,25 +89,132 @@
       "name": "Show camera",
       "description": "Show a Home Assistant camera stream or snapshot on a paired Android TV receiver.",
       "fields": {
-        "camera_entity": {"name": "Camera entity"},
-        "duration_seconds": {"name": "Duration"},
-        "enter_pip": {"name": "Enter PiP"},
-        "receiver_device_id": {"name": "Receiver device"},
-        "snapshot_camera_entity": {"name": "Snapshot fallback camera entity"},
-        "snapshot_fallback": {"name": "Snapshot fallback"},
-        "stream_type": {"name": "Stream type"},
-        "title": {"name": "Title"}
+        "camera_entity": {
+          "name": "Camera entity"
+        },
+        "duration_seconds": {
+          "name": "Duration"
+        },
+        "enter_pip": {
+          "name": "Enter PiP"
+        },
+        "receiver_device_id": {
+          "name": "Receiver device"
+        },
+        "snapshot_camera_entity": {
+          "name": "Snapshot fallback camera entity"
+        },
+        "snapshot_fallback": {
+          "name": "Snapshot fallback"
+        },
+        "stream_type": {
+          "name": "Stream type"
+        },
+        "title": {
+          "name": "Title"
+        },
+        "background_color": {
+          "name": "Background color"
+        },
+        "message": {
+          "name": "Message"
+        },
+        "message_color": {
+          "name": "Message color"
+        },
+        "message_size": {
+          "name": "Message size"
+        },
+        "position": {
+          "name": "Position"
+        },
+        "title_color": {
+          "name": "Title color"
+        },
+        "title_size": {
+          "name": "Title size"
+        }
       }
     },
     "show_snapshot": {
       "name": "Show snapshot",
       "description": "Show a camera snapshot on a paired Android TV receiver.",
       "fields": {
-        "camera_entity": {"name": "Camera entity"},
-        "duration_seconds": {"name": "Duration"},
-        "enter_pip": {"name": "Enter PiP"},
-        "receiver_device_id": {"name": "Receiver device"},
-        "title": {"name": "Title"}
+        "camera_entity": {
+          "name": "Camera entity"
+        },
+        "duration_seconds": {
+          "name": "Duration"
+        },
+        "enter_pip": {
+          "name": "Enter PiP"
+        },
+        "receiver_device_id": {
+          "name": "Receiver device"
+        },
+        "title": {
+          "name": "Title"
+        },
+        "background_color": {
+          "name": "Background color"
+        },
+        "message": {
+          "name": "Message"
+        },
+        "message_color": {
+          "name": "Message color"
+        },
+        "message_size": {
+          "name": "Message size"
+        },
+        "position": {
+          "name": "Position"
+        },
+        "title_color": {
+          "name": "Title color"
+        },
+        "title_size": {
+          "name": "Title size"
+        }
+      }
+    },
+    "show_notification": {
+      "name": "Show notification",
+      "description": "Show a styled text notification on a paired Android TV receiver.",
+      "fields": {
+        "background_color": {
+          "name": "Background color"
+        },
+        "duration_seconds": {
+          "name": "Duration"
+        },
+        "enter_pip": {
+          "name": "Enter PiP"
+        },
+        "message": {
+          "name": "Message"
+        },
+        "message_color": {
+          "name": "Message color"
+        },
+        "message_size": {
+          "name": "Message size"
+        },
+        "position": {
+          "name": "Position"
+        },
+        "receiver_device_id": {
+          "name": "Receiver device"
+        },
+        "title": {
+          "name": "Title"
+        },
+        "title_color": {
+          "name": "Title color"
+        },
+        "title_size": {
+          "name": "Title size"
+        }
       }
     }
   }

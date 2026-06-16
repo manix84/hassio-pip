@@ -119,7 +119,7 @@ class LocalControlServer(
                         .put(endpoint("GET", "/status", "Receiver and playback status"))
                         .put(endpoint("POST", "/pair/start", "Start local pairing"))
                         .put(endpoint("POST", "/pair/confirm", "Confirm local pairing code"))
-                        .put(endpoint("POST", "/show", "Show an HLS stream"))
+                        .put(endpoint("POST", "/show", "Show a stream, snapshot, or notification"))
                         .put(endpoint("POST", "/close", "Close the active display"))
                         .put(endpoint("POST", "/management/open", "Open receiver management UI"))
                         .put(endpoint("POST", "/management/launcher", "Show or hide launcher icon"))

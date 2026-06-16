@@ -789,33 +789,77 @@ Apple TV support is desirable but exploratory. tvOS has different constraints ar
 
 Future platform work should keep the local receiver protocol platform-neutral so Home Assistant can target receiver capabilities rather than Android-specific behavior.
 
-## Enhanced Notifications / Styled Overlays
+# Phase 11: Enhanced Notifications / Styled Overlays 🚧
 
-Future notification work should support a richer overlay command model inspired by PiPup-style notifications while staying aligned with HA TV PiP's receiver protocol.
+## Goal
 
-Candidate optional fields:
+Make HA TV PiP useful for general Home Assistant TV alerts, not only camera and snapshot popups.
+
+Stage 11 adds a richer overlay command model inspired by PiPup-style notifications while staying aligned with HA TV PiP's receiver protocol.
+
+## Initial Scope
+
+- ✅ Add `ha_tv_pip.show_notification`.
+- ✅ Send notification commands through the existing local HTTP and remote WebSocket receiver transports.
+- ✅ Render text-only notification overlays on Android TV.
+- ✅ Allow camera and snapshot commands to carry optional notification text/styling.
+- ✅ Render rounded notification cards for text-only and combined media popups.
+- ✅ Support title and message text.
+- ✅ Support popup corner position.
+- ✅ Support title, message, and background colors.
+- ✅ Support title and message text sizes.
+- ✅ Validate color, size, position, duration, and receiver target inputs.
+- 🚧 Add optional image/snapshot notification media in a later Stage 11 slice.
+- 🚧 Add website examples and richer automation snippets in a later Stage 11 slice.
+
+## Receiver Payload
+
+Current optional fields:
 
 ```json
 {
-  "position": 0,
+  "streamType": "notification",
   "title": "Home Assistant",
-  "titleColor": "#50BFF2",
-  "titleSize": 10,
   "message": "",
+  "position": "top_right",
+  "titleColor": "#50BFF2",
+  "titleSize": 24,
   "messageColor": "#fbf5f5",
-  "messageSize": 14,
-  "backgroundColor": "#0f0e0e"
+  "messageSize": 18,
+  "backgroundColor": "#0f0e0e",
+  "durationSeconds": 15,
+  "enterPip": true
 }
 ```
 
-Planned behavior:
+## Planned Behavior
 
-- `position` controls the popup corner, for example `0 = top right`, `1 = top left`, `2 = bottom right`, `3 = bottom left`.
+- `position` controls the popup corner: `top_right`, `top_left`, `bottom_right`, or `bottom_left`.
 - `title` is the larger heading text.
 - `message` is the smaller body text.
 - `titleColor`, `messageColor`, and `backgroundColor` should accept validated hex colors only.
 - `titleSize` and `messageSize` should be clamped to TV-readable ranges.
-- These options should be available to future `show_notification` work and may also be reused by camera/snapshot overlays where useful.
+- These options can be reused by camera/snapshot overlays when `message` is provided.
 - Defaults should remain readable and Home Assistant-friendly without requiring users to configure every field.
 
-This is intentionally future work because it changes the receiver command schema, Home Assistant services, Android overlay renderer, documentation, and tests.
+## Example Automation
+
+```yaml
+alias: Show front door notification on TV
+trigger:
+  - platform: state
+    entity_id: binary_sensor.front_door_bell_visitor
+    to: "on"
+action:
+  - service: ha_tv_pip.show_notification
+    target:
+      device_id: living_room_tv
+    data:
+      title: Front door
+      message: Someone is at the door
+      duration_seconds: 15
+      position: top_right
+      background_color: "#0f0e0e"
+      title_color: "#50BFF2"
+      message_color: "#fbf5f5"
+```

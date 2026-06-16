@@ -92,6 +92,7 @@ class LocalControlService : Service() {
     private fun showPlayer(command: ShowCommand) {
         val compatibility = DeviceCompatibilityEvaluator.from(this)
         if (
+            command.streamType == StreamType.Notification ||
             command.streamType == StreamType.Snapshot ||
             (command.enterPip && compatibility.recommendedMode == ReceiverDisplayMode.OverlayFallback)
         ) {
@@ -102,6 +103,13 @@ class LocalControlService : Service() {
                     .putExtra(PlayerActivity.EXTRA_URL, command.url)
                     .putExtra(PlayerActivity.EXTRA_STREAM_TYPE, command.streamType.wireName)
                     .putExtra(PlayerActivity.EXTRA_PREVIEW_URL, command.previewUrl)
+                    .putExtra(PlayerActivity.EXTRA_MESSAGE, command.message)
+                    .putExtra(PlayerActivity.EXTRA_POSITION, command.style.position.wireName)
+                    .putExtra(PlayerActivity.EXTRA_TITLE_COLOR, command.style.titleColor)
+                    .putExtra(PlayerActivity.EXTRA_TITLE_SIZE, command.style.titleSize)
+                    .putExtra(PlayerActivity.EXTRA_MESSAGE_COLOR, command.style.messageColor)
+                    .putExtra(PlayerActivity.EXTRA_MESSAGE_SIZE, command.style.messageSize)
+                    .putExtra(PlayerActivity.EXTRA_BACKGROUND_COLOR, command.style.backgroundColor)
                     .apply {
                         command.durationSeconds?.let {
                             putExtra(PlayerActivity.EXTRA_DURATION_SECONDS, it)

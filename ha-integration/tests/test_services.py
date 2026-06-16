@@ -17,20 +17,28 @@ from custom_components.ha_tv_pip.const import (
     CONF_TOKEN,
 )
 from custom_components.ha_tv_pip.services import (
+    ATTR_BACKGROUND_COLOR,
     ATTR_CAMERA_ENTITY,
     ATTR_DEVICE_ID,
     ATTR_DURATION_SECONDS,
     ATTR_ENTER_PIP,
+    ATTR_MESSAGE,
+    ATTR_MESSAGE_COLOR,
+    ATTR_MESSAGE_SIZE,
+    ATTR_POSITION,
     ATTR_RECEIVER_DEVICE_ID,
     ATTR_SNAPSHOT_CAMERA_ENTITY,
     ATTR_SNAPSHOT_FALLBACK,
     ATTR_STREAM_TYPE,
     ATTR_TITLE,
+    ATTR_TITLE_COLOR,
+    ATTR_TITLE_SIZE,
     ServiceValidationError,
     _absolute_stream_url,
     _async_show_camera_command,
     _camera_snapshot_url,
     _camera_title,
+    _notification_request_from_call,
     _request_from_call,
     _resolve_receiver,
     _validate_camera_entity,
@@ -153,6 +161,31 @@ def test_request_from_call_accepts_title_and_duration() -> None:
     assert request.title == "Doorbell"
 
 
+def test_request_from_call_accepts_overlay_message_style() -> None:
+    request = _request_from_call(
+        FakeCall(
+            data={
+                ATTR_CAMERA_ENTITY: "camera.front_door",
+                ATTR_MESSAGE: "Someone is at the door",
+                ATTR_POSITION: "bottom_left",
+                ATTR_TITLE_COLOR: "#50BFF2",
+                ATTR_TITLE_SIZE: 28,
+                ATTR_MESSAGE_COLOR: "#fbf5f5",
+                ATTR_MESSAGE_SIZE: 20,
+                ATTR_BACKGROUND_COLOR: "#0f0e0e",
+            }
+        )
+    )
+
+    assert request.message == "Someone is at the door"
+    assert request.position == "bottom_left"
+    assert request.title_color == "#50BFF2"
+    assert request.title_size == 28
+    assert request.message_color == "#fbf5f5"
+    assert request.message_size == 20
+    assert request.background_color == "#0f0e0e"
+
+
 def test_request_from_call_accepts_receiver_device_id_field() -> None:
     request = _request_from_call(
         FakeCall(
@@ -178,6 +211,47 @@ def test_request_from_call_rejects_invalid_stream_type() -> None:
         )
 
     assert error.value.code == "invalid_stream_type"
+
+
+def test_notification_request_from_call_accepts_style_defaults_and_target() -> None:
+    request = _notification_request_from_call(
+        FakeCall(
+            data={
+                ATTR_TITLE: "Enhanced notifications",
+                ATTR_MESSAGE: "Notifications can show text on the TV",
+                ATTR_DURATION_SECONDS: 15,
+                ATTR_ENTER_PIP: True,
+                ATTR_POSITION: "bottom_right",
+                ATTR_TITLE_COLOR: "#50BFF2",
+                ATTR_TITLE_SIZE: 26,
+                ATTR_MESSAGE_COLOR: "#fbf5f5",
+                ATTR_MESSAGE_SIZE: 18,
+                ATTR_BACKGROUND_COLOR: "#0f0e0e",
+            },
+            target={ATTR_DEVICE_ID: "device-1"},
+        )
+    )
+
+    assert request.title == "Enhanced notifications"
+    assert request.message == "Notifications can show text on the TV"
+    assert request.duration_seconds == 15
+    assert request.enter_pip is True
+    assert request.position == "bottom_right"
+    assert request.title_color == "#50BFF2"
+    assert request.title_size == 26
+    assert request.message_color == "#fbf5f5"
+    assert request.message_size == 18
+    assert request.background_color == "#0f0e0e"
+    assert request.device_ids == ("device-1",)
+
+
+def test_notification_request_rejects_invalid_color() -> None:
+    with pytest.raises(ServiceValidationError) as error:
+        _notification_request_from_call(
+            FakeCall(data={ATTR_TITLE_COLOR: "blue"}),
+        )
+
+    assert error.value.code == "invalid_color"
 
 
 def test_resolve_receiver_uses_single_paired_entry_without_target() -> None:

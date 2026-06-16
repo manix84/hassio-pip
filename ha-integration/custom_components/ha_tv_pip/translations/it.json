@@ -54,40 +54,167 @@
     }
   },
   "entity": {
-    "binary_sensor": {"connected": {"name": "Connesso"}},
-    "button": {
-      "close_pip": {"name": "Chiudi PiP"},
-      "open_launcher": {"name": "Apri launcher"},
-      "sync_remote_config": {"name": "Sincronizza configurazione remota"},
-      "test_pip": {"name": "Test PiP"}
+    "binary_sensor": {
+      "connected": {
+        "name": "Connesso"
+      }
     },
-    "sensor": {"status": {"name": "Stato"}},
-    "switch": {"hide_launcher": {"name": "Nascondi launcher"}}
+    "button": {
+      "close_pip": {
+        "name": "Chiudi PiP"
+      },
+      "open_launcher": {
+        "name": "Apri launcher"
+      },
+      "sync_remote_config": {
+        "name": "Sincronizza configurazione remota"
+      },
+      "test_pip": {
+        "name": "Test PiP"
+      }
+    },
+    "sensor": {
+      "status": {
+        "name": "Stato"
+      }
+    },
+    "switch": {
+      "hide_launcher": {
+        "name": "Nascondi launcher"
+      }
+    }
   },
   "services": {
     "show_camera": {
       "name": "Mostra videocamera",
       "description": "Mostra uno stream o uno snapshot di una videocamera Home Assistant su un ricevitore Android TV associato.",
       "fields": {
-        "camera_entity": {"name": "Entità videocamera"},
-        "duration_seconds": {"name": "Durata"},
-        "enter_pip": {"name": "Entra in PiP"},
-        "receiver_device_id": {"name": "Dispositivo ricevitore"},
-        "snapshot_camera_entity": {"name": "Videocamera snapshot di fallback"},
-        "snapshot_fallback": {"name": "Snapshot di fallback"},
-        "stream_type": {"name": "Tipo stream"},
-        "title": {"name": "Titolo"}
+        "camera_entity": {
+          "name": "Entità videocamera"
+        },
+        "duration_seconds": {
+          "name": "Durata"
+        },
+        "enter_pip": {
+          "name": "Entra in PiP"
+        },
+        "receiver_device_id": {
+          "name": "Dispositivo ricevitore"
+        },
+        "snapshot_camera_entity": {
+          "name": "Videocamera snapshot di fallback"
+        },
+        "snapshot_fallback": {
+          "name": "Snapshot di fallback"
+        },
+        "stream_type": {
+          "name": "Tipo stream"
+        },
+        "title": {
+          "name": "Titolo"
+        },
+        "background_color": {
+          "name": "Background color"
+        },
+        "message": {
+          "name": "Message"
+        },
+        "message_color": {
+          "name": "Message color"
+        },
+        "message_size": {
+          "name": "Message size"
+        },
+        "position": {
+          "name": "Position"
+        },
+        "title_color": {
+          "name": "Title color"
+        },
+        "title_size": {
+          "name": "Title size"
+        }
       }
     },
     "show_snapshot": {
       "name": "Mostra snapshot",
       "description": "Mostra uno snapshot di videocamera su un ricevitore Android TV associato.",
       "fields": {
-        "camera_entity": {"name": "Entità videocamera"},
-        "duration_seconds": {"name": "Durata"},
-        "enter_pip": {"name": "Entra in PiP"},
-        "receiver_device_id": {"name": "Dispositivo ricevitore"},
-        "title": {"name": "Titolo"}
+        "camera_entity": {
+          "name": "Entità videocamera"
+        },
+        "duration_seconds": {
+          "name": "Durata"
+        },
+        "enter_pip": {
+          "name": "Entra in PiP"
+        },
+        "receiver_device_id": {
+          "name": "Dispositivo ricevitore"
+        },
+        "title": {
+          "name": "Titolo"
+        },
+        "background_color": {
+          "name": "Background color"
+        },
+        "message": {
+          "name": "Message"
+        },
+        "message_color": {
+          "name": "Message color"
+        },
+        "message_size": {
+          "name": "Message size"
+        },
+        "position": {
+          "name": "Position"
+        },
+        "title_color": {
+          "name": "Title color"
+        },
+        "title_size": {
+          "name": "Title size"
+        }
+      }
+    },
+    "show_notification": {
+      "name": "Show notification",
+      "description": "Show a styled text notification on a paired Android TV receiver.",
+      "fields": {
+        "background_color": {
+          "name": "Background color"
+        },
+        "duration_seconds": {
+          "name": "Duration"
+        },
+        "enter_pip": {
+          "name": "Enter PiP"
+        },
+        "message": {
+          "name": "Message"
+        },
+        "message_color": {
+          "name": "Message color"
+        },
+        "message_size": {
+          "name": "Message size"
+        },
+        "position": {
+          "name": "Position"
+        },
+        "receiver_device_id": {
+          "name": "Receiver device"
+        },
+        "title": {
+          "name": "Title"
+        },
+        "title_color": {
+          "name": "Title color"
+        },
+        "title_size": {
+          "name": "Title size"
+        }
       }
     }
   }

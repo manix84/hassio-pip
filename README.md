@@ -36,6 +36,8 @@ Phase 9 is complete in `0.27.0`. Remote receiver mode lets a TV connect outbound
 
 Phase 10 distribution prep is complete except for actual Play Store deployment, which remains intentionally out of scope for now. The Android TV app has moved from a developer-style status page to a TV-first receiver dashboard with clear PiP controls, launcher controls, remote receiver status, and diagnostics kept out of the way of everyday actions. Remote receiver setup now prefers Home Assistant-assisted config sync, with manual URL/token entry kept as an advanced TV-side fallback. Onboarding, pairing, and troubleshooting are currently implemented as dashboard sections rather than separate screens to keep the TV app shallow and D-pad friendly.
 
+Stage 11 is in progress. The first slice adds `ha_tv_pip.show_notification`, a styled text notification command that can display title/message alerts in a receiver overlay with configurable corner position, colors, text sizes, and duration.
+
 ## Monorepo Layout 🧱
 
 ```txt
@@ -207,7 +209,7 @@ Future phases will expand the Home Assistant custom integration and Android TV r
 
 - Home Assistant service: `ha_tv_pip.show_camera` 📹
 - Home Assistant service: `ha_tv_pip.show_snapshot` 🖼️
-- Future enhanced notifications with title, message, colors, and popup position controls 🔔
+- Home Assistant service: `ha_tv_pip.show_notification` 🔔
 - HLS streams from Home Assistant 🎬
 - Future WebRTC support 🧵
 - HACS distribution 🧩

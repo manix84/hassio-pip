@@ -326,6 +326,13 @@ class PlayerActivity : ComponentActivity() {
         const val EXTRA_URL = "com.hatvpip.receiver.extra.URL"
         const val EXTRA_STREAM_TYPE = "com.hatvpip.receiver.extra.STREAM_TYPE"
         const val EXTRA_PREVIEW_URL = "com.hatvpip.receiver.extra.PREVIEW_URL"
+        const val EXTRA_MESSAGE = "com.hatvpip.receiver.extra.MESSAGE"
+        const val EXTRA_POSITION = "com.hatvpip.receiver.extra.POSITION"
+        const val EXTRA_TITLE_COLOR = "com.hatvpip.receiver.extra.TITLE_COLOR"
+        const val EXTRA_TITLE_SIZE = "com.hatvpip.receiver.extra.TITLE_SIZE"
+        const val EXTRA_MESSAGE_COLOR = "com.hatvpip.receiver.extra.MESSAGE_COLOR"
+        const val EXTRA_MESSAGE_SIZE = "com.hatvpip.receiver.extra.MESSAGE_SIZE"
+        const val EXTRA_BACKGROUND_COLOR = "com.hatvpip.receiver.extra.BACKGROUND_COLOR"
         const val EXTRA_DURATION_SECONDS = "com.hatvpip.receiver.extra.DURATION_SECONDS"
         const val EXTRA_ENTER_PIP = "com.hatvpip.receiver.extra.ENTER_PIP"
         const val TEST_STREAM_URL = "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
@@ -337,6 +344,13 @@ class PlayerActivity : ComponentActivity() {
                 putExtra(EXTRA_URL, command.url)
                 putExtra(EXTRA_STREAM_TYPE, command.streamType.wireName)
                 putExtra(EXTRA_PREVIEW_URL, command.previewUrl)
+                putExtra(EXTRA_MESSAGE, command.message)
+                putExtra(EXTRA_POSITION, command.style.position.wireName)
+                putExtra(EXTRA_TITLE_COLOR, command.style.titleColor)
+                putExtra(EXTRA_TITLE_SIZE, command.style.titleSize)
+                putExtra(EXTRA_MESSAGE_COLOR, command.style.messageColor)
+                putExtra(EXTRA_MESSAGE_SIZE, command.style.messageSize)
+                putExtra(EXTRA_BACKGROUND_COLOR, command.style.backgroundColor)
                 command.durationSeconds?.let { putExtra(EXTRA_DURATION_SECONDS, it) }
                 putExtra(EXTRA_ENTER_PIP, command.enterPip)
             }
@@ -349,9 +363,21 @@ private fun Intent.toShowCommand(): ShowCommand =
         url = getStringExtra(PlayerActivity.EXTRA_URL) ?: PlayerActivity.TEST_STREAM_URL,
         streamType = when (getStringExtra(PlayerActivity.EXTRA_STREAM_TYPE)) {
             StreamType.Snapshot.wireName -> StreamType.Snapshot
+            StreamType.Notification.wireName -> StreamType.Notification
             else -> StreamType.Hls
         },
         previewUrl = getStringExtra(PlayerActivity.EXTRA_PREVIEW_URL),
+        message = getStringExtra(PlayerActivity.EXTRA_MESSAGE),
+        style = NotificationStyle(
+            position = NotificationPosition.fromWire(
+                getStringExtra(PlayerActivity.EXTRA_POSITION) ?: NotificationPosition.TopRight.wireName
+            ),
+            titleColor = getStringExtra(PlayerActivity.EXTRA_TITLE_COLOR) ?: "#50BFF2",
+            titleSize = getIntExtra(PlayerActivity.EXTRA_TITLE_SIZE, 24).coerceIn(10, 48),
+            messageColor = getStringExtra(PlayerActivity.EXTRA_MESSAGE_COLOR) ?: "#fbf5f5",
+            messageSize = getIntExtra(PlayerActivity.EXTRA_MESSAGE_SIZE, 18).coerceIn(10, 40),
+            backgroundColor = getStringExtra(PlayerActivity.EXTRA_BACKGROUND_COLOR) ?: "#0f0e0e"
+        ),
         durationSeconds = if (hasExtra(PlayerActivity.EXTRA_DURATION_SECONDS)) {
             getIntExtra(PlayerActivity.EXTRA_DURATION_SECONDS, 0).takeIf { it > 0 }
         } else {

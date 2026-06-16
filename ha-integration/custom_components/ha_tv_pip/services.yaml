@@ -59,6 +59,60 @@ show_camera:
         text:
       name: Title
       description: Optional display title. Defaults to the camera friendly name.
+    message:
+      required: false
+      selector:
+        text:
+          multiline: true
+      name: Message
+      description: Optional smaller text to overlay on the camera popup.
+    position:
+      default: top_right
+      selector:
+        select:
+          options:
+            - top_right
+            - top_left
+            - bottom_right
+            - bottom_left
+      name: Position
+      description: Corner where optional overlay text should appear.
+    title_color:
+      default: "#50BFF2"
+      selector:
+        text:
+      name: Title color
+      description: Hex color for the title text when message overlay is used.
+    title_size:
+      default: 24
+      selector:
+        number:
+          min: 10
+          max: 48
+          mode: box
+      name: Title size
+      description: Title text size when message overlay is used.
+    message_color:
+      default: "#fbf5f5"
+      selector:
+        text:
+      name: Message color
+      description: Hex color for the message text.
+    message_size:
+      default: 18
+      selector:
+        number:
+          min: 10
+          max: 40
+          mode: box
+      name: Message size
+      description: Message text size.
+    background_color:
+      default: "#0f0e0e"
+      selector:
+        text:
+      name: Background color
+      description: Hex color for the optional text overlay background.
 show_snapshot:
   fields:
     receiver_device_id:
@@ -97,3 +151,142 @@ show_snapshot:
         text:
       name: Title
       description: Optional display title. Defaults to the camera friendly name.
+    message:
+      required: false
+      selector:
+        text:
+          multiline: true
+      name: Message
+      description: Optional smaller text to overlay on the snapshot popup.
+    position:
+      default: top_right
+      selector:
+        select:
+          options:
+            - top_right
+            - top_left
+            - bottom_right
+            - bottom_left
+      name: Position
+      description: Corner where optional overlay text should appear.
+    title_color:
+      default: "#50BFF2"
+      selector:
+        text:
+      name: Title color
+      description: Hex color for the title text when message overlay is used.
+    title_size:
+      default: 24
+      selector:
+        number:
+          min: 10
+          max: 48
+          mode: box
+      name: Title size
+      description: Title text size when message overlay is used.
+    message_color:
+      default: "#fbf5f5"
+      selector:
+        text:
+      name: Message color
+      description: Hex color for the message text.
+    message_size:
+      default: 18
+      selector:
+        number:
+          min: 10
+          max: 40
+          mode: box
+      name: Message size
+      description: Message text size.
+    background_color:
+      default: "#0f0e0e"
+      selector:
+        text:
+      name: Background color
+      description: Hex color for the optional text overlay background.
+show_notification:
+  fields:
+    receiver_device_id:
+      required: false
+      selector:
+        device:
+          integration: ha_tv_pip
+      name: Receiver device
+      description: Paired Android TV or Google TV receiver to display the notification on.
+    title:
+      default: Home Assistant
+      selector:
+        text:
+      name: Title
+      description: Larger notification heading text.
+    message:
+      required: false
+      selector:
+        text:
+          multiline: true
+      name: Message
+      description: Smaller notification body text.
+    duration_seconds:
+      default: 15
+      selector:
+        number:
+          min: 1
+          max: 3600
+          mode: box
+          unit_of_measurement: seconds
+      name: Duration
+      description: How long the receiver should keep the notification open.
+    enter_pip:
+      default: true
+      selector:
+        boolean:
+      name: Enter PiP
+      description: Ask the receiver to use PiP or overlay mode when available.
+    position:
+      default: top_right
+      selector:
+        select:
+          options:
+            - top_right
+            - top_left
+            - bottom_right
+            - bottom_left
+      name: Position
+      description: Corner where the receiver should place the notification.
+    title_color:
+      default: "#50BFF2"
+      selector:
+        text:
+      name: Title color
+      description: Hex color for the title text.
+    title_size:
+      default: 24
+      selector:
+        number:
+          min: 10
+          max: 48
+          mode: box
+      name: Title size
+      description: Title text size.
+    message_color:
+      default: "#fbf5f5"
+      selector:
+        text:
+      name: Message color
+      description: Hex color for the message text.
+    message_size:
+      default: 18
+      selector:
+        number:
+          min: 10
+          max: 40
+          mode: box
+      name: Message size
+      description: Message text size.
+    background_color:
+      default: "#0f0e0e"
+      selector:
+        text:
+      name: Background color
+      description: Hex color for the notification background.

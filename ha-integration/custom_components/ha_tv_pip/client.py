@@ -41,6 +41,13 @@ class ShowCameraCommand:
     enter_pip: bool
     stream_type: str = "hls"
     preview_url: str | None = None
+    message: str | None = None
+    position: str | None = None
+    title_color: str | None = None
+    title_size: int | None = None
+    message_color: str | None = None
+    message_size: int | None = None
+    background_color: str | None = None
 
 
 def show_camera_payload(command: ShowCameraCommand) -> dict[str, Any]:
@@ -56,6 +63,20 @@ def show_camera_payload(command: ShowCameraCommand) -> dict[str, Any]:
         payload["durationSeconds"] = command.duration_seconds
     if command.preview_url is not None:
         payload["previewUrl"] = command.preview_url
+    if command.message is not None:
+        payload["message"] = command.message
+    if command.position is not None:
+        payload["position"] = command.position
+    if command.title_color is not None:
+        payload["titleColor"] = command.title_color
+    if command.title_size is not None:
+        payload["titleSize"] = command.title_size
+    if command.message_color is not None:
+        payload["messageColor"] = command.message_color
+    if command.message_size is not None:
+        payload["messageSize"] = command.message_size
+    if command.background_color is not None:
+        payload["backgroundColor"] = command.background_color
     return payload
 
 

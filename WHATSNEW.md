@@ -1,5 +1,15 @@
 # What's New ✨
 
+## 0.40.0 - Stage 11 Enhanced Notifications 🔔
+
+- Started Stage 11 with `ha_tv_pip.show_notification` for styled TV text alerts 🏠
+- Added Android receiver parsing for `streamType: notification` commands 📺
+- Added Android overlay rendering for notification title, message, corner position, colors, text sizes, and duration 🎨
+- Allowed camera and snapshot popups to include the same optional notification text and styling fields 📹
+- Rounded the TV notification card corners so alert overlays feel less harsh 📺
+- Reused both local HTTP and remote WebSocket receiver transports for notification commands 🌍
+- Added Home Assistant service metadata, translations, validation, and focused tests ✅
+
 ## 0.39.1 - Phase 10 Distribution Polish 🎨
 
 - Started a TV-first receiver dashboard with summary cards, primary PiP controls, launcher controls, remote receiver settings, and diagnostics separated from everyday actions 📺

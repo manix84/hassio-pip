@@ -99,6 +99,40 @@ def test_post_json_sends_snapshot_stream_type(monkeypatch) -> None:  # type: ign
     assert '"streamType": "snapshot"' in captured["body"]
 
 
+def test_show_camera_payload_includes_notification_style() -> None:
+    payload = show_camera_payload(
+        ShowCameraCommand(
+            title="Enhanced notifications",
+            url="",
+            stream_type="notification",
+            duration_seconds=15,
+            enter_pip=True,
+            message="Notifications can show text on the TV",
+            position="bottom_right",
+            title_color="#50BFF2",
+            title_size=26,
+            message_color="#fbf5f5",
+            message_size=18,
+            background_color="#0f0e0e",
+        )
+    )
+
+    assert payload == {
+        "title": "Enhanced notifications",
+        "url": "",
+        "streamType": "notification",
+        "enterPip": True,
+        "durationSeconds": 15,
+        "message": "Notifications can show text on the TV",
+        "position": "bottom_right",
+        "titleColor": "#50BFF2",
+        "titleSize": 26,
+        "messageColor": "#fbf5f5",
+        "messageSize": 18,
+        "backgroundColor": "#0f0e0e",
+    }
+
+
 def test_get_json_fetches_receiver_status(monkeypatch) -> None:  # type: ignore[no-untyped-def]
     captured = {}
 

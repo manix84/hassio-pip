@@ -5,7 +5,8 @@ import org.json.JSONObject
 
 enum class StreamType(val wireName: String) {
     Hls("hls"),
-    Snapshot("snapshot")
+    Snapshot("snapshot"),
+    Notification("notification")
 }
 
 data class ShowCommand(
@@ -14,7 +15,9 @@ data class ShowCommand(
     val streamType: StreamType,
     val durationSeconds: Int?,
     val enterPip: Boolean,
-    val previewUrl: String?
+    val previewUrl: String?,
+    val message: String?,
+    val style: NotificationStyle
 ) {
     companion object {
         fun testVideo(title: String = "Test Video"): ShowCommand =
@@ -24,22 +27,30 @@ data class ShowCommand(
                 streamType = StreamType.Hls,
                 durationSeconds = null,
                 enterPip = false,
-                previewUrl = null
+                previewUrl = null,
+                message = null,
+                style = NotificationStyle()
             )
 
         fun fromJson(body: String): Result<ShowCommand> =
             runCatching {
                 val json = JSONObject(body)
-                val url = json.optString("url").trim()
-                require(url.isNotEmpty()) { "`url` is required" }
-                require(url.startsWith("http://") || url.startsWith("https://")) {
-                    "`url` must be an HTTP or HTTPS URL"
-                }
-
                 val streamType = when (val value = json.optString("streamType", "hls")) {
                     StreamType.Hls.wireName -> StreamType.Hls
                     StreamType.Snapshot.wireName -> StreamType.Snapshot
+                    StreamType.Notification.wireName -> StreamType.Notification
                     else -> error("Unsupported `streamType`: $value")
+                }
+                val url = json.optString("url").trim()
+                if (streamType == StreamType.Notification) {
+                    require(url.isEmpty() || url.startsWith("http://") || url.startsWith("https://")) {
+                        "`url` must be an HTTP or HTTPS URL"
+                    }
+                } else {
+                    require(url.isNotEmpty()) { "`url` is required" }
+                    require(url.startsWith("http://") || url.startsWith("https://")) {
+                        "`url` must be an HTTP or HTTPS URL"
+                    }
                 }
 
                 val durationSeconds = if (json.has("durationSeconds") && !json.isNull("durationSeconds")) {
@@ -62,7 +73,9 @@ data class ShowCommand(
                     streamType = streamType,
                     durationSeconds = durationSeconds,
                     enterPip = json.optBoolean("enterPip", true),
-                    previewUrl = previewUrl
+                    previewUrl = previewUrl,
+                    message = json.optString("message").trim().ifBlank { null },
+                    style = NotificationStyle.fromJson(json)
                 )
             }.recoverCatching { error ->
                 if (error is JSONException) {
@@ -70,5 +83,42 @@ data class ShowCommand(
                 }
                 throw error
             }
+    }
+}
+
+enum class NotificationPosition(val wireName: String, val fallbackIndex: Int) {
+    TopRight("top_right", 0),
+    TopLeft("top_left", 1),
+    BottomRight("bottom_right", 2),
+    BottomLeft("bottom_left", 3);
+
+    companion object {
+        fun fromWire(value: String): NotificationPosition =
+            entries.firstOrNull { it.wireName == value }
+                ?: value.toIntOrNull()?.let { index ->
+                    entries.firstOrNull { it.fallbackIndex == index }
+                }
+                ?: TopRight
+    }
+}
+
+data class NotificationStyle(
+    val position: NotificationPosition = NotificationPosition.TopRight,
+    val titleColor: String = "#50BFF2",
+    val titleSize: Int = 24,
+    val messageColor: String = "#fbf5f5",
+    val messageSize: Int = 18,
+    val backgroundColor: String = "#0f0e0e"
+) {
+    companion object {
+        fun fromJson(json: JSONObject): NotificationStyle =
+            NotificationStyle(
+                position = NotificationPosition.fromWire(json.optString("position", "top_right")),
+                titleColor = json.optString("titleColor", "#50BFF2"),
+                titleSize = json.optInt("titleSize", 24).coerceIn(10, 48),
+                messageColor = json.optString("messageColor", "#fbf5f5"),
+                messageSize = json.optInt("messageSize", 18).coerceIn(10, 40),
+                backgroundColor = json.optString("backgroundColor", "#0f0e0e")
+            )
     }
 }

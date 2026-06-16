@@ -3,7 +3,9 @@ package com.hatvpip.receiver
 import android.app.Service
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.PixelFormat
+import android.graphics.drawable.GradientDrawable
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -12,6 +14,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
@@ -28,6 +31,8 @@ class OverlayPlayerService : Service() {
     private var title: String = ""
     private var url: String = PlayerActivity.TEST_STREAM_URL
     private var previewUrl: String? = null
+    private var message: String? = null
+    private var style: NotificationStyle = NotificationStyle()
     private var streamType: StreamType = StreamType.Hls
     private var durationSeconds: Int? = null
     private val autoCloseHandler = Handler(Looper.getMainLooper())
@@ -45,8 +50,21 @@ class OverlayPlayerService : Service() {
                 title = intent?.getStringExtra(PlayerActivity.EXTRA_TITLE) ?: title
                 url = intent?.getStringExtra(PlayerActivity.EXTRA_URL) ?: url
                 previewUrl = intent?.getStringExtra(PlayerActivity.EXTRA_PREVIEW_URL)
+                message = intent?.getStringExtra(PlayerActivity.EXTRA_MESSAGE)
+                style = NotificationStyle(
+                    position = NotificationPosition.fromWire(
+                        intent?.getStringExtra(PlayerActivity.EXTRA_POSITION)
+                            ?: NotificationPosition.TopRight.wireName
+                    ),
+                    titleColor = intent?.getStringExtra(PlayerActivity.EXTRA_TITLE_COLOR) ?: "#50BFF2",
+                    titleSize = intent?.getIntExtra(PlayerActivity.EXTRA_TITLE_SIZE, 24)?.coerceIn(10, 48) ?: 24,
+                    messageColor = intent?.getStringExtra(PlayerActivity.EXTRA_MESSAGE_COLOR) ?: "#fbf5f5",
+                    messageSize = intent?.getIntExtra(PlayerActivity.EXTRA_MESSAGE_SIZE, 18)?.coerceIn(10, 40) ?: 18,
+                    backgroundColor = intent?.getStringExtra(PlayerActivity.EXTRA_BACKGROUND_COLOR) ?: "#0f0e0e"
+                )
                 streamType = when (intent?.getStringExtra(PlayerActivity.EXTRA_STREAM_TYPE)) {
                     StreamType.Snapshot.wireName -> StreamType.Snapshot
+                    StreamType.Notification.wireName -> StreamType.Notification
                     else -> StreamType.Hls
                 }
                 durationSeconds = intent?.takeIf {
@@ -72,12 +90,23 @@ class OverlayPlayerService : Service() {
         }
 
         val root = FrameLayout(this).apply {
-            setBackgroundColor(android.graphics.Color.BLACK)
+            setBackgroundColor(
+                if (streamType == StreamType.Notification) {
+                    Color.TRANSPARENT
+                } else {
+                    Color.BLACK
+                }
+            )
         }
-        if (streamType == StreamType.Snapshot) {
+        if (streamType == StreamType.Notification) {
+            addNotificationView(root)
+        } else if (streamType == StreamType.Snapshot) {
             addSnapshotView(root, url, updateStateOnLoad = true)
         } else {
             addPlayerView(root)
+        }
+        if (streamType != StreamType.Notification && !message.isNullOrBlank()) {
+            addNotificationView(root)
         }
 
         errorTextView = TextView(this).apply {
@@ -96,15 +125,15 @@ class OverlayPlayerService : Service() {
         root.addView(errorTextView)
 
         val params = WindowManager.LayoutParams(
-            OVERLAY_WIDTH_PX,
-            OVERLAY_HEIGHT_PX,
+            if (streamType == StreamType.Notification) NOTIFICATION_WIDTH_PX else OVERLAY_WIDTH_PX,
+            if (streamType == StreamType.Notification) WindowManager.LayoutParams.WRAP_CONTENT else OVERLAY_HEIGHT_PX,
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
             PixelFormat.TRANSLUCENT
         ).apply {
-            gravity = Gravity.TOP or Gravity.END
+            gravity = overlayGravity()
             x = OVERLAY_MARGIN_PX
             y = OVERLAY_MARGIN_PX
         }
@@ -113,7 +142,7 @@ class OverlayPlayerService : Service() {
             windowManager.addView(root, params)
             overlayView = root
             updatePlaybackState(
-                status = PlaybackStatus.Buffering,
+                status = if (streamType == StreamType.Notification) PlaybackStatus.Ready else PlaybackStatus.Buffering,
                 isPlaying = false,
                 errorMessage = null
             )
@@ -125,6 +154,41 @@ class OverlayPlayerService : Service() {
             player = null
             stopSelf()
         }
+    }
+
+    private fun addNotificationView(root: FrameLayout) {
+        val card = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            background = GradientDrawable().apply {
+                setColor(parseColorOrDefault(style.backgroundColor, Color.rgb(15, 14, 14)))
+                cornerRadius = NOTIFICATION_CORNER_RADIUS_PX
+            }
+            setPadding(24, 20, 24, 20)
+            layoutParams = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                notificationCardGravity()
+            )
+        }
+        TextView(this).apply {
+            text = title.ifBlank { getString(R.string.notification_default_title) }
+            setTextColor(parseColorOrDefault(style.titleColor, Color.rgb(80, 191, 242)))
+            textSize = style.titleSize.toFloat()
+            typeface = android.graphics.Typeface.DEFAULT_BOLD
+            includeFontPadding = false
+            card.addView(this)
+        }
+        message?.takeIf { it.isNotBlank() }?.let { body ->
+            TextView(this).apply {
+                text = body
+                setTextColor(parseColorOrDefault(style.messageColor, Color.rgb(251, 245, 245)))
+                textSize = style.messageSize.toFloat()
+                setPadding(0, 10, 0, 0)
+                includeFontPadding = false
+                card.addView(this)
+            }
+        }
+        root.addView(card)
     }
 
     private fun addPlayerView(root: FrameLayout) {
@@ -295,14 +359,35 @@ class OverlayPlayerService : Service() {
         autoCloseHandler.postDelayed({ stopSelf() }, duration * 1_000L)
     }
 
+    private fun overlayGravity(): Int =
+        when (style.position) {
+            NotificationPosition.TopRight -> Gravity.TOP or Gravity.END
+            NotificationPosition.TopLeft -> Gravity.TOP or Gravity.START
+            NotificationPosition.BottomRight -> Gravity.BOTTOM or Gravity.END
+            NotificationPosition.BottomLeft -> Gravity.BOTTOM or Gravity.START
+        }
+
+    private fun notificationCardGravity(): Int =
+        when (style.position) {
+            NotificationPosition.TopRight,
+            NotificationPosition.TopLeft -> Gravity.TOP
+            NotificationPosition.BottomRight,
+            NotificationPosition.BottomLeft -> Gravity.BOTTOM
+        }
+
     companion object {
         const val ACTION_SHOW = "com.hatvpip.receiver.action.SHOW_OVERLAY"
         const val ACTION_STOP = "com.hatvpip.receiver.action.STOP_OVERLAY"
         private const val OVERLAY_WIDTH_PX = 640
         private const val OVERLAY_HEIGHT_PX = 360
+        private const val NOTIFICATION_WIDTH_PX = 512
+        private const val NOTIFICATION_CORNER_RADIUS_PX = 18f
         private const val OVERLAY_MARGIN_PX = 48
     }
 }
+
+private fun parseColorOrDefault(value: String, defaultColor: Int): Int =
+    runCatching { Color.parseColor(value) }.getOrDefault(defaultColor)
 
 private fun Int.toPlaybackStatus(): PlaybackStatus =
     when (this) {

@@ -98,6 +98,7 @@
 
     <string name="test_video_title">Test Video</string>
     <string name="pip_subtitle_camera_preview">Smart home camera preview</string>
+    <string name="notification_default_title" translatable="false">Home Assistant</string>
     <string name="notification_title">HA TV PiP Receiver</string>
     <string name="notification_local_control_running">Local control endpoint running on port %1$d</string>
     <string name="notification_channel_local_control">Local Control</string>

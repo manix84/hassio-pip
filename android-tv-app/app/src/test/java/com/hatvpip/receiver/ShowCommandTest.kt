@@ -56,6 +56,63 @@ class ShowCommandTest {
     }
 
     @Test
+    fun parsesNotificationShowRequestWithoutUrl() {
+        val command = ShowCommand.fromJson(
+            """
+            {
+              "title": "Enhanced notifications",
+              "message": "Notifications can show text on the TV",
+              "streamType": "notification",
+              "position": "bottom_right",
+              "titleColor": "#50BFF2",
+              "titleSize": 26,
+              "messageColor": "#fbf5f5",
+              "messageSize": 18,
+              "backgroundColor": "#0f0e0e",
+              "durationSeconds": 15,
+              "enterPip": true
+            }
+            """.trimIndent()
+        ).getOrThrow()
+
+        assertEquals(StreamType.Notification, command.streamType)
+        assertEquals("", command.url)
+        assertEquals("Enhanced notifications", command.title)
+        assertEquals("Notifications can show text on the TV", command.message)
+        assertEquals(NotificationPosition.BottomRight, command.style.position)
+        assertEquals("#50BFF2", command.style.titleColor)
+        assertEquals(26, command.style.titleSize)
+        assertEquals("#fbf5f5", command.style.messageColor)
+        assertEquals(18, command.style.messageSize)
+        assertEquals("#0f0e0e", command.style.backgroundColor)
+    }
+
+    @Test
+    fun parsesCameraShowRequestWithNotificationStyle() {
+        val command = ShowCommand.fromJson(
+            """
+            {
+              "title": "Front Door",
+              "message": "Someone is at the door",
+              "url": "https://example.com/front-door.m3u8",
+              "streamType": "hls",
+              "position": "bottom_left",
+              "titleColor": "#50BFF2",
+              "messageColor": "#fbf5f5",
+              "backgroundColor": "#0f0e0e"
+            }
+            """.trimIndent()
+        ).getOrThrow()
+
+        assertEquals(StreamType.Hls, command.streamType)
+        assertEquals("Someone is at the door", command.message)
+        assertEquals(NotificationPosition.BottomLeft, command.style.position)
+        assertEquals("#50BFF2", command.style.titleColor)
+        assertEquals("#fbf5f5", command.style.messageColor)
+        assertEquals("#0f0e0e", command.style.backgroundColor)
+    }
+
+    @Test
     fun rejectsInvalidPreviewUrl() {
         val result = ShowCommand.fromJson(
             """{"url":"https://example.com/video.m3u8","previewUrl":"file:///tmp/image.jpg"}"""

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import re
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 from urllib.parse import quote, urlencode, urljoin, urlparse
@@ -16,6 +17,7 @@ from .const import (
     CONF_TOKEN,
     DOMAIN,
     SERVICE_SHOW_CAMERA,
+    SERVICE_SHOW_NOTIFICATION,
     SERVICE_SHOW_SNAPSHOT,
 )
 from .remote import remote_registry
@@ -41,14 +43,28 @@ ATTR_CAMERA_ENTITY = "camera_entity"
 ATTR_DEVICE_ID = "device_id"
 ATTR_DURATION_SECONDS = "duration_seconds"
 ATTR_ENTER_PIP = "enter_pip"
+ATTR_BACKGROUND_COLOR = "background_color"
+ATTR_MESSAGE = "message"
+ATTR_MESSAGE_COLOR = "message_color"
+ATTR_MESSAGE_SIZE = "message_size"
+ATTR_POSITION = "position"
 ATTR_RECEIVER_DEVICE_ID = "receiver_device_id"
 ATTR_SNAPSHOT_CAMERA_ENTITY = "snapshot_camera_entity"
 ATTR_SNAPSHOT_FALLBACK = "snapshot_fallback"
 ATTR_STREAM_TYPE = "stream_type"
 ATTR_TITLE = "title"
+ATTR_TITLE_COLOR = "title_color"
+ATTR_TITLE_SIZE = "title_size"
 CAMERA_DOMAIN = "camera"
+COLOR_PATTERN = re.compile(r"^#[0-9a-fA-F]{6}$")
+DEFAULT_NOTIFICATION_BACKGROUND_COLOR = "#0f0e0e"
+DEFAULT_NOTIFICATION_MESSAGE_COLOR = "#fbf5f5"
+DEFAULT_NOTIFICATION_TITLE = "Home Assistant"
+DEFAULT_NOTIFICATION_TITLE_COLOR = "#50BFF2"
+NOTIFICATION_POSITIONS = ("top_right", "top_left", "bottom_right", "bottom_left")
 STREAM_TYPE_AUTO = "auto"
 STREAM_TYPE_HLS = "hls"
+STREAM_TYPE_NOTIFICATION = "notification"
 STREAM_TYPE_SNAPSHOT = "snapshot"
 STREAM_TYPES = (STREAM_TYPE_AUTO, STREAM_TYPE_HLS, STREAM_TYPE_SNAPSHOT)
 ERROR_MESSAGES = {
@@ -58,6 +74,14 @@ ERROR_MESSAGES = {
     ),
     "invalid_camera_entity": "The selected entity is not a camera.",
     "invalid_duration": "Duration must be at least 1 second.",
+    "invalid_color": "Notification colors must be six-digit hex values.",
+    "invalid_notification_size": (
+        "Notification text sizes are outside the supported range."
+    ),
+    "invalid_position": (
+        "Notification position must be top_right, top_left, bottom_right, "
+        "or bottom_left."
+    ),
     "invalid_stream_type": "Stream type must be auto, hls, or snapshot.",
     "missing_camera_entity": "A camera entity is required.",
     "multiple_receivers": (
@@ -93,10 +117,34 @@ class ShowCameraRequest:
     camera_entity: str
     duration_seconds: int | None
     enter_pip: bool
+    message: str | None
+    position: str
+    title_color: str
+    title_size: int
+    message_color: str
+    message_size: int
+    background_color: str
     snapshot_camera_entity: str | None
     snapshot_fallback: bool
     stream_type: str
     title: str | None
+    device_ids: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class ShowNotificationRequest:
+    """Validated notification service request."""
+
+    title: str
+    message: str | None
+    duration_seconds: int | None
+    enter_pip: bool
+    position: str
+    title_color: str
+    title_size: int
+    message_color: str
+    message_size: int
+    background_color: str
     device_ids: tuple[str, ...]
 
 
@@ -127,6 +175,30 @@ async def async_register_services(hass: Any) -> None:
         vol.Optional(ATTR_RECEIVER_DEVICE_ID): vol.Any(str, [str]),
         vol.Optional(ATTR_ENTER_PIP, default=True): bool,
         vol.Optional(ATTR_TITLE): str,
+        vol.Optional(ATTR_MESSAGE): str,
+        vol.Optional(ATTR_POSITION, default="top_right"): vol.Any(
+            *NOTIFICATION_POSITIONS
+        ),
+        vol.Optional(
+            ATTR_TITLE_COLOR,
+            default=DEFAULT_NOTIFICATION_TITLE_COLOR,
+        ): str,
+        vol.Optional(ATTR_TITLE_SIZE, default=24): vol.All(
+            vol.Coerce(int),
+            vol.Range(min=10, max=48),
+        ),
+        vol.Optional(
+            ATTR_MESSAGE_COLOR,
+            default=DEFAULT_NOTIFICATION_MESSAGE_COLOR,
+        ): str,
+        vol.Optional(ATTR_MESSAGE_SIZE, default=18): vol.All(
+            vol.Coerce(int),
+            vol.Range(min=10, max=40),
+        ),
+        vol.Optional(
+            ATTR_BACKGROUND_COLOR,
+            default=DEFAULT_NOTIFICATION_BACKGROUND_COLOR,
+        ): str,
     }
 
     camera_schema = vol.Schema(
@@ -152,12 +224,51 @@ async def async_register_services(hass: Any) -> None:
             ),
         }
     )
+    notification_schema = vol.Schema(
+        {
+            vol.Optional(ATTR_DEVICE_ID): vol.Any(str, [str]),
+            vol.Optional(ATTR_RECEIVER_DEVICE_ID): vol.Any(str, [str]),
+            vol.Optional(ATTR_TITLE, default=DEFAULT_NOTIFICATION_TITLE): str,
+            vol.Optional(ATTR_MESSAGE): str,
+            vol.Optional(ATTR_DURATION_SECONDS, default=15): vol.All(
+                vol.Coerce(int),
+                vol.Range(min=1, max=3600),
+            ),
+            vol.Optional(ATTR_ENTER_PIP, default=True): bool,
+            vol.Optional(ATTR_POSITION, default="top_right"): vol.Any(
+                *NOTIFICATION_POSITIONS
+            ),
+            vol.Optional(
+                ATTR_TITLE_COLOR,
+                default=DEFAULT_NOTIFICATION_TITLE_COLOR,
+            ): str,
+            vol.Optional(ATTR_TITLE_SIZE, default=24): vol.All(
+                vol.Coerce(int),
+                vol.Range(min=10, max=48),
+            ),
+            vol.Optional(
+                ATTR_MESSAGE_COLOR,
+                default=DEFAULT_NOTIFICATION_MESSAGE_COLOR,
+            ): str,
+            vol.Optional(ATTR_MESSAGE_SIZE, default=18): vol.All(
+                vol.Coerce(int),
+                vol.Range(min=10, max=40),
+            ),
+            vol.Optional(
+                ATTR_BACKGROUND_COLOR,
+                default=DEFAULT_NOTIFICATION_BACKGROUND_COLOR,
+            ): str,
+        }
+    )
 
     async def handle_show_camera(call: Any) -> None:
         await async_handle_show_camera(hass, call)
 
     async def handle_show_snapshot(call: Any) -> None:
         await async_handle_show_snapshot(hass, call)
+
+    async def handle_show_notification(call: Any) -> None:
+        await async_handle_show_notification(hass, call)
 
     if not hass.services.has_service(DOMAIN, SERVICE_SHOW_CAMERA):
         hass.services.async_register(
@@ -173,6 +284,14 @@ async def async_register_services(hass: Any) -> None:
             SERVICE_SHOW_SNAPSHOT,
             handle_show_snapshot,
             schema=snapshot_schema,
+        )
+
+    if not hass.services.has_service(DOMAIN, SERVICE_SHOW_NOTIFICATION):
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_SHOW_NOTIFICATION,
+            handle_show_notification,
+            schema=notification_schema,
         )
 
 
@@ -241,6 +360,7 @@ async def async_handle_show_snapshot(hass: Any, call: Any) -> None:
             duration_seconds=request.duration_seconds,
             enter_pip=request.enter_pip,
             stream_type=STREAM_TYPE_SNAPSHOT,
+            **_presentation_payload(request),
         )
         if await remote.async_send_show(device_id=receiver.device_id, command=command):
             return
@@ -252,6 +372,47 @@ async def async_handle_show_snapshot(hass: Any, call: Any) -> None:
         )
     except ReceiverClientError as error:
         _LOGGER.error("Unable to send camera snapshot to %s: %s", receiver.name, error)
+        raise ServiceValidationError("receiver_command_failed", str(error)) from error
+
+
+async def async_handle_show_notification(hass: Any, call: Any) -> None:
+    """Handle `ha_tv_pip.show_notification` service calls."""
+
+    request = _notification_request_from_call(call)
+    receiver = _resolve_receiver(hass, request)
+    remote = remote_registry(hass)
+    prefer_external = remote.is_connected(receiver.device_id)
+    _LOGGER.info(
+        "Sending notification to receiver %s using %s transport",
+        receiver.name,
+        "remote" if prefer_external else "local",
+    )
+
+    try:
+        command = ShowCameraCommand(
+            title=request.title,
+            url="",
+            duration_seconds=request.duration_seconds,
+            enter_pip=request.enter_pip,
+            stream_type=STREAM_TYPE_NOTIFICATION,
+            message=request.message,
+            position=request.position,
+            title_color=request.title_color,
+            title_size=request.title_size,
+            message_color=request.message_color,
+            message_size=request.message_size,
+            background_color=request.background_color,
+        )
+        if await remote.async_send_show(device_id=receiver.device_id, command=command):
+            return
+        await async_show_camera(
+            receiver.host,
+            receiver.port,
+            token=receiver.token,
+            command=command,
+        )
+    except ReceiverClientError as error:
+        _LOGGER.error("Unable to send notification to %s: %s", receiver.name, error)
         raise ServiceValidationError("receiver_command_failed", str(error)) from error
 
 
@@ -281,6 +442,22 @@ def _request_from_call(call: Any) -> ShowCameraRequest:
         camera_entity=camera_entity,
         duration_seconds=duration_seconds,
         enter_pip=bool(data.get(ATTR_ENTER_PIP, True)),
+        message=_optional_text(data.get(ATTR_MESSAGE)),
+        position=_notification_position(data),
+        title_color=_validated_color(
+            data.get(ATTR_TITLE_COLOR),
+            DEFAULT_NOTIFICATION_TITLE_COLOR,
+        ),
+        title_size=_notification_size(data.get(ATTR_TITLE_SIZE, 24), 10, 48),
+        message_color=_validated_color(
+            data.get(ATTR_MESSAGE_COLOR),
+            DEFAULT_NOTIFICATION_MESSAGE_COLOR,
+        ),
+        message_size=_notification_size(data.get(ATTR_MESSAGE_SIZE, 18), 10, 40),
+        background_color=_validated_color(
+            data.get(ATTR_BACKGROUND_COLOR),
+            DEFAULT_NOTIFICATION_BACKGROUND_COLOR,
+        ),
         title=_optional_text(data.get(ATTR_TITLE)),
         snapshot_camera_entity=_optional_text(data.get(ATTR_SNAPSHOT_CAMERA_ENTITY)),
         snapshot_fallback=bool(data.get(ATTR_SNAPSHOT_FALLBACK, True)),
@@ -289,7 +466,47 @@ def _request_from_call(call: Any) -> ShowCameraRequest:
     )
 
 
-def _resolve_receiver(hass: Any, request: ShowCameraRequest) -> ReceiverEntry:
+def _notification_request_from_call(call: Any) -> ShowNotificationRequest:
+    data = dict(getattr(call, "data", {}))
+    target = getattr(call, "target", {}) or {}
+    device_ids = _tuple_value(
+        data.get(ATTR_RECEIVER_DEVICE_ID)
+        or data.get(ATTR_DEVICE_ID)
+        or target.get(ATTR_DEVICE_ID)
+    )
+    duration_value = data.get(ATTR_DURATION_SECONDS, 15)
+    duration_seconds = int(duration_value) if duration_value is not None else None
+    if duration_seconds is not None and duration_seconds < 1:
+        raise ServiceValidationError("invalid_duration")
+
+    return ShowNotificationRequest(
+        title=_optional_text(data.get(ATTR_TITLE)) or DEFAULT_NOTIFICATION_TITLE,
+        message=_optional_text(data.get(ATTR_MESSAGE)),
+        duration_seconds=duration_seconds,
+        enter_pip=bool(data.get(ATTR_ENTER_PIP, True)),
+        position=_notification_position(data),
+        title_color=_validated_color(
+            data.get(ATTR_TITLE_COLOR),
+            DEFAULT_NOTIFICATION_TITLE_COLOR,
+        ),
+        title_size=_notification_size(data.get(ATTR_TITLE_SIZE, 24), 10, 48),
+        message_color=_validated_color(
+            data.get(ATTR_MESSAGE_COLOR),
+            DEFAULT_NOTIFICATION_MESSAGE_COLOR,
+        ),
+        message_size=_notification_size(data.get(ATTR_MESSAGE_SIZE, 18), 10, 40),
+        background_color=_validated_color(
+            data.get(ATTR_BACKGROUND_COLOR),
+            DEFAULT_NOTIFICATION_BACKGROUND_COLOR,
+        ),
+        device_ids=device_ids,
+    )
+
+
+def _resolve_receiver(
+    hass: Any,
+    request: ShowCameraRequest | ShowNotificationRequest,
+) -> ReceiverEntry:
     entries = _configured_entries(hass)
     if request.device_ids:
         entries = _entries_for_devices(hass, entries, request.device_ids)
@@ -380,6 +597,7 @@ async def _async_show_camera_command(
             duration_seconds=request.duration_seconds,
             enter_pip=request.enter_pip,
             stream_type=STREAM_TYPE_SNAPSHOT,
+            **_presentation_payload(request),
         )
 
     preview_url = _snapshot_preview_url(
@@ -399,6 +617,7 @@ async def _async_show_camera_command(
             enter_pip=request.enter_pip,
             stream_type=STREAM_TYPE_HLS,
             preview_url=preview_url,
+            **_presentation_payload(request),
         )
     except ServiceValidationError as error:
         if (
@@ -422,6 +641,7 @@ async def _async_show_camera_command(
             duration_seconds=request.duration_seconds,
             enter_pip=request.enter_pip,
             stream_type=STREAM_TYPE_SNAPSHOT,
+            **_presentation_payload(request),
         )
 
 
@@ -563,3 +783,38 @@ def _optional_text(value: Any) -> str | None:
         return None
     text = str(value).strip()
     return text or None
+
+
+def _validated_color(value: Any, default: str) -> str:
+    color = _optional_text(value) or default
+    if not COLOR_PATTERN.fullmatch(color):
+        raise ServiceValidationError("invalid_color")
+    return color
+
+
+def _notification_position(data: dict[str, Any]) -> str:
+    position = str(data.get(ATTR_POSITION, "top_right")).strip().lower()
+    if position not in NOTIFICATION_POSITIONS:
+        raise ServiceValidationError("invalid_position")
+    return position
+
+
+def _notification_size(value: Any, minimum: int, maximum: int) -> int:
+    size = int(value)
+    if not minimum <= size <= maximum:
+        raise ServiceValidationError("invalid_notification_size")
+    return size
+
+
+def _presentation_payload(request: ShowCameraRequest) -> dict[str, Any]:
+    if request.message is None:
+        return {}
+    return {
+        "message": request.message,
+        "position": request.position,
+        "title_color": request.title_color,
+        "title_size": request.title_size,
+        "message_color": request.message_color,
+        "message_size": request.message_size,
+        "background_color": request.background_color,
+    }
