@@ -1,5 +1,12 @@
 # What's New ✨
 
+## 0.48.0 - Stage 12 Release Hardening 📦
+
+- Added explicit debug and release Android APK assets to GitHub release packaging 📺
+- Updated release docs for immutable GitHub Releases and draft-first asset publishing 📦
+- Added Stage 11 enhanced notification examples to the website and automation examples 🔔
+- Expanded HACS-facing integration README install, setup, service, option, and limitation guidance 🧩
+
 ## 0.47.0 - Release Workflow Fix 📦
 
 - Changed release automation to attach assets while the GitHub Release is still a draft so published immutable releases are not mutated 📦

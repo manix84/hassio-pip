@@ -631,9 +631,9 @@ When code is pushed or merged into `main`, `.github/workflows/release.yml`:
 2. Sets up Java, Android SDK, Gradle, and Node.
 3. Reads the release version from root `package.json`.
 4. Runs the version consistency check.
-5. Builds the Android release APK.
+5. Builds the Android debug and release APKs.
 6. Packages the Home Assistant integration zip.
-7. Creates draft GitHub Release `vX.Y.Z` with the Android APK, versioned integration zip, and stable HACS integration zip already attached.
+7. Creates draft GitHub Release `vX.Y.Z` with the Android APKs, versioned integration zip, and stable HACS integration zip already attached.
 8. Publishes the draft GitHub Release.
 
 Published GitHub Releases are treated as immutable. The workflow will not replace assets on an existing published release; bump the root `package.json` version before producing another release. If an older failed workflow already created a published release without assets, delete that failed release manually or move forward with the next version.
@@ -641,7 +641,8 @@ Published GitHub Releases are treated as immutable. The workflow will not replac
 For version `1.2.3`, expected release assets are:
 
 ```txt
-ha-tv-pip-android-v1.2.3.apk
+ha-tv-pip-android-debug-v1.2.3.apk
+ha-tv-pip-android-release-v1.2.3.apk
 ha-tv-pip-integration-v1.2.3.zip
 ha-tv-pip-integration.zip
 ```
@@ -692,7 +693,8 @@ npm run website:build
 
 Verify release packaging expectations:
 
-- Android APK asset: `ha-tv-pip-android-vX.Y.Z.apk`.
+- Android debug APK asset: `ha-tv-pip-android-debug-vX.Y.Z.apk`.
+- Android release APK asset: `ha-tv-pip-android-release-vX.Y.Z.apk`.
 - Versioned integration zip: `ha-tv-pip-integration-vX.Y.Z.zip`.
 - Stable HACS integration zip: `ha-tv-pip-integration.zip`.
 - Integration zip internal path: `custom_components/ha_tv_pip/`.

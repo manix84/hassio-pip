@@ -125,7 +125,7 @@ function localePath(locale: WebsiteLocale): string {
 }
 
 const automationExample = `
-alias: Show front door on TV
+alias: Show front door alert on TV
 trigger:
   - platform: state
     entity_id: binary_sensor.front_door_bell_visitor
@@ -140,6 +140,12 @@ action:
       enter_pip: true
       snapshot_fallback: true
       snapshot_camera_entity: camera.front_door_sub
+      title: Front door
+      message: Someone is at the door
+      position: top_right
+      background_color: "#B30F0E0E"
+      width: 720
+      height: 405
 `;
 
 function App() {

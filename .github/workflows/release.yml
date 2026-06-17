@@ -48,13 +48,17 @@ jobs:
       - name: Check version consistency
         run: npm run version:check
 
+      - name: Build Android debug APK
+        run: npm run android:assemble:debug
+
       - name: Build Android release APK
         run: npm run android:assemble:release
 
-      - name: Prepare Android release asset
+      - name: Prepare Android release assets
         run: |
           mkdir -p dist
-          cp android-tv-app/app/build/outputs/apk/release/app-release-unsigned.apk "dist/ha-tv-pip-android-v${{ steps.version.outputs.version }}.apk"
+          cp android-tv-app/app/build/outputs/apk/debug/app-debug.apk "dist/ha-tv-pip-android-debug-v${{ steps.version.outputs.version }}.apk"
+          cp android-tv-app/app/build/outputs/apk/release/app-release-unsigned.apk "dist/ha-tv-pip-android-release-v${{ steps.version.outputs.version }}.apk"
 
       - name: Package Home Assistant integration
         run: npm run package:integration
@@ -75,7 +79,8 @@ jobs:
             fi
 
             gh release upload "$RELEASE_TAG" \
-              "dist/ha-tv-pip-android-v$RELEASE_VERSION.apk" \
+              "dist/ha-tv-pip-android-debug-v$RELEASE_VERSION.apk" \
+              "dist/ha-tv-pip-android-release-v$RELEASE_VERSION.apk" \
               "dist/ha-tv-pip-integration-v$RELEASE_VERSION.zip" \
               "dist/ha-tv-pip-integration.zip" \
               --clobber
@@ -83,7 +88,8 @@ jobs:
           fi
 
           gh release create "$RELEASE_TAG" \
-            "dist/ha-tv-pip-android-v$RELEASE_VERSION.apk" \
+            "dist/ha-tv-pip-android-debug-v$RELEASE_VERSION.apk" \
+            "dist/ha-tv-pip-android-release-v$RELEASE_VERSION.apk" \
             "dist/ha-tv-pip-integration-v$RELEASE_VERSION.zip" \
             "dist/ha-tv-pip-integration.zip" \
             --draft \

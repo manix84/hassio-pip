@@ -38,7 +38,7 @@ Phase 10 distribution prep is complete except for actual Play Store deployment, 
 
 Stage 11 is complete in `0.45.0`. HA TV PiP now supports styled text-only notifications plus camera and snapshot popups with optional title/message footers, configurable corner position, title/message colors, text sizes, translucent glass backgrounds, and overlay width/height options.
 
-Stage 12 is next. The focus is beta release hardening: full quality checks, release packaging verification, Android artifact builds, HACS zip validation, website build validation, public install docs, Stage 11 website examples, and a release-candidate workflow before broader testing.
+Stage 12 is in progress. The focus is beta release hardening: full quality checks, release packaging verification, Android artifact builds, HACS zip validation, website build validation, public install docs, Stage 11 website examples, and a release-candidate workflow before broader testing.
 
 ## Monorepo Layout 🧱
 
@@ -185,11 +185,13 @@ See `docs/translations.md` for the full language plan.
 GitHub Releases are the distribution target for now. When code is pushed or merged into `main`, the release workflow reads the version from the root `package.json`, builds the Android TV APK, packages the Home Assistant integration, creates draft release `vX.Y.Z` with the assets already attached, and then publishes it:
 
 ```txt
-ha-tv-pip-android-vX.Y.Z.apk
+ha-tv-pip-android-debug-vX.Y.Z.apk
+ha-tv-pip-android-release-vX.Y.Z.apk
 ha-tv-pip-integration-vX.Y.Z.zip
+ha-tv-pip-integration.zip
 ```
 
-The stable `ha-tv-pip-integration.zip` asset is for HACS. That zip contains `custom_components/ha_tv_pip/` at its root so HACS-style installs do not include the monorepo wrapper path.
+The debug APK is for beta testing and easier sideloading. The release APK is currently unsigned and is the shape that will become the normal Android release artifact once signing is introduced. The stable `ha-tv-pip-integration.zip` asset is for HACS. That zip contains `custom_components/ha_tv_pip/` at its root so HACS-style installs do not include the monorepo wrapper path.
 
 Published GitHub Releases are treated as immutable. If a release for the current version already exists, bump the root `package.json` version before producing another release.
 
@@ -207,16 +209,24 @@ Until HA TV PiP is accepted as a default HACS repository, add it as a custom rep
 6. Restart Home Assistant.
 7. Add the integration from Settings > Devices & services, preferably using the discovered receiver card.
 
-## Future Home Assistant Plan 🏠
+## Home Assistant Integration Plan 🏠
 
-Future phases will expand the Home Assistant custom integration and Android TV receiver control features:
+Available now:
 
 - Home Assistant service: `ha_tv_pip.show_camera` 📹
 - Home Assistant service: `ha_tv_pip.show_snapshot` 🖼️
 - Home Assistant service: `ha_tv_pip.show_notification` 🔔
-- HLS streams from Home Assistant 🎬
-- Future WebRTC support 🧵
-- HACS distribution 🧩
+- Home Assistant HLS stream resolution with snapshot fallback 🎬
+- Zeroconf discovery and TV-visible pairing 🔎
+- Receiver status, PiP controls, launcher controls, and diagnostics 🧰
+- Optional remote receiver mode through the user's own Home Assistant external URL 🌍
+- HACS custom-repository installation using the stable release zip 🧩
+
+Future roadmap:
+
+- Better camera stream compatibility, including future WebRTC and/or transcoding work 🧵
+- Default HACS repository inclusion 🧩
 - Long-term official Home Assistant integration track 🏠
+- Play Store distribution for the Android TV app 📺
 - Fire TV / Vega OS receiver support 🔥
 - Exploratory Apple TV support 🍎

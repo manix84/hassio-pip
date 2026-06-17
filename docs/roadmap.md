@@ -889,9 +889,9 @@ Stage 12 is not a new feature stage. It is a release-quality stage that turns th
 - Build the website locally and confirm public-facing content reflects the current project status.
 - Add Stage 11 notification examples to the website and example automations.
 - Tighten install docs for Android TV APK installation, HACS custom repository installation, and manual Home Assistant custom integration installation.
-- Verify GitHub release packaging produces the Android APK, versioned integration zip, and stable HACS zip.
+- Verify GitHub release packaging produces the Android debug APK, Android release APK, versioned integration zip, and stable HACS zip.
 - Do a local release dry-run before pushing a release candidate.
-- Commit and push Stage 11 completion changes before creating the release candidate.
+- Commit and push Stage 12 release-candidate changes before creating the release candidate.
 - Create a first GitHub release candidate from `main` once checks and docs are clean.
 
 ## Success Criteria
@@ -901,7 +901,7 @@ Stage 12 is not a new feature stage. It is a release-quality stage that turns th
 - Home Assistant integration packaging creates both versioned and stable HACS zips.
 - Website production build completes.
 - Root README, Android README, Home Assistant README, website, roadmap, development docs, release notes, and examples all describe the same current state.
-- The GitHub release workflow can create or update `vX.Y.Z` with the expected assets.
+- The GitHub release workflow can create draft release `vX.Y.Z` with the expected assets attached, then publish it.
 - A new user can understand how to install the Android APK, install the HA integration through HACS custom repository, pair a receiver, and run a test notification without reading source code.
 
 ## Out of Scope
@@ -915,14 +915,14 @@ Stage 12 is not a new feature stage. It is a release-quality stage that turns th
 
 ## Stage 12 Checklist
 
-- 🚧 Run full quality checks.
-- 🚧 Build Android debug APK.
-- 🚧 Build Android release APK.
-- 🚧 Package Home Assistant integration zips.
-- 🚧 Build website.
-- 🚧 Add Stage 11 examples to website.
-- 🚧 Add richer Stage 11 automation examples.
-- 🚧 Audit install docs.
-- 🚧 Verify release asset names and zip contents.
-- 🚧 Commit and push Stage 11 completion.
+- ✅ Run full quality checks.
+- ✅ Build Android debug APK.
+- ✅ Build Android release APK.
+- ✅ Package Home Assistant integration zips.
+- ✅ Build website.
+- ✅ Add Stage 11 examples to website.
+- ✅ Add richer Stage 11 automation examples.
+- ✅ Audit install docs.
+- ✅ Verify release asset names and zip contents.
+- 🚧 Commit and push Stage 12 release-candidate changes.
 - 🚧 Create first release candidate.

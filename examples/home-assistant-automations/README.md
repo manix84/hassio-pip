@@ -2,9 +2,9 @@
 
 Automation examples use the Stage 7 `ha_tv_pip.show_camera` stream type options, the Stage 6 `ha_tv_pip.show_snapshot` service, and the Stage 11 `ha_tv_pip.show_notification` service.
 
-Stage 12 will expand these examples as part of beta release hardening so new testers have copy-ready automations for text-only notifications, camera footers, snapshot footers, and resize-only media popups.
+Replace `receiver_device_id`, `camera_entity`, and trigger entity ids with values from your Home Assistant instance. Use a compatible H.264/HLS camera stream where possible; lower-resolution secondary streams are often more reliable on Android TV devices than high-resolution main streams.
 
-Current Stage 7 service shape:
+## Camera Popup With Snapshot Preview And Footer 📹
 
 ```yaml
 alias: Show front door on TV
@@ -22,15 +22,17 @@ action:
       stream_type: auto
       snapshot_fallback: true
       snapshot_camera_entity: camera.front_door_sub
+      title: Front door
       message: Someone is at the door
       position: top_right
+      background_color: "#B30F0E0E"
       width: 720
       height: 405
 ```
 
-Replace `receiver_device_id` and `camera_entity` with values from your Home Assistant instance. `stream_type` defaults to `auto`; use `hls` to force video or `snapshot` to force a still image through the camera service. `snapshot_camera_entity` is optional and defaults to the main camera entity. Optional notification fields such as `message`, `position`, colors, `width`, and `height` add text below the video or snapshot inside the same rounded glass popup and can resize the receiver overlay. For cameras with multiple stream profiles, use a TV-compatible H.264 or lower-resolution stream where possible; high-resolution main streams can exceed what Android TV devices can decode directly.
+`stream_type` defaults to `auto`; use `hls` to force video or `snapshot` to force a still image through the camera service. `snapshot_camera_entity` is optional and defaults to the main camera entity. Optional notification fields such as `title`, `message`, `position`, colors, `width`, and `height` add text below the video or snapshot inside the same rounded glass popup and can resize the receiver overlay.
 
-Snapshot alert example:
+## Snapshot Popup With Footer 🖼️
 
 ```yaml
 alias: Show front door snapshot on TV
@@ -45,9 +47,15 @@ action:
       camera_entity: camera.front_door
       duration_seconds: 10
       enter_pip: true
+      title: Front door
+      message: Motion detected
+      position: top_right
+      background_color: "#B30F0E0E"
 ```
 
-Styled notification example:
+Snapshot mode is useful when you want a fast alert and do not need live playback.
+
+## Text-Only Notification 🔔
 
 ```yaml
 alias: Show doorbell notification on TV
@@ -70,4 +78,27 @@ action:
       background_color: "#B30F0E0E"
       width: 512
       height: 240
+```
+
+## Resize-Only Camera Popup 📐
+
+Use width and height without `title` or `message` when you want to resize the media popup without showing a footer.
+
+```yaml
+alias: Show compact driveway camera on TV
+trigger:
+  - platform: state
+    entity_id: binary_sensor.driveway_motion
+    to: "on"
+action:
+  - service: ha_tv_pip.show_camera
+    data:
+      receiver_device_id: living_room_tv
+      camera_entity: camera.driveway
+      duration_seconds: 20
+      enter_pip: true
+      stream_type: auto
+      snapshot_fallback: true
+      width: 480
+      height: 270
 ```
