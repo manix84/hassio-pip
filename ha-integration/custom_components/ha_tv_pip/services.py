@@ -71,12 +71,14 @@ NOTIFICATION_POSITIONS = ("top_right", "top_left", "bottom_right", "bottom_left"
 STREAM_TYPE_AUTO = "auto"
 STREAM_TYPE_HLS = "hls"
 STREAM_TYPE_MJPEG = "mjpeg"
+STREAM_TYPE_MJPEG_FIRST = "mjpeg_first"
 STREAM_TYPE_NOTIFICATION = "notification"
 STREAM_TYPE_SNAPSHOT = "snapshot"
 STREAM_TYPES = (
     STREAM_TYPE_AUTO,
     STREAM_TYPE_HLS,
     STREAM_TYPE_MJPEG,
+    STREAM_TYPE_MJPEG_FIRST,
     STREAM_TYPE_SNAPSHOT,
 )
 ERROR_MESSAGES = {
@@ -100,7 +102,9 @@ ERROR_MESSAGES = {
         "Notification position must be top_right, top_left, bottom_right, "
         "or bottom_left."
     ),
-    "invalid_stream_type": "Stream type must be auto, hls, mjpeg, or snapshot.",
+    "invalid_stream_type": (
+        "Stream type must be auto, hls, mjpeg, mjpeg_first, or snapshot."
+    ),
     "missing_camera_entity": "A camera entity is required.",
     "multiple_receivers": (
         "Multiple HA TV PiP receivers are configured. Target one receiver device."
@@ -682,15 +686,27 @@ async def _async_show_camera_command(
         request,
         prefer_external=prefer_external,
     )
-    if request.stream_type == STREAM_TYPE_MJPEG:
-        return _mjpeg_show_camera_command(
-            hass,
-            request,
-            title=title,
-            stream_entity=stream_entity,
-            preview_url=preview_url,
-            prefer_external=prefer_external,
-        )
+    if request.stream_type in (STREAM_TYPE_MJPEG, STREAM_TYPE_MJPEG_FIRST):
+        try:
+            return _mjpeg_show_camera_command(
+                hass,
+                request,
+                title=title,
+                stream_entity=stream_entity,
+                preview_url=preview_url,
+                prefer_external=prefer_external,
+            )
+        except ServiceValidationError as error:
+            if (
+                request.stream_type == STREAM_TYPE_MJPEG
+                or error.code != "camera_mjpeg_unavailable"
+            ):
+                raise
+            _LOGGER.warning(
+                "Falling back to HLS for %s because MJPEG stream resolution failed: %s",
+                stream_entity,
+                error,
+            )
 
     try:
         return ShowCameraCommand(
@@ -713,23 +729,25 @@ async def _async_show_camera_command(
         ):
             raise
 
-        try:
-            _LOGGER.warning(
-                "Falling back to MJPEG for %s because HLS stream resolution failed: %s",
-                stream_entity,
-                error,
-            )
-            return _mjpeg_show_camera_command(
-                hass,
-                request,
-                title=title,
-                stream_entity=stream_entity,
-                preview_url=preview_url,
-                prefer_external=prefer_external,
-            )
-        except ServiceValidationError as mjpeg_error:
-            if mjpeg_error.code != "camera_mjpeg_unavailable":
-                raise
+        if request.stream_type != STREAM_TYPE_MJPEG_FIRST:
+            try:
+                _LOGGER.warning(
+                    "Falling back to MJPEG for %s because HLS stream "
+                    "resolution failed: %s",
+                    stream_entity,
+                    error,
+                )
+                return _mjpeg_show_camera_command(
+                    hass,
+                    request,
+                    title=title,
+                    stream_entity=stream_entity,
+                    preview_url=preview_url,
+                    prefer_external=prefer_external,
+                )
+            except ServiceValidationError as mjpeg_error:
+                if mjpeg_error.code != "camera_mjpeg_unavailable":
+                    raise
 
         _LOGGER.warning(
             "Falling back to snapshot for %s because HLS and MJPEG failed.",

@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.5.0 - Stream Preference Strategy 📹
+
+- Added `stream_type: mjpeg_first` so camera alerts can prefer MJPEG, then fall back to HLS and snapshot if needed 📺
+- Kept `stream_type: mjpeg` as a strict force-MJPEG option for advanced troubleshooting 🧪
+- Updated Home Assistant service metadata, tests, and docs for the new stream preference option 📝
+
 ## 1.4.1 - Target Selection And Stream Fallback 🎯
 
 - Rejected non-device Home Assistant targets with a clear HA TV PiP validation error instead of generic schema failures 🎯

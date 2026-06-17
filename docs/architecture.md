@@ -580,7 +580,7 @@ Phase 6 currently adds:
 
 Phase 7 currently adds:
 
-- `stream_type: auto`, `stream_type: hls`, `stream_type: mjpeg`, and `stream_type: snapshot` for `ha_tv_pip.show_camera`
+- `stream_type: auto`, `stream_type: hls`, `stream_type: mjpeg`, `stream_type: mjpeg_first`, and `stream_type: snapshot` for `ha_tv_pip.show_camera`
 - Optional `stream_camera_entity` support for selecting a separate Android TV-compatible live stream entity
 - Receiver-side MJPEG overlay rendering for Home Assistant camera proxy streams
 - Home Assistant-side fallback from HLS to MJPEG, then snapshot, when stream URL resolution fails
@@ -592,7 +592,7 @@ Phase 7 currently adds:
 Future phases will add:
 
 - Receiver entities and diagnostics
-- MJPEG and WebRTC stream modes
+- WebRTC stream mode
 - Stream profile selection or transcoding
 - Remote operation
 - HACS distribution

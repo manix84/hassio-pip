@@ -31,7 +31,7 @@ action:
       height: 405
 ```
 
-`stream_type` defaults to `auto`; use `hls` to force HLS, `mjpeg` to force Home Assistant's camera proxy stream, or `snapshot` to force a still image through the camera service. In automatic mode, HA TV PiP tries HLS, then MJPEG, then snapshot when stream URL resolution fails. `snapshot_camera_entity` is optional and defaults to the main camera entity. Optional notification fields such as `title`, `message`, `position`, colors, `width`, and `height` add text below the video or snapshot inside the same rounded glass popup and can resize the receiver overlay.
+`stream_type` defaults to `auto`; use `hls` to force HLS, `mjpeg` to force Home Assistant's camera proxy stream, `mjpeg_first` to prefer MJPEG with HLS fallback, or `snapshot` to force a still image through the camera service. In automatic mode, HA TV PiP tries HLS, then MJPEG, then snapshot when stream URL resolution fails. `snapshot_camera_entity` is optional and defaults to the main camera entity. Optional notification fields such as `title`, `message`, `position`, colors, `width`, and `height` add text below the video or snapshot inside the same rounded glass popup and can resize the receiver overlay.
 
 ## Snapshot Popup With Footer 🖼️
 

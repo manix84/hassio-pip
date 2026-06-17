@@ -57,9 +57,10 @@ show_camera:
             - auto
             - hls
             - mjpeg
+            - mjpeg_first
             - snapshot
       name: Stream type
-      description: Choose automatic handling, force HLS, force MJPEG, or send a snapshot. Try MJPEG when an HLS camera stream is unsupported on Android TV.
+      description: Choose automatic handling, force HLS, force MJPEG, prefer MJPEG with fallback, or send a snapshot.
       example: auto
     title:
       required: false

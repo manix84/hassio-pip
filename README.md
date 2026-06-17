@@ -28,7 +28,7 @@ Stage 5 is complete in `0.21.0`. Home Assistant automations can call `ha_tv_pip.
 
 Stage 6 is complete in `0.23.0`. Home Assistant automations can call `ha_tv_pip.show_snapshot` to display fast camera snapshots on paired receivers using the same local auth and targeting path. Video stream commands can also send an optional entity-based snapshot preview while live playback loads.
 
-Stage 7 is complete in `0.24.0`. `ha_tv_pip.show_camera` supports `stream_type: auto`, `stream_type: hls`, `stream_type: mjpeg`, and `stream_type: snapshot`, with tested receiver-side snapshot fallback when an accepted video stream fails during playback. Current compatibility work adds optional `stream_camera_entity` support for cameras that expose a separate TV-friendly stream entity.
+Stage 7 is complete in `0.24.0`. `ha_tv_pip.show_camera` supports `stream_type: auto`, `stream_type: hls`, `stream_type: mjpeg`, `stream_type: mjpeg_first`, and `stream_type: snapshot`, with tested receiver-side snapshot fallback when an accepted video stream fails during playback. Current compatibility work adds optional `stream_camera_entity` support for cameras that expose a separate TV-friendly stream entity.
 
 Stage 8 is complete in `0.26.0`. Each paired receiver now exposes Home Assistant status, connected, test, close, and launcher management entities, plus redacted config entry diagnostics for troubleshooting. Home Assistant can hide or restore the Android TV launcher icon and reopen the receiver UI without ADB.
 

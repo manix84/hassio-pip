@@ -963,6 +963,97 @@ def test_show_camera_command_can_force_mjpeg(
     )
 
 
+def test_show_camera_command_mjpeg_first_prefers_mjpeg(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setitem(
+        sys.modules,
+        "homeassistant.helpers.network",
+        FakeNetworkModule("homeassistant.helpers.network"),
+    )
+    hass = FakeHass(
+        entries=[],
+        states={"camera.front_door": FakeState({"access_token": "stream-token"})},
+    )
+
+    command = asyncio.run(
+        _async_show_camera_command(
+            hass,
+            _request_from_call(
+                FakeCall(
+                    data={
+                        ATTR_CAMERA_ENTITY: "camera.front_door",
+                        ATTR_STREAM_TYPE: "mjpeg_first",
+                    }
+                )
+            ),
+            title="Front Door",
+        ),
+    )
+
+    assert command.stream_type == "mjpeg"
+    assert command.url == (
+        "http://10.0.0.2:8123/api/camera_proxy_stream/camera.front_door"
+        "?token=stream-token"
+    )
+
+
+def test_show_camera_command_mjpeg_first_falls_back_to_hls(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from custom_components.ha_tv_pip import services
+
+    camera_module = FakeCameraModule("/api/hls/front-door")
+    monkeypatch.setitem(sys.modules, "homeassistant.components.camera", camera_module)
+    monkeypatch.setitem(
+        sys.modules,
+        "homeassistant.exceptions",
+        FakeExceptionsModule("homeassistant.exceptions"),
+    )
+    monkeypatch.setitem(
+        sys.modules,
+        "homeassistant.helpers.network",
+        FakeNetworkModule("homeassistant.helpers.network"),
+    )
+
+    def fake_mjpeg_stream_url(
+        hass: Any,
+        entity_id: str,
+        *,
+        prefer_external: bool = False,
+    ) -> str:
+        raise ServiceValidationError("camera_mjpeg_unavailable")
+
+    monkeypatch.setattr(services, "_camera_mjpeg_stream_url", fake_mjpeg_stream_url)
+    hass = FakeHass(
+        entries=[],
+        states={"camera.front_door": FakeState({"access_token": "snapshot-token"})},
+    )
+
+    command = asyncio.run(
+        _async_show_camera_command(
+            hass,
+            _request_from_call(
+                FakeCall(
+                    data={
+                        ATTR_CAMERA_ENTITY: "camera.front_door",
+                        ATTR_STREAM_TYPE: "mjpeg_first",
+                    }
+                )
+            ),
+            title="Front Door",
+        ),
+    )
+
+    assert camera_module.requested_entity_id == "camera.front_door"
+    assert command.stream_type == "hls"
+    assert command.url == "http://10.0.0.2:8123/api/hls/front-door"
+    assert command.preview_url == (
+        "http://10.0.0.2:8123/api/camera_proxy/camera.front_door"
+        "?token=snapshot-token"
+    )
+
+
 def test_show_camera_command_auto_falls_back_to_mjpeg(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

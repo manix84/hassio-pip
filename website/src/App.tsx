@@ -162,7 +162,7 @@ action:
       device_id: living_room_tv
     data:
       camera_entity: camera.front_door
-      stream_type: mjpeg
+      stream_type: mjpeg_first
       stream_camera_entity: camera.front_door_sub
       snapshot_fallback: true
       snapshot_camera_entity: camera.front_door
