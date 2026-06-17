@@ -1,5 +1,10 @@
 # What's New ✨
 
+## 1.13.2 - Receiver Visibility Entities 🧰
+
+- Added focused Home Assistant sensors for active display mode, active stream type, last receiver error, and receiver app version 🔎
+- Added a remote-connected binary sensor and a refresh-status button for receiver troubleshooting 🧰
+
 ## 1.13.1 - Capability-Aware Stream Selection 🧭
 
 - Used receiver-reported capabilities to reject unsupported forced stream, snapshot, notification, and media-text commands before sending them 🛡️

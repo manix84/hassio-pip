@@ -26,15 +26,25 @@ else:
 async def async_setup_entry(hass: Any, entry: Any, async_add_entities: Any) -> None:
     """Set up HA TV PiP receiver sensors."""
 
-    async_add_entities([ReceiverStatusSensor(entry)])
+    async_add_entities(
+        [
+            ReceiverStatusSensor(entry),
+            ReceiverDisplayModeSensor(entry),
+            ReceiverStreamTypeSensor(entry),
+            ReceiverLastErrorSensor(entry),
+            ReceiverVersionSensor(entry),
+        ]
+    )
 
 
-class ReceiverStatusSensor(ReceiverEntity, SensorEntity):
-    """Receiver playback/status sensor."""
+class ReceiverPollingSensor(ReceiverEntity, SensorEntity):
+    """Base sensor that polls the receiver status endpoint."""
 
-    def __init__(self, entry: Any) -> None:
-        super().__init__(entry, key="status", name="Status")
-        self._attr_native_value = "unknown"
+    unavailable_value = "unavailable"
+
+    def __init__(self, entry: Any, *, key: str, name: str) -> None:
+        super().__init__(entry, key=key, name=name)
+        self._attr_native_value: str | None = self.unavailable_value
         self._attr_extra_state_attributes: dict[str, Any] = {}
 
     async def async_update(self) -> None:
@@ -51,8 +61,66 @@ class ReceiverStatusSensor(ReceiverEntity, SensorEntity):
             }
             return
 
-        self._attr_native_value = status.playback_state
-        self._attr_extra_state_attributes = _status_attributes(status)
+        self._attr_native_value = self._native_value(status)
+        self._attr_extra_state_attributes = self._extra_attributes(status)
+
+    def _native_value(self, status: ReceiverStatus) -> str | None:
+        raise NotImplementedError
+
+    def _extra_attributes(self, status: ReceiverStatus) -> dict[str, Any]:
+        return _status_attributes(status)
+
+
+class ReceiverStatusSensor(ReceiverPollingSensor):
+    """Receiver playback/status sensor."""
+
+    def __init__(self, entry: Any) -> None:
+        super().__init__(entry, key="status", name="Status")
+
+    def _native_value(self, status: ReceiverStatus) -> str:
+        return status.playback_state
+
+
+class ReceiverDisplayModeSensor(ReceiverPollingSensor):
+    """Receiver display mode sensor."""
+
+    def __init__(self, entry: Any) -> None:
+        super().__init__(entry, key="display_mode", name="Active Display Mode")
+
+    def _native_value(self, status: ReceiverStatus) -> str:
+        return status.display_mode
+
+
+class ReceiverStreamTypeSensor(ReceiverPollingSensor):
+    """Receiver active stream type sensor."""
+
+    unavailable_value = "unknown"
+
+    def __init__(self, entry: Any) -> None:
+        super().__init__(entry, key="stream_type", name="Active Stream Type")
+
+    def _native_value(self, status: ReceiverStatus) -> str:
+        return status.stream_type or "unknown"
+
+
+class ReceiverLastErrorSensor(ReceiverPollingSensor):
+    """Receiver last error sensor."""
+
+    def __init__(self, entry: Any) -> None:
+        super().__init__(entry, key="last_error", name="Last Receiver Error")
+
+    def _native_value(self, status: ReceiverStatus) -> str:
+        return status.error or "none"
+
+
+class ReceiverVersionSensor(ReceiverPollingSensor):
+    """Receiver app version sensor."""
+
+    def __init__(self, entry: Any) -> None:
+        super().__init__(entry, key="receiver_version", name="Receiver Version")
+
+    def _native_value(self, status: ReceiverStatus) -> str:
+        return status.version or "unknown"
 
 
 def _status_attributes(status: ReceiverStatus) -> dict[str, Any]:
@@ -63,6 +131,7 @@ def _status_attributes(status: ReceiverStatus) -> dict[str, Any]:
         "device_id": status.device_id,
         "device_name": status.device_name,
         "display_mode": status.display_mode,
+        "stream_type": status.stream_type,
         "pairing_state": status.pairing_state,
         "remote_status": status.remote_status,
         "control_running": status.control_running,

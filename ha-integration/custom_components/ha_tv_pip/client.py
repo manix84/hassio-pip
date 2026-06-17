@@ -126,6 +126,7 @@ class ReceiverStatus:
     control_running: bool
     playback_state: str
     display_mode: str
+    stream_type: str | None
     pairing_state: str | None
     launcher_visible: bool | None
     remote_status: str | None
@@ -220,6 +221,7 @@ async def async_get_receiver_status(host: str, port: int) -> ReceiverStatus:
     pairing = response.get("pairing")
     management = response.get("management")
     remote = response.get("remote")
+    playback = response.get("playback")
     last_request = response.get("lastRequest")
     return ReceiverStatus(
         app=str(response.get("app", "HA TV PiP Receiver")),
@@ -231,6 +233,10 @@ async def async_get_receiver_status(host: str, port: int) -> ReceiverStatus:
         control_running=bool(response.get("controlRunning", False)),
         playback_state=str(response.get("playbackState", "unknown")),
         display_mode=str(response.get("displayMode", "unknown")),
+        stream_type=_optional_text(
+            response.get("streamType")
+            or (playback.get("streamType") if isinstance(playback, dict) else None)
+        ),
         pairing_state=str(pairing.get("state")) if isinstance(pairing, dict) else None,
         launcher_visible=(
             bool(management["launcherVisible"])
@@ -413,6 +419,13 @@ def _optional_int(value: Any) -> int | None:
         return int(value)
     except (TypeError, ValueError):
         return None
+
+
+def _optional_text(value: Any) -> str | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
 
 
 def _parse_capabilities(value: Any) -> ReceiverCapabilities | None:

@@ -57,6 +57,9 @@
     "binary_sensor": {
       "connected": {
         "name": "Connected"
+      },
+      "remote_connected": {
+        "name": "Remote Connected"
       }
     },
     "button": {
@@ -66,6 +69,9 @@
       "open_launcher": {
         "name": "Open Launcher"
       },
+      "refresh_status": {
+        "name": "Refresh Status"
+      },
       "sync_remote_config": {
         "name": "Sync Remote Config"
       },
@@ -74,8 +80,20 @@
       }
     },
     "sensor": {
+      "display_mode": {
+        "name": "Active Display Mode"
+      },
+      "last_error": {
+        "name": "Last Receiver Error"
+      },
+      "receiver_version": {
+        "name": "Receiver Version"
+      },
       "status": {
         "name": "Status"
+      },
+      "stream_type": {
+        "name": "Active Stream Type"
       }
     },
     "switch": {

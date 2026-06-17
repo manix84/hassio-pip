@@ -5,8 +5,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from .client import (
+    ReceiverClientError,
     ShowCameraCommand,
     async_close_receiver,
+    async_get_receiver_status,
     async_open_receiver,
     async_show_camera,
 )
@@ -57,6 +59,7 @@ async def async_setup_entry(hass: Any, entry: Any, async_add_entities: Any) -> N
         [
             ReceiverOpenButton(entry),
             ReceiverSyncRemoteButton(hass, entry),
+            ReceiverRefreshStatusButton(entry),
             ReceiverTestButton(entry),
             ReceiverCloseButton(entry),
         ]
@@ -100,6 +103,23 @@ class ReceiverSyncRemoteButton(ReceiverEntity, ButtonEntity):
             raise HomeAssistantError(
                 "Could not send remote receiver settings to the TV."
             )
+
+
+class ReceiverRefreshStatusButton(ReceiverEntity, ButtonEntity):
+    """Button that checks the receiver status endpoint on demand."""
+
+    def __init__(self, entry: Any) -> None:
+        super().__init__(entry, key="refresh_status", name="Refresh Status")
+
+    async def async_press(self) -> None:
+        """Fetch receiver status once and fail visibly when unreachable."""
+
+        try:
+            await async_get_receiver_status(self.host, self.port)
+        except ReceiverClientError as error:
+            raise HomeAssistantError(
+                f"Could not refresh receiver status: {error}"
+            ) from error
 
 
 class ReceiverTestButton(ReceiverEntity, ButtonEntity):

@@ -57,6 +57,9 @@
     "binary_sensor": {
       "connected": {
         "name": "Verbunden"
+      },
+      "remote_connected": {
+        "name": "Remote Connected"
       }
     },
     "button": {
@@ -71,11 +74,26 @@
       },
       "test_pip": {
         "name": "PiP testen"
+      },
+      "refresh_status": {
+        "name": "Refresh Status"
       }
     },
     "sensor": {
       "status": {
         "name": "Status"
+      },
+      "display_mode": {
+        "name": "Active Display Mode"
+      },
+      "last_error": {
+        "name": "Last Receiver Error"
+      },
+      "receiver_version": {
+        "name": "Receiver Version"
+      },
+      "stream_type": {
+        "name": "Active Stream Type"
       }
     },
     "switch": {

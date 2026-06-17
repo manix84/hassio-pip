@@ -81,6 +81,7 @@ def _status() -> ReceiverStatus:
         control_running=True,
         playback_state="playing",
         display_mode="overlay",
+        stream_type="hls",
         pairing_state="paired",
         launcher_visible=True,
         remote_status="connected",
@@ -113,9 +114,20 @@ def test_sensor_setup_adds_status_sensor() -> None:
 
     asyncio.run(sensor.async_setup_entry(None, _entry(), added.extend))
 
-    assert len(added) == 1
-    assert added[0]._attr_unique_id == "device-1_status"
-    assert added[0]._attr_translation_key == "status"
+    assert [entity._attr_unique_id for entity in added] == [
+        "device-1_status",
+        "device-1_display_mode",
+        "device-1_stream_type",
+        "device-1_last_error",
+        "device-1_receiver_version",
+    ]
+    assert [entity._attr_translation_key for entity in added] == [
+        "status",
+        "display_mode",
+        "stream_type",
+        "last_error",
+        "receiver_version",
+    ]
 
 
 def test_binary_sensor_setup_adds_connected_sensor() -> None:
@@ -123,9 +135,14 @@ def test_binary_sensor_setup_adds_connected_sensor() -> None:
 
     asyncio.run(binary_sensor.async_setup_entry(None, _entry(), added.extend))
 
-    assert len(added) == 1
-    assert added[0]._attr_unique_id == "device-1_connected"
-    assert added[0]._attr_translation_key == "connected"
+    assert [entity._attr_unique_id for entity in added] == [
+        "device-1_connected",
+        "device-1_remote_connected",
+    ]
+    assert [entity._attr_translation_key for entity in added] == [
+        "connected",
+        "remote_connected",
+    ]
 
 
 def test_button_setup_adds_open_test_and_close_buttons() -> None:
@@ -136,18 +153,21 @@ def test_button_setup_adds_open_test_and_close_buttons() -> None:
     assert [entity._attr_unique_id for entity in added] == [
         "device-1_open_launcher",
         "device-1_sync_remote_config",
+        "device-1_refresh_status",
         "device-1_test_pip",
         "device-1_close_pip",
     ]
     assert [entity._attr_name for entity in added] == [
         "Open Launcher",
         "Sync Remote Config",
+        "Refresh Status",
         "Test PiP",
         "Close PiP",
     ]
     assert [entity._attr_translation_key for entity in added] == [
         "open_launcher",
         "sync_remote_config",
+        "refresh_status",
         "test_pip",
         "close_pip",
     ]
@@ -155,6 +175,7 @@ def test_button_setup_adds_open_test_and_close_buttons() -> None:
     assert added[1]._attr_entity_category == "config"
     assert not hasattr(added[2], "_attr_entity_category")
     assert not hasattr(added[3], "_attr_entity_category")
+    assert not hasattr(added[4], "_attr_entity_category")
 
 
 def test_switch_setup_adds_launcher_visibility_switch() -> None:
@@ -181,6 +202,7 @@ def test_status_sensor_updates_from_receiver(monkeypatch) -> None:  # type: igno
     assert entity._attr_native_value == "playing"
     assert entity._attr_extra_state_attributes["connected"] is True
     assert entity._attr_extra_state_attributes["display_mode"] == "overlay"
+    assert entity._attr_extra_state_attributes["stream_type"] == "hls"
     assert entity._attr_extra_state_attributes["remote_status"] == "connected"
     assert entity._attr_extra_state_attributes["capabilities_version"] == 1
     assert entity._attr_extra_state_attributes["supported_stream_types"] == [
@@ -213,6 +235,28 @@ def test_status_sensor_updates_from_receiver(monkeypatch) -> None:  # type: igno
     )
 
 
+def test_focused_status_sensors_update_from_receiver(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    async def fake_status(host: str, port: int) -> ReceiverStatus:
+        return _status()
+
+    monkeypatch.setattr(sensor, "async_get_receiver_status", fake_status)
+
+    display_mode = sensor.ReceiverDisplayModeSensor(_entry())
+    stream_type = sensor.ReceiverStreamTypeSensor(_entry())
+    last_error = sensor.ReceiverLastErrorSensor(_entry())
+    version = sensor.ReceiverVersionSensor(_entry())
+
+    asyncio.run(display_mode.async_update())
+    asyncio.run(stream_type.async_update())
+    asyncio.run(last_error.async_update())
+    asyncio.run(version.async_update())
+
+    assert display_mode._attr_native_value == "overlay"
+    assert stream_type._attr_native_value == "hls"
+    assert last_error._attr_native_value == "none"
+    assert version._attr_native_value == "0.24.0"
+
+
 def test_connected_sensor_handles_unavailable_receiver(monkeypatch) -> None:  # type: ignore[no-untyped-def]
     async def fake_status(host: str, port: int) -> ReceiverStatus:
         raise ReceiverClientError("cannot_connect")
@@ -224,6 +268,19 @@ def test_connected_sensor_handles_unavailable_receiver(monkeypatch) -> None:  # 
 
     assert entity._attr_is_on is False
     assert entity._attr_extra_state_attributes == {"last_error": "cannot_connect"}
+
+
+def test_remote_connected_sensor_updates_from_receiver(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    async def fake_status(host: str, port: int) -> ReceiverStatus:
+        return _status()
+
+    monkeypatch.setattr(binary_sensor, "async_get_receiver_status", fake_status)
+    entity = binary_sensor.ReceiverRemoteConnectedBinarySensor(_entry())
+
+    asyncio.run(entity.async_update())
+
+    assert entity._attr_is_on is True
+    assert entity._attr_extra_state_attributes["remote_status"] == "connected"
 
 
 def test_test_button_sends_public_test_stream(monkeypatch) -> None:  # type: ignore[no-untyped-def]
@@ -251,6 +308,35 @@ def test_test_button_sends_public_test_stream(monkeypatch) -> None:  # type: ign
         "title": "HA TV PiP Test",
         "stream_type": "hls",
     }
+
+
+def test_refresh_status_button_fetches_receiver_status(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    captured: dict[str, Any] = {}
+
+    async def fake_status(host: str, port: int) -> ReceiverStatus:
+        captured.update({"host": host, "port": port})
+        return _status()
+
+    monkeypatch.setattr(button, "async_get_receiver_status", fake_status)
+
+    asyncio.run(button.ReceiverRefreshStatusButton(_entry()).async_press())
+
+    assert captured == {"host": "10.0.0.236", "port": 8765}
+
+
+def test_refresh_status_button_reports_receiver_errors(monkeypatch) -> None:  # type: ignore[no-untyped-def]
+    async def fake_status(host: str, port: int) -> ReceiverStatus:
+        raise ReceiverClientError("cannot_connect")
+
+    monkeypatch.setattr(button, "async_get_receiver_status", fake_status)
+    entity = button.ReceiverRefreshStatusButton(_entry())
+
+    try:
+        asyncio.run(entity.async_press())
+    except button.HomeAssistantError as error:
+        assert "Could not refresh receiver status" in str(error)
+    else:
+        raise AssertionError("Expected HomeAssistantError")
 
 
 def test_open_button_opens_receiver_management(monkeypatch) -> None:  # type: ignore[no-untyped-def]

@@ -233,6 +233,7 @@ def test_async_get_receiver_status_parses_response(monkeypatch) -> None:  # type
             "controlRunning": True,
             "playbackState": "playing",
             "displayMode": "overlay",
+            "playback": {"streamType": "hls"},
             "remote": {"status": "connected"},
             "management": {"launcherVisible": False},
             "pairing": {"state": "paired"},
@@ -271,6 +272,7 @@ def test_async_get_receiver_status_parses_response(monkeypatch) -> None:  # type
     assert status.control_running is True
     assert status.playback_state == "playing"
     assert status.display_mode == "overlay"
+    assert status.stream_type == "hls"
     assert status.pairing_state == "paired"
     assert status.launcher_visible is False
     assert status.remote_status == "connected"

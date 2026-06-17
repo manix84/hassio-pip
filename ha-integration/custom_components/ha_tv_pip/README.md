@@ -92,10 +92,13 @@ The dry-run build packages the custom integration zip and will remain the integr
 Each paired receiver creates:
 
 - Status sensor with playback state, receiver diagnostics, and parsed receiver capability metadata.
+- Focused sensors for active display mode, active stream type, last receiver error, and receiver app version.
 - Connected binary sensor based on the local `/status` endpoint.
+- Remote connected binary sensor for outbound remote receiver mode.
 
 PiP controls:
 
+- Refresh Status button that checks the receiver status endpoint on demand.
 - Test PiP button that sends a known public HLS stream to the receiver.
 - Close PiP button that closes the active receiver display.
 
