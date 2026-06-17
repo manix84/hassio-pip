@@ -49,6 +49,12 @@ async def async_get_config_entry_diagnostics(hass: Any, entry: Any) -> dict[str,
 
     receiver_status = _redact(status.raw)
     diagnostics["receiver_status"] = receiver_status
+    diagnostics["compatibility"] = {
+        "state": status.compatibility.state,
+        "compatible": status.compatibility.compatible,
+        "missing_features": list(status.compatibility.missing_features),
+        "warnings": list(status.compatibility.warnings),
+    }
     return diagnostics
 
 

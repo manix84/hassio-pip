@@ -464,6 +464,7 @@ async def async_handle_show_camera(hass: Any, call: Any) -> None:
     remote = remote_registry(hass)
     prefer_external = remote.is_connected(receiver.device_id)
     capabilities = await _async_receiver_capabilities(receiver)
+    request = _degrade_camera_request_for_capabilities(request, capabilities)
     _validate_camera_capabilities(request, capabilities)
     command = await _async_show_camera_command(
         hass,
@@ -504,6 +505,7 @@ async def async_handle_show_snapshot(hass: Any, call: Any) -> None:
     remote = remote_registry(hass)
     prefer_external = remote.is_connected(receiver.device_id)
     capabilities = await _async_receiver_capabilities(receiver)
+    request = _degrade_camera_request_for_capabilities(request, capabilities)
     _validate_stream_capability(capabilities, STREAM_TYPE_SNAPSHOT)
     snapshot_url = _camera_snapshot_url(
         hass,
@@ -1561,8 +1563,31 @@ def _validate_camera_capabilities(
     ):
         raise ServiceValidationError("receiver_capability_unavailable")
 
-    if _presentation_payload(request) and not capabilities.media_with_notification_text:
+    if _media_text_payload(request) and not capabilities.media_with_notification_text:
         raise ServiceValidationError("receiver_capability_unavailable")
+
+
+def _degrade_camera_request_for_capabilities(
+    request: ShowCameraRequest,
+    capabilities: ReceiverCapabilities | None,
+) -> ShowCameraRequest:
+    """Drop optional media text fields when an older receiver cannot render them."""
+
+    if capabilities is None or capabilities.media_with_notification_text:
+        return request
+    if not _media_text_payload(request):
+        return request
+
+    _LOGGER.warning(
+        "Receiver does not support media text footers; sending %s without title/message"
+        " presentation fields",
+        request.camera_entity,
+    )
+    return replace(
+        request,
+        message=None,
+        title=None,
+    )
 
 
 def _validate_notification_capabilities(
@@ -1664,6 +1689,10 @@ def _presentation_payload(request: ShowCameraRequest) -> dict[str, Any]:
         if request.message is not None:
             payload["message"] = request.message
     return payload
+
+
+def _media_text_payload(request: ShowCameraRequest) -> bool:
+    return request.title is not None or request.message is not None
 
 
 def _optional_overlay_dimension(value: Any, minimum: int, maximum: int) -> int | None:

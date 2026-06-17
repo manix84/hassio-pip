@@ -44,6 +44,8 @@ Post-1.0 compatibility polish now includes receiver-level Home Assistant default
 
 The current compatibility pass adds Home Assistant-side camera stream testing and per-camera defaults. Users can test HLS, MJPEG, and snapshot availability for a camera/receiver pair, then store camera-specific stream, fallback, position, duration, width, and height defaults so automations stay simpler.
 
+Receiver/integration compatibility checks now compare receiver API and capability metadata with the Home Assistant integration. Older receivers without capability metadata are treated as legacy best-effort, degraded receivers expose missing optional features in diagnostics, and camera popups drop optional title/message footer fields when the receiver cannot render them.
+
 ## Monorepo Layout 🧱
 
 ```txt

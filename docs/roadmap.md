@@ -814,6 +814,8 @@ Completed:
 - ✅ Per-camera default settings through `ha_tv_pip.set_camera_defaults` and `ha_tv_pip.clear_camera_defaults`.
 - ✅ Camera compatibility testing through `ha_tv_pip.test_camera_stream`.
 - ✅ Non-sensitive last compatibility result in Home Assistant diagnostics.
+- ✅ Receiver/integration compatibility summary for compatible, degraded, legacy, and incompatible states.
+- ✅ Graceful media-footer downgrade when receiver capabilities are missing optional presentation support.
 
 Still future:
 

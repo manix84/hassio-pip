@@ -133,6 +133,17 @@ Diagnostics:
 - Config entry diagnostics redact pairing tokens and active stream URLs.
 - Use diagnostics when reporting setup, pairing, stream compatibility, or remote receiver issues.
 
+## Receiver Compatibility 🧩
+
+The integration reads receiver `/status` API and capability metadata and computes a compatibility summary:
+
+- `compatible`: the receiver supports the expected command and display features.
+- `degraded`: the receiver works but is missing optional features such as media text footers, playable fallback, launcher management, or remote receiver settings.
+- `legacy`: the receiver does not report capability metadata, so Home Assistant uses best-effort behavior.
+- `incompatible`: the receiver is missing a required API version or display stream support.
+
+Compatibility state, missing features, and warnings are exposed on the status sensor attributes and in config entry diagnostics. Camera and snapshot commands gracefully drop optional title/message footer fields when the receiver cannot render media text, while still sending the media command where possible.
+
 ## Receiver Defaults ⚙️
 
 Each receiver has configurable defaults in the Home Assistant integration options. These defaults are used only when an action does not provide its own value:

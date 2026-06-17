@@ -1,6 +1,7 @@
 """Tests for the HA TV PiP receiver client helpers."""
 
 import asyncio
+from typing import Any
 
 from custom_components.ha_tv_pip.client import (
     ShowCameraCommand,
@@ -277,6 +278,132 @@ def test_async_get_receiver_status_parses_response(monkeypatch) -> None:  # type
     assert status.launcher_visible is False
     assert status.remote_status == "connected"
     assert status.error == "decoder_failed"
+    assert status.compatibility.state == "compatible"
+    assert status.compatibility.compatible is True
+    assert status.compatibility.missing_features == ()
+    assert status.compatibility.warnings == ()
+
+
+def test_async_get_receiver_status_treats_missing_capabilities_as_legacy(
+    monkeypatch: Any,
+) -> None:
+    async def fake_to_thread(func: Any, *args: Any) -> dict[str, Any]:
+        return {
+            "app": "HA TV PiP Receiver",
+            "version": "0.12.0",
+            "deviceId": "device-1",
+            "deviceName": "Nursery TV",
+            "apiVersion": 1,
+            "controlRunning": True,
+            "playbackState": "idle",
+            "displayMode": "idle",
+        }
+
+    monkeypatch.setattr(
+        "custom_components.ha_tv_pip.client.asyncio.to_thread",
+        fake_to_thread,
+    )
+
+    status = asyncio.run(async_get_receiver_status("10.0.0.236", 8765))
+
+    assert status.capabilities is None
+    assert status.compatibility.state == "legacy"
+    assert status.compatibility.compatible is True
+    assert status.compatibility.missing_features == ("capability_metadata",)
+    assert status.compatibility.warnings == ("best_effort_without_capabilities",)
+
+
+def test_async_get_receiver_status_reports_degraded_capabilities(
+    monkeypatch: Any,
+) -> None:
+    async def fake_to_thread(func: Any, *args: Any) -> dict[str, Any]:
+        return {
+            "app": "HA TV PiP Receiver",
+            "version": "1.0.0",
+            "deviceId": "device-1",
+            "deviceName": "Nursery TV",
+            "apiVersion": 1,
+            "capabilities": {
+                "capabilitiesVersion": 1,
+                "streamTypes": ["hls", "snapshot"],
+                "positions": ["top_right"],
+                "previewImage": False,
+                "playableFallback": False,
+                "nativePictureInPicture": True,
+                "overlayFallback": True,
+                "styledNotifications": False,
+                "mediaWithNotificationText": False,
+                "launcherManagement": False,
+                "localPairing": True,
+                "remoteReceiverSettings": False,
+            },
+        }
+
+    monkeypatch.setattr(
+        "custom_components.ha_tv_pip.client.asyncio.to_thread",
+        fake_to_thread,
+    )
+
+    status = asyncio.run(async_get_receiver_status("10.0.0.236", 8765))
+
+    assert status.compatibility.state == "degraded"
+    assert status.compatibility.compatible is True
+    assert status.compatibility.missing_features == ()
+    assert "media_text_footer_unavailable" in status.compatibility.warnings
+    assert "remote_receiver_settings_unavailable" in status.compatibility.warnings
+
+
+def test_async_get_receiver_status_reports_incompatible_api(
+    monkeypatch: Any,
+) -> None:
+    async def fake_to_thread(func: Any, *args: Any) -> dict[str, Any]:
+        return {
+            "app": "HA TV PiP Receiver",
+            "version": "0.1.0",
+            "deviceId": "device-1",
+            "deviceName": "Nursery TV",
+            "apiVersion": 0,
+        }
+
+    monkeypatch.setattr(
+        "custom_components.ha_tv_pip.client.asyncio.to_thread",
+        fake_to_thread,
+    )
+
+    status = asyncio.run(async_get_receiver_status("10.0.0.236", 8765))
+
+    assert status.compatibility.state == "incompatible"
+    assert status.compatibility.compatible is False
+    assert status.compatibility.missing_features == ("api_v1",)
+
+
+def test_async_get_receiver_status_reports_incompatible_stream_support(
+    monkeypatch: Any,
+) -> None:
+    async def fake_to_thread(func: Any, *args: Any) -> dict[str, Any]:
+        return {
+            "app": "HA TV PiP Receiver",
+            "version": "1.0.0",
+            "deviceId": "device-1",
+            "deviceName": "Nursery TV",
+            "apiVersion": 1,
+            "capabilities": {
+                "capabilitiesVersion": 1,
+                "streamTypes": ["notification"],
+                "positions": ["top_right"],
+            },
+        }
+
+    monkeypatch.setattr(
+        "custom_components.ha_tv_pip.client.asyncio.to_thread",
+        fake_to_thread,
+    )
+
+    status = asyncio.run(async_get_receiver_status("10.0.0.236", 8765))
+
+    assert status.compatibility.state == "incompatible"
+    assert status.compatibility.compatible is False
+    assert status.compatibility.missing_features == ("display_stream",)
 
 
 def test_async_close_receiver_returns_accepted(monkeypatch) -> None:  # type: ignore[no-untyped-def]

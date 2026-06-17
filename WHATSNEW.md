@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.17.0 - Receiver Compatibility Checks 🧩
+
+- Added a computed receiver compatibility summary for compatible, degraded, legacy, and incompatible receiver states 🧩
+- Exposed receiver compatibility state, missing features, and warnings through Home Assistant status attributes and diagnostics 🔎
+- Gracefully downgrade camera and snapshot popups when a receiver cannot render title/message footers, while preserving media playback and sizing where possible 📺
+
 ## 1.16.0 - Camera Compatibility Defaults 🧭
 
 - Added `ha_tv_pip.test_camera_stream` to check HLS, MJPEG, and snapshot availability for a camera/receiver pair 🧪

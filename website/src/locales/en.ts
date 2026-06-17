@@ -11,7 +11,7 @@ export const en = {
     currentStatus: {
       body: [
         "HA TV PiP now supports discovery, TV-visible pairing, authenticated receiver control, camera stream popups, snapshots, styled notifications, receiver management, remote receiver transport, and per-camera receiver defaults.",
-        "Post-1.0 compatibility work is underway. The Home Assistant integration can test HLS, MJPEG, and snapshot availability for a camera, store the last compatibility result, and reuse per-camera stream defaults in later automations.",
+        "Post-1.0 compatibility work is underway. The Home Assistant integration can test HLS, MJPEG, and snapshot availability for a camera, store the last compatibility result, reuse per-camera stream defaults, and report whether the installed receiver is current, degraded, legacy, or incompatible.",
       ],
       eyebrow: "Current status",
       title: "Stage 12: Beta release hardening",
@@ -92,7 +92,7 @@ export const en = {
       {
         title: "Camera stream support",
         description:
-          "HLS, MJPEG, and snapshot paths with compatibility tests and per-camera defaults.",
+          "HLS, MJPEG, and snapshot paths with compatibility tests, capability checks, graceful downgrades, and per-camera defaults.",
         status: "complete",
       },
       {

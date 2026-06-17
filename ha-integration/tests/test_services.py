@@ -1584,24 +1584,58 @@ def test_show_notification_service_rejects_receiver_without_notification_capabil
     assert error.value.code == "receiver_capability_unavailable"
 
 
-def test_show_camera_service_rejects_media_text_when_receiver_lacks_capability(
+def test_show_camera_service_strips_media_text_when_receiver_lacks_capability(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from custom_components.ha_tv_pip import services
+    sent: dict[str, Any] = {}
 
     class FakeRemoteRegistry:
         def is_connected(self, device_id: str) -> bool:
             return False
 
+        async def async_send_show(
+            self,
+            *,
+            device_id: str,
+            command: ShowCameraCommand,
+        ) -> bool:
+            return False
+
     async def fake_capabilities(receiver: Any) -> ReceiverCapabilities:
         return _capabilities(media_with_notification_text=False)
 
-    async def fail_command(*args: Any, **kwargs: Any) -> ShowCameraCommand:
-        raise AssertionError("unsupported media text should not build a command")
+    async def fake_command(
+        hass: Any,
+        request: Any,
+        *,
+        title: str,
+        prefer_external: bool = False,
+        capabilities: ReceiverCapabilities | None = None,
+    ) -> ShowCameraCommand:
+        sent["request_title"] = request.title
+        sent["request_message"] = request.message
+        return ShowCameraCommand(
+            title=title,
+            url="http://camera",
+            duration_seconds=request.duration_seconds,
+            enter_pip=True,
+            show_notification=request.title is not None or request.message is not None,
+        )
+
+    async def fake_local_show(
+        host: str,
+        port: int,
+        *,
+        token: str,
+        command: ShowCameraCommand,
+    ) -> None:
+        sent["show_notification"] = command.show_notification
 
     monkeypatch.setattr(services, "remote_registry", lambda hass: FakeRemoteRegistry())
     monkeypatch.setattr(services, "_async_receiver_capabilities", fake_capabilities)
-    monkeypatch.setattr(services, "_async_show_camera_command", fail_command)
+    monkeypatch.setattr(services, "_async_show_camera_command", fake_command)
+    monkeypatch.setattr(services, "async_show_camera", fake_local_show)
 
     entry = FakeEntry(
         entry_id="entry-1",
@@ -1618,20 +1652,24 @@ def test_show_camera_service_rejects_media_text_when_receiver_lacks_capability(
         states={"camera.front_door": FakeState({"friendly_name": "Front Door"})},
     )
 
-    with pytest.raises(ServiceValidationError) as error:
-        asyncio.run(
-            services.async_handle_show_camera(
-                hass,
-                FakeCall(
-                    data={
-                        ATTR_CAMERA_ENTITY: "camera.front_door",
-                        ATTR_TITLE: "Doorbell",
-                    }
-                ),
-            )
+    asyncio.run(
+        services.async_handle_show_camera(
+            hass,
+            FakeCall(
+                data={
+                    ATTR_CAMERA_ENTITY: "camera.front_door",
+                    ATTR_TITLE: "Doorbell",
+                    ATTR_MESSAGE: "Motion detected",
+                }
+            ),
         )
+    )
 
-    assert error.value.code == "receiver_capability_unavailable"
+    assert sent == {
+        "request_title": None,
+        "request_message": None,
+        "show_notification": False,
+    }
 
 
 def test_show_camera_command_can_force_snapshot(

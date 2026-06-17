@@ -14,6 +14,7 @@ from custom_components.ha_tv_pip import (
 from custom_components.ha_tv_pip.client import (
     ReceiverCapabilities,
     ReceiverClientError,
+    ReceiverCompatibility,
     ReceiverStatus,
 )
 from custom_components.ha_tv_pip.const import (
@@ -77,6 +78,12 @@ def _status() -> ReceiverStatus:
             launcher_management=True,
             local_pairing=True,
             remote_receiver_settings=True,
+        ),
+        compatibility=ReceiverCompatibility(
+            state="compatible",
+            compatible=True,
+            missing_features=(),
+            warnings=(),
         ),
         control_running=True,
         playback_state="playing",

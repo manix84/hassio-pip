@@ -114,6 +114,16 @@ class ReceiverCapabilities:
 
 
 @dataclass(frozen=True)
+class ReceiverCompatibility:
+    """Integration compatibility summary for a receiver status response."""
+
+    state: str
+    compatible: bool
+    missing_features: tuple[str, ...]
+    warnings: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class ReceiverStatus:
     """Receiver status returned by the local HTTP API."""
 
@@ -123,6 +133,7 @@ class ReceiverStatus:
     device_name: str
     api_version: int | None
     capabilities: ReceiverCapabilities | None
+    compatibility: ReceiverCompatibility
     control_running: bool
     playback_state: str
     display_mode: str
@@ -223,13 +234,16 @@ async def async_get_receiver_status(host: str, port: int) -> ReceiverStatus:
     remote = response.get("remote")
     playback = response.get("playback")
     last_request = response.get("lastRequest")
+    capabilities = _parse_capabilities(response.get("capabilities"))
+    api_version = _optional_int(response.get("apiVersion"))
     return ReceiverStatus(
         app=str(response.get("app", "HA TV PiP Receiver")),
         version=str(response.get("version", "")),
         device_id=str(response.get("deviceId", "")),
         device_name=str(response.get("deviceName", "")),
-        api_version=_optional_int(response.get("apiVersion")),
-        capabilities=_parse_capabilities(response.get("capabilities")),
+        api_version=api_version,
+        capabilities=capabilities,
+        compatibility=_receiver_compatibility(api_version, capabilities),
         control_running=bool(response.get("controlRunning", False)),
         playback_state=str(response.get("playbackState", "unknown")),
         display_mode=str(response.get("displayMode", "unknown")),
@@ -447,6 +461,67 @@ def _parse_capabilities(value: Any) -> ReceiverCapabilities | None:
         launcher_management=bool(value.get("launcherManagement", False)),
         local_pairing=bool(value.get("localPairing", False)),
         remote_receiver_settings=bool(value.get("remoteReceiverSettings", False)),
+    )
+
+
+def _receiver_compatibility(
+    api_version: int | None,
+    capabilities: ReceiverCapabilities | None,
+) -> ReceiverCompatibility:
+    """Summarise how well this receiver can support the current integration."""
+
+    if api_version is not None and api_version < 1:
+        return ReceiverCompatibility(
+            state="incompatible",
+            compatible=False,
+            missing_features=("api_v1",),
+            warnings=(),
+        )
+
+    if capabilities is None:
+        return ReceiverCompatibility(
+            state="legacy",
+            compatible=True,
+            missing_features=("capability_metadata",),
+            warnings=("best_effort_without_capabilities",),
+        )
+
+    missing_features: list[str] = []
+    warnings: list[str] = []
+    supported_streams = set(capabilities.stream_types)
+    if not supported_streams.intersection({"hls", "mjpeg", "snapshot"}):
+        missing_features.append("display_stream")
+    if "notification" not in supported_streams:
+        warnings.append("styled_notifications_unavailable")
+    if not capabilities.preview_image:
+        warnings.append("snapshot_preview_unavailable")
+    if not capabilities.playable_fallback:
+        warnings.append("playable_fallback_unavailable")
+    if not capabilities.media_with_notification_text:
+        warnings.append("media_text_footer_unavailable")
+    if not capabilities.launcher_management:
+        warnings.append("launcher_management_unavailable")
+    if not capabilities.remote_receiver_settings:
+        warnings.append("remote_receiver_settings_unavailable")
+
+    if capabilities.capabilities_version is None:
+        warnings.append("unknown_capabilities_version")
+    elif capabilities.capabilities_version > 1:
+        warnings.append("newer_receiver_capabilities_version")
+
+    compatible = not missing_features
+    if not compatible:
+        state = "incompatible"
+    elif warnings:
+        state = "degraded"
+    else:
+        state = "compatible"
+
+    return ReceiverCompatibility(
+        state=state,
+        compatible=compatible,
+        missing_features=tuple(missing_features),
+        warnings=tuple(warnings),
     )
 
 
