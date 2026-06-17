@@ -1,5 +1,10 @@
 # What's New ✨
 
+## 1.12.0 - Receiver Capability Metadata 🧭
+
+- Added receiver capability metadata to Android `/` and `/status` responses so clients can see supported command features without guessing 🧭
+- Documented receiver capabilities for local API users and troubleshooting tools 📚
+
 ## 1.11.0 - Fallback Playback Diagnostics 🔎
 
 - Added fallback stream URL/type fields to Android receiver playback status so stream-fallback decisions are visible in `/status` 🔎

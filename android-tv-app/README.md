@@ -113,7 +113,7 @@ Duplicate `/show` requests replace the current playback or overlay. `durationSec
 `/status` also reports endpoint diagnostics, including control uptime, request count, the previous request, and a nested `playback` object with display mode, stream type, media URL, preview URL, playable fallback URL/type, error detail, and update time.
 MJPEG playback uses explicit connection/read timeouts and bounded frame reads so malformed or unexpectedly large camera frames fail cleanly.
 `/close` reports whether a display was active and which display mode it closed.
-`GET /` returns API metadata and the supported endpoint list. Known endpoints return `405 Method Not Allowed` when called with the wrong HTTP method.
+`GET /` returns API metadata, receiver capabilities, and the supported endpoint list. `GET /status` also includes the same capability object so Home Assistant and troubleshooting tools can confirm support for stream command types, notification positions, preview images, playable fallbacks, overlay fallback, pairing, launcher management, and remote receiver settings. Known endpoints return `405 Method Not Allowed` when called with the wrong HTTP method.
 
 ## Discovery Testing 🔎
 

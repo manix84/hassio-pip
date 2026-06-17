@@ -112,6 +112,7 @@ class LocalControlServer(
                 .put("version", BuildConfig.VERSION_NAME)
                 .put("apiVersion", 1)
                 .put("pairingRequired", PairingState.snapshot(context).pairingRequired)
+                .put("capabilities", ReceiverCapabilities.toJson())
                 .put(
                     "endpoints",
                     JSONArray()
@@ -148,6 +149,7 @@ class LocalControlServer(
                     .put("pairedClientName", pairing.pairedClientName)
             )
             .put("apiVersion", 1)
+            .put("capabilities", ReceiverCapabilities.toJson())
             .put("controlPort", port)
             .put("controlRunning", control.running)
             .put("controlUptimeSeconds", control.uptimeSeconds(System.currentTimeMillis()))

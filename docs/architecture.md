@@ -545,6 +545,7 @@ Phase 2 currently adds:
 - Local close command
 - Runtime playback state reporting
 - API metadata and JSON error responses
+- Receiver capability metadata for supported command types, notification positions, preview images, playable fallbacks, overlay fallback, pairing, launcher management, and remote receiver settings
 
 Phase 3 currently adds:
 

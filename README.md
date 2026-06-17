@@ -118,7 +118,7 @@ When the Android TV app is open, it starts a local HTTP control endpoint on port
 curl http://ANDROID_TV_IP:8765/status
 ```
 
-The status response includes control, discovery, pairing, remote receiver, management, and playback diagnostics. Playback details are exposed both through the older top-level fields and a nested `playback` object containing display mode, stream type, URL, preview URL, playable fallback URL/type, error detail, and update time.
+The root and status responses include receiver capabilities so clients can see supported stream command types, notification positions, preview images, playable fallbacks, overlay fallback, pairing, launcher management, and remote receiver settings. The status response also includes control, discovery, pairing, remote receiver, management, and playback diagnostics. Playback details are exposed both through the older top-level fields and a nested `playback` object containing display mode, stream type, URL, preview URL, playable fallback URL/type, error detail, and update time.
 
 Show a test HLS stream:
 
