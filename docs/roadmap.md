@@ -873,13 +873,13 @@ action:
       message_color: "#fbf5f5"
 ```
 
-# Phase 12: Beta Release Hardening 🚧
+# Phase 12: Beta Release Hardening ✅
 
 ## Goal
 
 Make HA TV PiP ready for a first public beta / release-candidate workflow so people other than the project maintainer can install it, test it, and report useful feedback.
 
-Stage 12 is not a new feature stage. It is a release-quality stage that turns the current Android receiver, Home Assistant integration, website, docs, packaging, and automation into a coherent beta candidate.
+Stage 12 completed in `0.48.0`. It was not a new feature stage; it was a release-quality stage that turned the Android receiver, Home Assistant integration, website, docs, packaging, and automation into a coherent beta candidate.
 
 ## Scope
 

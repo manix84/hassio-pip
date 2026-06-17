@@ -676,13 +676,13 @@ Default HACS repository inclusion is a separate later step. Before submitting to
 
 Stage 12 completed in `0.48.0` as a release-quality pass rather than a feature-expansion pass.
 
-Run the full repository check before release-candidate work:
+The Stage 12 release-candidate pass used the full repository check:
 
 ```sh
 npm run check
 ```
 
-Build and package each project area:
+It also built and packaged each project area:
 
 ```sh
 npm run android:assemble:debug
@@ -700,7 +700,7 @@ Verify release packaging expectations:
 - Integration zip internal path: `custom_components/ha_tv_pip/`.
 - Root `package.json`, Android `versionName`, HA `manifest.json`, and project `package.json` files all match.
 
-Documentation work in Stage 12 should include:
+Documentation work in Stage 12 included:
 
 - Root README install flow.
 - Android TV app install and sideload guidance.
@@ -710,7 +710,7 @@ Documentation work in Stage 12 should include:
 - Example automations for text-only notifications, camera with footer, snapshot with footer, and resize-only media popups.
 - Release notes for the beta candidate.
 
-Stage 12 should finish with a GitHub release candidate from `main` after local checks, builds, packaging, website build, and docs are clean.
+Stage 12 finished with GitHub Release `v0.48.0` from `main` after local checks, builds, packaging, website build, and docs were clean.
 
 ---
 
