@@ -134,7 +134,7 @@
     <string name="error_snapshot_unsupported_image">Snapshot response was not a supported image</string>
     <string name="error_unknown_snapshot">unknown snapshot error</string>
     <string name="snapshot_unavailable">Snapshot unavailable</string>
-    <string name="error_unsupported_video_stream">Unsupported video stream\nTry a compatible lower-resolution or H.264 stream</string>
+    <string name="error_unsupported_video_stream">Unsupported video stream\nTry a compatible substream, H.264, or stream_type: mjpeg</string>
     <string name="error_playback_error_code">Playback error\n%1$s</string>
 
     <string name="setup_step_pair">1. Pair this receiver from Home Assistant after discovery.</string>

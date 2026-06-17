@@ -121,7 +121,7 @@
     <string name="error_snapshot_unsupported_image">La réponse de l’image n’était pas dans un format pris en charge</string>
     <string name="error_unknown_snapshot">erreur d’image inconnue</string>
     <string name="snapshot_unavailable">Image indisponible</string>
-    <string name="error_unsupported_video_stream">Flux vidéo non pris en charge\nEssayez un flux compatible de résolution inférieure ou H.264</string>
+    <string name="error_unsupported_video_stream">Flux vidéo non pris en charge\nEssayez un sous-flux compatible, H.264 ou stream_type: mjpeg</string>
     <string name="error_playback_error_code">Erreur de lecture\n%1$s</string>
     <string name="setup_step_pair">1. Associez ce récepteur depuis Home Assistant après la découverte.</string>
     <string name="setup_step_overlay">2. Accordez l’autorisation de superposition si votre TV n’expose pas le PiP natif.</string>

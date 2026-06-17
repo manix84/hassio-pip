@@ -121,7 +121,7 @@
     <string name="error_snapshot_unsupported_image">Odpowiedź snapshotu nie była obsługiwanym obrazem</string>
     <string name="error_unknown_snapshot">nieznany błąd snapshotu</string>
     <string name="snapshot_unavailable">Snapshot niedostępny</string>
-    <string name="error_unsupported_video_stream">Nieobsługiwany strumień wideo\nSpróbuj zgodnego strumienia o niższej rozdzielczości lub H.264</string>
+    <string name="error_unsupported_video_stream">Nieobsługiwany strumień wideo\nSpróbuj zgodnego podstrumienia, H.264 lub stream_type: mjpeg</string>
     <string name="error_playback_error_code">Błąd odtwarzania\n%1$s</string>
     <string name="setup_step_pair">1. Sparuj ten odbiornik z Home Assistant po wykryciu.</string>
     <string name="setup_step_overlay">2. Przyznaj uprawnienie nakładki, jeśli telewizor nie udostępnia natywnego PiP.</string>

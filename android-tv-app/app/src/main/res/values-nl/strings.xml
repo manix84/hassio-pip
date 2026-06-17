@@ -121,7 +121,7 @@
     <string name="error_snapshot_unsupported_image">Snapshotantwoord was geen ondersteunde afbeelding</string>
     <string name="error_unknown_snapshot">onbekende snapshotfout</string>
     <string name="snapshot_unavailable">Snapshot niet beschikbaar</string>
-    <string name="error_unsupported_video_stream">Niet-ondersteunde videostream\nProbeer een compatibele stream met lagere resolutie of H.264</string>
+    <string name="error_unsupported_video_stream">Niet-ondersteunde videostream\nProbeer een compatibele substream, H.264 of stream_type: mjpeg</string>
     <string name="error_playback_error_code">Afspeelfout\n%1$s</string>
     <string name="setup_step_pair">1. Koppel deze receiver vanuit Home Assistant na ontdekking.</string>
     <string name="setup_step_overlay">2. Geef overlaytoestemming als je tv geen native PiP aanbiedt.</string>

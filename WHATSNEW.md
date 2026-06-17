@@ -1,11 +1,12 @@
 # What's New ✨
 
-## 1.1.0 - Stream Compatibility 📹
+## 1.2.0 - Stream Compatibility 📹
 
 - Added optional `stream_camera_entity` support so camera alerts can use a more compatible live-stream entity while keeping the primary camera for titles and snapshot fallback 📹
 - Added explicit `stream_type: mjpeg` support using Home Assistant's camera proxy stream endpoint and receiver-side MJPEG overlay rendering 📺
 - Kept MJPEG opt-in while HLS remains the default automatic stream path, pending broader real-device testing 🧪
 - Added receiver status reporting for the active stream type so MJPEG tests are easier to diagnose 🔎
+- Updated unsupported-stream guidance to suggest compatible substreams, H.264, or `stream_type: mjpeg` 🩺
 - Updated Home Assistant service metadata, Tier 1 translation labels, tests, and docs for separate stream camera selection 🏠
 
 ## 0.48.0 - Stage 12 Release Hardening 📦

@@ -20,7 +20,7 @@ show_camera:
         entity:
           domain: camera
       name: Stream camera entity
-      description: Optional camera entity to use for the live HLS stream. Use this when a lower-resolution or H.264 substream is more reliable on Android TV.
+      description: Optional camera entity to use for the live stream. Use this when a lower-resolution, H.264, or MJPEG substream is more reliable on Android TV.
     duration_seconds:
       default: 30
       selector:
@@ -63,7 +63,7 @@ show_camera:
             - mjpeg
             - snapshot
       name: Stream type
-      description: Choose automatic handling, force an HLS stream, force an MJPEG stream, or send a snapshot through the camera service.
+      description: Choose automatic handling, force HLS, force MJPEG, or send a snapshot. Try MJPEG when an HLS camera stream is unsupported on Android TV.
       example: auto
     title:
       required: false

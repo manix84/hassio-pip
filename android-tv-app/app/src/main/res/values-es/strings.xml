@@ -121,7 +121,7 @@
     <string name="error_snapshot_unsupported_image">La respuesta de la imagen no era compatible</string>
     <string name="error_unknown_snapshot">error de imagen desconocido</string>
     <string name="snapshot_unavailable">Imagen no disponible</string>
-    <string name="error_unsupported_video_stream">Flujo de vídeo no compatible\nPrueba un flujo compatible de menor resolución o H.264</string>
+    <string name="error_unsupported_video_stream">Flujo de vídeo no compatible\nPrueba un subflujo compatible, H.264 o stream_type: mjpeg</string>
     <string name="error_playback_error_code">Error de reproducción\n%1$s</string>
     <string name="setup_step_pair">1. Empareja este receptor desde Home Assistant después del descubrimiento.</string>
     <string name="setup_step_overlay">2. Concede permiso de superposición si tu TV no expone PiP nativo.</string>

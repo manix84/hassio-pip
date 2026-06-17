@@ -121,7 +121,7 @@
     <string name="error_snapshot_unsupported_image">La risposta snapshot non era un’immagine supportata</string>
     <string name="error_unknown_snapshot">errore snapshot sconosciuto</string>
     <string name="snapshot_unavailable">Snapshot non disponibile</string>
-    <string name="error_unsupported_video_stream">Stream video non supportato\nProva uno stream compatibile a risoluzione più bassa o H.264</string>
+    <string name="error_unsupported_video_stream">Stream video non supportato\nProva un substream compatibile, H.264 o stream_type: mjpeg</string>
     <string name="error_playback_error_code">Errore riproduzione\n%1$s</string>
     <string name="setup_step_pair">1. Associa questo ricevitore da Home Assistant dopo il rilevamento.</string>
     <string name="setup_step_overlay">2. Concedi l’autorizzazione overlay se la TV non espone il PiP nativo.</string>
