@@ -56,7 +56,7 @@ class ReceiverStatusSensor(ReceiverEntity, SensorEntity):
 
 
 def _status_attributes(status: ReceiverStatus) -> dict[str, Any]:
-    return {
+    attributes = {
         "connected": True,
         "app_version": status.version,
         "api_version": status.api_version,
@@ -70,3 +70,29 @@ def _status_attributes(status: ReceiverStatus) -> dict[str, Any]:
         "last_error": status.error,
         "last_seen": datetime.now().isoformat(timespec="seconds"),
     }
+    capabilities = status.capabilities
+    if capabilities is not None:
+        attributes.update(
+            {
+                "capabilities_version": capabilities.capabilities_version,
+                "supported_stream_types": list(capabilities.stream_types),
+                "supported_positions": list(capabilities.positions),
+                "supports_preview_image": capabilities.preview_image,
+                "supports_playable_fallback": capabilities.playable_fallback,
+                "supports_native_picture_in_picture": (
+                    capabilities.native_picture_in_picture
+                ),
+                "supports_overlay_fallback": capabilities.overlay_fallback,
+                "supports_styled_notifications": capabilities.styled_notifications,
+                "supports_media_with_notification_text": (
+                    capabilities.media_with_notification_text
+                ),
+                "supports_launcher_management": capabilities.launcher_management,
+                "supports_local_pairing": capabilities.local_pairing,
+                "supports_remote_receiver_settings": (
+                    capabilities.remote_receiver_settings
+                ),
+            }
+        )
+
+    return attributes

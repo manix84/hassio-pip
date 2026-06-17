@@ -1,5 +1,10 @@
 # What's New ✨
 
+## 1.13.0 - Home Assistant Capability Parsing 🏠
+
+- Parsed Android receiver capability metadata into a typed Home Assistant status model 🧭
+- Exposed supported stream types, notification positions, and receiver feature flags on the status sensor for troubleshooting 🔎
+
 ## 1.12.0 - Receiver Capability Metadata 🧭
 
 - Added receiver capability metadata to Android `/` and `/status` responses so clients can see supported command features without guessing 🧭

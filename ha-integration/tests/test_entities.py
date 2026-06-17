@@ -11,7 +11,11 @@ from custom_components.ha_tv_pip import (
     sensor,
     switch,
 )
-from custom_components.ha_tv_pip.client import ReceiverClientError, ReceiverStatus
+from custom_components.ha_tv_pip.client import (
+    ReceiverCapabilities,
+    ReceiverClientError,
+    ReceiverStatus,
+)
 from custom_components.ha_tv_pip.const import (
     CONF_DEVICE_ID,
     CONF_HOST,
@@ -60,6 +64,20 @@ def _status() -> ReceiverStatus:
         device_id="device-1",
         device_name="Nursery TV",
         api_version=1,
+        capabilities=ReceiverCapabilities(
+            capabilities_version=1,
+            stream_types=("hls", "mjpeg", "snapshot", "notification"),
+            positions=("top_right", "bottom_left"),
+            preview_image=True,
+            playable_fallback=True,
+            native_picture_in_picture=True,
+            overlay_fallback=True,
+            styled_notifications=True,
+            media_with_notification_text=True,
+            launcher_management=True,
+            local_pairing=True,
+            remote_receiver_settings=True,
+        ),
         control_running=True,
         playback_state="playing",
         display_mode="overlay",
@@ -164,6 +182,35 @@ def test_status_sensor_updates_from_receiver(monkeypatch) -> None:  # type: igno
     assert entity._attr_extra_state_attributes["connected"] is True
     assert entity._attr_extra_state_attributes["display_mode"] == "overlay"
     assert entity._attr_extra_state_attributes["remote_status"] == "connected"
+    assert entity._attr_extra_state_attributes["capabilities_version"] == 1
+    assert entity._attr_extra_state_attributes["supported_stream_types"] == [
+        "hls",
+        "mjpeg",
+        "snapshot",
+        "notification",
+    ]
+    assert entity._attr_extra_state_attributes["supported_positions"] == [
+        "top_right",
+        "bottom_left",
+    ]
+    assert entity._attr_extra_state_attributes["supports_preview_image"] is True
+    assert entity._attr_extra_state_attributes["supports_playable_fallback"] is True
+    assert (
+        entity._attr_extra_state_attributes["supports_native_picture_in_picture"]
+        is True
+    )
+    assert entity._attr_extra_state_attributes["supports_overlay_fallback"] is True
+    assert entity._attr_extra_state_attributes["supports_styled_notifications"] is True
+    assert (
+        entity._attr_extra_state_attributes["supports_media_with_notification_text"]
+        is True
+    )
+    assert entity._attr_extra_state_attributes["supports_launcher_management"] is True
+    assert entity._attr_extra_state_attributes["supports_local_pairing"] is True
+    assert (
+        entity._attr_extra_state_attributes["supports_remote_receiver_settings"]
+        is True
+    )
 
 
 def test_connected_sensor_handles_unavailable_receiver(monkeypatch) -> None:  # type: ignore[no-untyped-def]

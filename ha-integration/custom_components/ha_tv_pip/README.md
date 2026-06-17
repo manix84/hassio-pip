@@ -91,7 +91,7 @@ The dry-run build packages the custom integration zip and will remain the integr
 
 Each paired receiver creates:
 
-- Status sensor with playback state and receiver diagnostics.
+- Status sensor with playback state, receiver diagnostics, and parsed receiver capability metadata.
 - Connected binary sensor based on the local `/status` endpoint.
 
 PiP controls:

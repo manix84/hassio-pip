@@ -546,6 +546,7 @@ Phase 2 currently adds:
 - Runtime playback state reporting
 - API metadata and JSON error responses
 - Receiver capability metadata for supported command types, notification positions, preview images, playable fallbacks, overlay fallback, pairing, launcher management, and remote receiver settings
+- Home Assistant status parsing for receiver capabilities so automations, diagnostics, and future UI paths can reason about installed receiver features
 
 Phase 3 currently adds:
 

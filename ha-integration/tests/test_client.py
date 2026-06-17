@@ -216,6 +216,20 @@ def test_async_get_receiver_status_parses_response(monkeypatch) -> None:  # type
             "deviceId": "device-1",
             "deviceName": "Nursery TV",
             "apiVersion": 1,
+            "capabilities": {
+                "capabilitiesVersion": 1,
+                "streamTypes": ["hls", "mjpeg", "snapshot", "notification"],
+                "positions": ["top_right", "bottom_left"],
+                "previewImage": True,
+                "playableFallback": True,
+                "nativePictureInPicture": True,
+                "overlayFallback": True,
+                "styledNotifications": True,
+                "mediaWithNotificationText": True,
+                "launcherManagement": True,
+                "localPairing": True,
+                "remoteReceiverSettings": True,
+            },
             "controlRunning": True,
             "playbackState": "playing",
             "displayMode": "overlay",
@@ -236,6 +250,24 @@ def test_async_get_receiver_status_parses_response(monkeypatch) -> None:  # type
     assert status.version == "0.24.0"
     assert status.device_id == "device-1"
     assert status.api_version == 1
+    assert status.capabilities is not None
+    assert status.capabilities.capabilities_version == 1
+    assert status.capabilities.stream_types == (
+        "hls",
+        "mjpeg",
+        "snapshot",
+        "notification",
+    )
+    assert status.capabilities.positions == ("top_right", "bottom_left")
+    assert status.capabilities.preview_image is True
+    assert status.capabilities.playable_fallback is True
+    assert status.capabilities.native_picture_in_picture is True
+    assert status.capabilities.overlay_fallback is True
+    assert status.capabilities.styled_notifications is True
+    assert status.capabilities.media_with_notification_text is True
+    assert status.capabilities.launcher_management is True
+    assert status.capabilities.local_pairing is True
+    assert status.capabilities.remote_receiver_settings is True
     assert status.control_running is True
     assert status.playback_state == "playing"
     assert status.display_mode == "overlay"

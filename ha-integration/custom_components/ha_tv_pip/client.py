@@ -96,6 +96,24 @@ def show_camera_payload(command: ShowCameraCommand) -> dict[str, Any]:
 
 
 @dataclass(frozen=True)
+class ReceiverCapabilities:
+    """Receiver protocol capabilities returned by the local HTTP API."""
+
+    capabilities_version: int | None
+    stream_types: tuple[str, ...]
+    positions: tuple[str, ...]
+    preview_image: bool
+    playable_fallback: bool
+    native_picture_in_picture: bool
+    overlay_fallback: bool
+    styled_notifications: bool
+    media_with_notification_text: bool
+    launcher_management: bool
+    local_pairing: bool
+    remote_receiver_settings: bool
+
+
+@dataclass(frozen=True)
 class ReceiverStatus:
     """Receiver status returned by the local HTTP API."""
 
@@ -104,6 +122,7 @@ class ReceiverStatus:
     device_id: str
     device_name: str
     api_version: int | None
+    capabilities: ReceiverCapabilities | None
     control_running: bool
     playback_state: str
     display_mode: str
@@ -208,6 +227,7 @@ async def async_get_receiver_status(host: str, port: int) -> ReceiverStatus:
         device_id=str(response.get("deviceId", "")),
         device_name=str(response.get("deviceName", "")),
         api_version=_optional_int(response.get("apiVersion")),
+        capabilities=_parse_capabilities(response.get("capabilities")),
         control_running=bool(response.get("controlRunning", False)),
         playback_state=str(response.get("playbackState", "unknown")),
         display_mode=str(response.get("displayMode", "unknown")),
@@ -393,3 +413,32 @@ def _optional_int(value: Any) -> int | None:
         return int(value)
     except (TypeError, ValueError):
         return None
+
+
+def _parse_capabilities(value: Any) -> ReceiverCapabilities | None:
+    if not isinstance(value, dict):
+        return None
+
+    return ReceiverCapabilities(
+        capabilities_version=_optional_int(value.get("capabilitiesVersion")),
+        stream_types=_string_tuple(value.get("streamTypes")),
+        positions=_string_tuple(value.get("positions")),
+        preview_image=bool(value.get("previewImage", False)),
+        playable_fallback=bool(value.get("playableFallback", False)),
+        native_picture_in_picture=bool(value.get("nativePictureInPicture", False)),
+        overlay_fallback=bool(value.get("overlayFallback", False)),
+        styled_notifications=bool(value.get("styledNotifications", False)),
+        media_with_notification_text=bool(
+            value.get("mediaWithNotificationText", False)
+        ),
+        launcher_management=bool(value.get("launcherManagement", False)),
+        local_pairing=bool(value.get("localPairing", False)),
+        remote_receiver_settings=bool(value.get("remoteReceiverSettings", False)),
+    )
+
+
+def _string_tuple(value: Any) -> tuple[str, ...]:
+    if not isinstance(value, list):
+        return ()
+
+    return tuple(str(item) for item in value if item is not None)
