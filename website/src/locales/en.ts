@@ -10,11 +10,11 @@ export const en = {
     },
     currentStatus: {
       body: [
-        "HA TV PiP now supports discovery, TV-visible pairing, authenticated receiver control, camera stream popups, snapshots, snapshot previews, receiver management, and remote receiver transport.",
-        "The current polish pass is improving the TV receiver interface, translation surfaces, documentation, and release readiness while keeping HACS and Play Store distribution materials for the end.",
+        "HA TV PiP now supports discovery, TV-visible pairing, authenticated receiver control, camera stream popups, snapshots, styled notifications, receiver management, and remote receiver transport.",
+        "The current Stage 12 pass is hardening the project for a first public beta: full checks, release packaging, HACS zip validation, website updates, install docs, and release-candidate preparation.",
       ],
       eyebrow: "Current status",
-      title: "Phase 10: Product polish in progress",
+      title: "Stage 12: Beta release hardening",
     },
     example: {
       eyebrow: "Example automation",
@@ -102,7 +102,7 @@ export const en = {
         title: "Remote receiver mode",
         description:
           "Outbound receiver transport for travel TVs without router port forwarding.",
-        status: "planned",
+        status: "complete",
       },
     ],
     featuresSection: {
@@ -190,16 +190,19 @@ export const en = {
       tiers: [
         {
           label: "Tier 1",
+          status: "complete",
           languages:
             "English, German, Dutch, French, Spanish, Italian, Brazilian Portuguese, Polish",
         },
         {
           label: "Tier 2",
+          status: "planned",
           languages:
             "Swedish, Norwegian, Danish, Finnish, Czech, Hungarian, Turkish, Japanese, Korean",
         },
         {
           label: "Tier 3",
+          status: "planned",
           languages:
             "Simplified Chinese, Traditional Chinese, Indonesian, Hindi, Arabic, Ukrainian, Romanian, Greek",
         },

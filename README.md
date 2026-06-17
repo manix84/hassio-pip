@@ -38,6 +38,8 @@ Phase 10 distribution prep is complete except for actual Play Store deployment, 
 
 Stage 11 is complete in `0.45.0`. HA TV PiP now supports styled text-only notifications plus camera and snapshot popups with optional title/message footers, configurable corner position, title/message colors, text sizes, translucent glass backgrounds, and overlay width/height options.
 
+Stage 12 is next. The focus is beta release hardening: full quality checks, release packaging verification, Android artifact builds, HACS zip validation, website build validation, public install docs, Stage 11 website examples, and a release-candidate workflow before broader testing.
+
 ## Monorepo Layout 🧱
 
 ```txt
@@ -172,9 +174,9 @@ Remote mode is for sending notifications to an external TV. It does not make HA 
 
 ## Translation Plan 🌍
 
-Translation planning has started across the Android TV app, Home Assistant integration, and website. Phase 10 has moved the main Android receiver UI, player, notification, setup, and troubleshooting strings into resources, added Tier 1 Android and Home Assistant translation files, and added Tier 1 website locale routes with localized TypeScript content modules.
+Translation planning has started across the Android TV app, Home Assistant integration, and website. Phase 10 moved the main Android receiver UI, player, notification, setup, and troubleshooting strings into resources, added Tier 1 Android and Home Assistant translation files, and added Tier 1 website locale routes with localized TypeScript content modules.
 
-English is the source language. Tier 1 translation targets are German, Dutch, French, Spanish, Italian, Brazilian Portuguese, and Polish, and should be in place before a broad release. Tier 2 and Tier 3 languages can follow after the product polish pass.
+English is the source language. Tier 1 translation targets are German, Dutch, French, Spanish, Italian, Brazilian Portuguese, and Polish, and are complete for the current app, integration, and website surfaces. Tier 2 and Tier 3 languages are planned after beta hardening and broader testing.
 
 See `docs/translations.md` for the full language plan.
 

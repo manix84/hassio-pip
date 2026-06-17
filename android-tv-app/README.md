@@ -16,6 +16,8 @@ Phase 9 adds optional remote receiver mode. The app can connect outbound to the 
 
 Phase 10 continues the Android TV polish pass. The main screen is now a TV-first dashboard with primary PiP controls near the top, receiver status cards, launcher controls, remote receiver status, and lower-priority diagnostics separated from everyday actions. Onboarding, pairing, and troubleshooting are intentionally handled as dashboard sections for now instead of separate screens, keeping the app simple to navigate with a TV remote. Active pairing requests also show a prominent TV-side pairing popup.
 
+Stage 12 focuses on beta release hardening. Android work should prioritize reliable debug/release APK builds, install instructions, release artifact verification, and avoiding new receiver features until the beta release path is proven.
+
 ## Build 🛠️
 
 Open this directory in Android Studio and let Gradle sync.

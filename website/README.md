@@ -4,7 +4,7 @@
 
 Promotional Vite website for HA TV PiP.
 
-The site currently acts as the project landing page, documentation entry point, FAQ, roadmap preview, and translation-aware promotional surface for Phase 10 polish.
+The site currently acts as the project landing page, documentation entry point, FAQ, roadmap preview, and translation-aware promotional surface. Stage 12 documentation work includes keeping the website current with beta release hardening, release-candidate status, and Stage 11 notification examples.
 
 ## Tech Stack 🛠️
 

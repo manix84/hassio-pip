@@ -2,7 +2,7 @@ import type { WebsiteContent } from "./types";
 
 export const pl = {
     codeBlock: { copyAriaLabel: "Skopiuj YAML Home Assistant do schowka", copyFailed: "Kopiowanie nie powiodło się", copied: "Skopiowano", copyTitle: "Kopiuj YAML", toolbar: "YAML Home Assistant" },
-    currentStatus: { body: ["HA TV PiP obsługuje już wykrywanie, parowanie widoczne na telewizorze, uwierzytelnione sterowanie odbiornikiem, popupy kamer, snapshoty, podglądy snapshotów, zarządzanie odbiornikiem i zdalny transport odbiornika.", "Obecna faza dopracowania ulepsza interfejs odbiornika TV, powierzchnie tłumaczeń, dokumentację i gotowość wydania, zostawiając materiały HACS i Play Store na koniec."], eyebrow: "Aktualny stan", title: "Faza 10: dopracowanie produktu w toku" },
+    currentStatus: { body: ["HA TV PiP obsługuje już wykrywanie, parowanie widoczne na telewizorze, uwierzytelnione sterowanie odbiornikiem, popupy kamer, snapshoty, stylizowane powiadomienia, zarządzanie odbiornikiem i zdalny transport odbiornika.", "Obecny etap Stage 12 utwardza projekt przed pierwszą publiczną betą: pełne testy, pakowanie wydań, walidację zip HACS, aktualizacje strony, dokumentację instalacji i przygotowanie release candidate."], eyebrow: "Aktualny stan", title: "Stage 12: utwardzanie bety" },
     example: { eyebrow: "Przykładowa automatyzacja", title: "Kierunek rozwoju." },
     faqItems: [
       { question: "Czy HA TV PiP jest usługą chmurową?", answer: "Nie. Sterowanie lokalne pozostaje domyślne, a tryb zdalnego odbiornika łączy telewizor wychodząco z Twoim własnym zewnętrznym URL Home Assistant. HA TV PiP nie uruchamia hostowanego przekaźnika." },
@@ -21,7 +21,7 @@ export const pl = {
       { title: "Bezpieczne parowanie", description: "Proces parowania widoczny na TV blokuje przypadkowym urządzeniom LAN możliwość wywoływania popupów kamer.", status: "complete" },
       { title: "Obsługa strumieni kamer", description: "Strumienie HLS z Home Assistant z informacją o kompatybilności po stronie odbiornika.", status: "complete" },
       { title: "Obsługa snapshotów", description: "Popupy obrazów statycznych dla szybkich alertów i podglądów fallback podczas ładowania wideo.", status: "complete" },
-      { title: "Tryb zdalnego odbiornika", description: "Wychodzący transport odbiornika dla telewizorów poza domem bez przekierowania portów.", status: "planned" },
+      { title: "Tryb zdalnego odbiornika", description: "Wychodzący transport odbiornika dla telewizorów poza domem bez przekierowania portów.", status: "complete" },
     ],
     featuresSection: { eyebrow: "Funkcje", title: "Budowane etapami, zaprojektowane jako jedno doświadczenie." },
     flow: { eyebrow: "Jak to działa", steps: ["Zdarzenie Home Assistant", "Integracja HA TV PiP", "Aplikacja odbiornika Android TV", "Popup kamery PiP"], title: "Lokalna ścieżka od zdarzenia do popupu PiP." },
@@ -34,7 +34,7 @@ export const pl = {
     solution: { eyebrow: "Rozwiązanie", imageAlt: "Makieta kontrolek Home Assistant połączonych z odbiornikiem PiP Android TV", steps: ["Zainstaluj aplikację odbiornika Android TV.", "Zainstaluj integrację Home Assistant.", "Sparuj je lokalnie.", "Wywołuj popupy kamer z automatyzacji."], title: "Aplikacja odbiornika dla TV, kontroler w Home Assistant." },
     statusLabels: { complete: "Gotowe", future: "Przyszłość", planned: "Planowane" },
     theme: { ariaLabel: "Wybór motywu", auto: "auto", dark: "ciemny", light: "jasny" },
-    translations: { eyebrow: "Tłumaczenia", tiers: [{ label: "Tier 1", languages: "Angielski, niemiecki, niderlandzki, francuski, hiszpański, włoski, portugalski brazylijski, polski" }, { label: "Tier 2", languages: "Szwedzki, norweski, duński, fiński, czeski, węgierski, turecki, japoński, koreański" }, { label: "Tier 3", languages: "Chiński uproszczony, chiński tradycyjny, indonezyjski, hindi, arabski, ukraiński, rumuński, grecki" }], title: "Internacjonalizacja jest częścią planu produktu." },
+    translations: { eyebrow: "Tłumaczenia", tiers: [{ label: "Tier 1", status: "complete", languages: "Angielski, niemiecki, niderlandzki, francuski, hiszpański, włoski, portugalski brazylijski, polski" }, { label: "Tier 2", status: "planned", languages: "Szwedzki, norweski, duński, fiński, czeski, węgierski, turecki, japoński, koreański" }, { label: "Tier 3", status: "planned", languages: "Chiński uproszczony, chiński tradycyjny, indonezyjski, hindi, arabski, ukraiński, rumuński, grecki" }], title: "Internacjonalizacja jest częścią planu produktu." },
     visualAlt: { network: "Makieta lokalnej sieci smart home wysyłającej obraz kamery do Android TV PiP", phase: "Promocyjny przegląd funkcji HA TV PiP obok makiety Picture-in-Picture Android TV" },
     visualCards: [{ title: "Panel sterowania automatyzacjami", text: "Przyjazna Home Assistant warstwa sterowania dla przyszłego wykrywania odbiorników, parowania i wywołań usług." }, { title: "Lokalna ścieżka odbiornika", text: "Aplikacja TV zarządza odtwarzaniem i PiP, a Home Assistant decyduje, co ma się pojawić." }],
   } satisfies WebsiteContent;

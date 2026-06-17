@@ -4,7 +4,7 @@ HA TV PiP should be designed for translation across the Android TV app, Home Ass
 
 English is the source language and the default locale for all project areas.
 
-The main implementation pass for translations belongs to Phase 10 distribution polish. Tier 1 languages should be in place before a broad release. Tier 2 and Tier 3 languages can be added after that as the project matures.
+The main implementation pass for translations belongs to Phase 10 distribution polish. Tier 1 languages are implemented across the Android app, Home Assistant integration, and website. Tier 2 and Tier 3 languages are planned after beta hardening and broader testing.
 
 ---
 
@@ -20,9 +20,9 @@ The main implementation pass for translations belongs to Phase 10 distribution p
 
 # Language Priority 🗺️
 
-## Tier 1
+## Tier 1 ✅ Complete
 
-Do these first during the Phase 10 polish/release pass:
+Implemented first during the Phase 10 polish/release pass:
 
 - English
 - German
@@ -33,9 +33,9 @@ Do these first during the Phase 10 polish/release pass:
 - Portuguese, Brazil first
 - Polish
 
-## Tier 2
+## Tier 2 🚧 Planned
 
-Very worth adding after Tier 1 is stable:
+Very worth adding after Tier 1 is stable and the beta release path is proven:
 
 - Swedish
 - Norwegian
@@ -47,7 +47,7 @@ Very worth adding after Tier 1 is stable:
 - Japanese
 - Korean
 
-## Tier 3
+## Tier 3 🚧 Planned
 
 Broader Android and global reach after the core release:
 
@@ -71,7 +71,8 @@ Current status:
 - `app_name` is already in `res/values/strings.xml`.
 - Main dashboard strings are now in `res/values/strings.xml`.
 - Player screen, playback status, notification, compatibility, overlay fallback, setup guidance, and troubleshooting strings are now in Android resources.
-- Tier 1 Android resource folders now exist for German, Dutch, French, Spanish, Italian, Brazilian Portuguese, and Polish.
+- ✅ Tier 1 Android resource folders now exist for German, Dutch, French, Spanish, Italian, Brazilian Portuguese, and Polish.
+- 🚧 Tier 2 and Tier 3 Android resource folders are planned after beta hardening.
 
 Required during Phase 10 before broad release:
 
@@ -90,9 +91,10 @@ Home Assistant should use integration translation files.
 Current status:
 
 - English config-flow strings exist in `strings.json` and `translations/en.json`.
-- Tier 1 translation files exist for config-flow and options-flow strings.
-- Entity names expose translation keys with Tier 1 translated names.
-- Service names, descriptions, and field labels are mirrored into translation metadata with Tier 1 labels.
+- ✅ Tier 1 translation files exist for config-flow and options-flow strings.
+- ✅ Entity names expose translation keys with Tier 1 translated names.
+- ✅ Service names, descriptions, and field labels are mirrored into translation metadata with Tier 1 labels.
+- 🚧 Tier 2 and Tier 3 Home Assistant translation files are planned after beta hardening.
 - Diagnostics wording should be expanded as the integration matures.
 
 Required during Phase 10 before HACS readiness:
@@ -119,11 +121,12 @@ Preferred approach during the Phase 10 website polish pass:
 
 Current Phase 10 status:
 
-- Tier 1 locale routes are detected client-side.
-- Website language selection prefers the URL locale, then the user's saved override, then browser language detection.
-- Users can override the detected language from the website language selector.
-- The website build creates `dist/de/`, `dist/nl/`, `dist/fr/`, `dist/es/`, `dist/it/`, `dist/pt-br/`, and `dist/pl/` entry points for GitHub Pages.
-- Tier 1 website copy exists in separate TypeScript locale modules.
+- ✅ Tier 1 locale routes are detected client-side.
+- ✅ Website language selection prefers the URL locale, then the user's saved override, then browser language detection.
+- ✅ Users can override the detected language from the website language selector.
+- ✅ The website build creates `dist/de/`, `dist/nl/`, `dist/fr/`, `dist/es/`, `dist/it/`, `dist/pt-br/`, and `dist/pl/` entry points for GitHub Pages.
+- ✅ Tier 1 website copy exists in separate TypeScript locale modules.
+- 🚧 Tier 2 and Tier 3 website locale routes are planned after beta hardening.
 - Native-speaker review is skipped for Stage 10 because it is not currently available. Future community/native review should happen before broad public release where possible.
 
 Website translation content now covered:
@@ -147,7 +150,7 @@ Recommended workflow:
 4. Run quality checks.
 5. Manually check long translated strings on small TV and mobile website layouts.
 6. Release with Tier 1 translations in place.
-7. Add Tier 2 and Tier 3 languages after the initial polished release.
+7. Add Tier 2 and Tier 3 languages after the beta release path is stable.
 
 Translation contributions should preserve technical accuracy over literal phrasing.
 

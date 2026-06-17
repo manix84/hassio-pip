@@ -80,7 +80,7 @@ export type WebsiteContent = {
   theme: Record<ThemeMode, string> & { ariaLabel: string };
   translations: {
     eyebrow: string;
-    tiers: Array<{ label: string; languages: string }>;
+    tiers: Array<{ label: string; languages: string; status: StatusKind }>;
     title: string;
   };
   visualCards: Array<{ text: string; title: string }>;

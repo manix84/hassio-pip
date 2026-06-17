@@ -373,6 +373,14 @@
   padding: 1rem;
 }
 
+.translationHeader {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  margin-bottom: 0.55rem;
+}
+
 .faqItem h3,
 .translationItem strong {
   color: var(--text);
@@ -380,6 +388,10 @@
   font-size: 1.05rem;
   line-height: 1.35;
   margin: 0 0 0.55rem;
+}
+
+.translationHeader strong {
+  margin: 0;
 }
 
 .faqItem p,

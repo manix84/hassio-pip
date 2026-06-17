@@ -2,7 +2,7 @@ import type { WebsiteContent } from "./types";
 
 export const ptbr = {
     codeBlock: { copyAriaLabel: "Copiar YAML do Home Assistant para a área de transferência", copyFailed: "Falha ao copiar", copied: "Copiado", copyTitle: "Copiar YAML", toolbar: "YAML do Home Assistant" },
-    currentStatus: { body: ["O HA TV PiP agora oferece descoberta, pareamento visível na TV, controle autenticado do receptor, popups de câmera, snapshots, prévias de snapshot, gerenciamento do receptor e transporte remoto do receptor.", "A etapa atual de polimento melhora a interface do receptor na TV, superfícies de tradução, documentação e preparação de lançamento, deixando materiais de HACS e Play Store para o final."], eyebrow: "Status atual", title: "Fase 10: polimento do produto em andamento" },
+    currentStatus: { body: ["O HA TV PiP agora oferece descoberta, pareamento visível na TV, controle autenticado do receptor, popups de câmera, snapshots, notificações estilizadas, gerenciamento do receptor e transporte remoto do receptor.", "A etapa Stage 12 atual prepara o projeto para uma primeira beta pública: verificações completas, empacotamento de release, validação do zip HACS, atualizações do site, docs de instalação e preparação de release candidate."], eyebrow: "Status atual", title: "Stage 12: hardening da beta" },
     example: { eyebrow: "Automação de exemplo", title: "Para onde isso está indo." },
     faqItems: [
       { question: "O HA TV PiP é um serviço em nuvem?", answer: "Não. O controle local continua sendo o padrão, e o modo receptor remoto conecta sua TV de saída ao seu próprio URL externo do Home Assistant. O HA TV PiP não executa um relay hospedado." },
@@ -21,7 +21,7 @@ export const ptbr = {
       { title: "Pareamento seguro", description: "Fluxo de pareamento visível na TV para impedir que dispositivos aleatórios da LAN acionem popups de câmera.", status: "complete" },
       { title: "Suporte a streams de câmera", description: "Streams HLS do Home Assistant com feedback de compatibilidade no receptor.", status: "complete" },
       { title: "Suporte a snapshots", description: "Popups de imagem estática para alertas rápidos e prévias de fallback enquanto o vídeo carrega.", status: "complete" },
-      { title: "Modo receptor remoto", description: "Transporte de saída do receptor para TVs de viagem sem encaminhamento de porta no roteador.", status: "planned" },
+      { title: "Modo receptor remoto", description: "Transporte de saída do receptor para TVs de viagem sem encaminhamento de porta no roteador.", status: "complete" },
     ],
     featuresSection: { eyebrow: "Recursos", title: "Construído em fases, projetado como uma experiência única." },
     flow: { eyebrow: "Como funciona", steps: ["Evento do Home Assistant", "Integração HA TV PiP", "App receptor Android TV", "Popup de câmera PiP"], title: "Um caminho local-first do evento ao popup PiP." },
@@ -34,7 +34,7 @@ export const ptbr = {
     solution: { eyebrow: "A solução", imageAlt: "Mockup mostrando controles Home Assistant conectados a um receptor PiP Android TV", steps: ["Instale o app receptor Android TV.", "Instale a integração Home Assistant.", "Faça o pareamento localmente.", "Acione popups de câmera por automações."], title: "Um app receptor para a TV, um controlador no Home Assistant." },
     statusLabels: { complete: "Concluído", future: "Futuro", planned: "Planejado" },
     theme: { ariaLabel: "Seletor de tema", auto: "auto", dark: "escuro", light: "claro" },
-    translations: { eyebrow: "Traduções", tiers: [{ label: "Tier 1", languages: "Inglês, alemão, holandês, francês, espanhol, italiano, português do Brasil, polonês" }, { label: "Tier 2", languages: "Sueco, norueguês, dinamarquês, finlandês, tcheco, húngaro, turco, japonês, coreano" }, { label: "Tier 3", languages: "Chinês simplificado, chinês tradicional, indonésio, hindi, árabe, ucraniano, romeno, grego" }], title: "Internacionalização faz parte do plano do produto." },
+    translations: { eyebrow: "Traduções", tiers: [{ label: "Tier 1", status: "complete", languages: "Inglês, alemão, holandês, francês, espanhol, italiano, português do Brasil, polonês" }, { label: "Tier 2", status: "planned", languages: "Sueco, norueguês, dinamarquês, finlandês, tcheco, húngaro, turco, japonês, coreano" }, { label: "Tier 3", status: "planned", languages: "Chinês simplificado, chinês tradicional, indonésio, hindi, árabe, ucraniano, romeno, grego" }], title: "Internacionalização faz parte do plano do produto." },
     visualAlt: { network: "Mockup de uma rede local de casa inteligente enviando uma câmera para Android TV PiP", phase: "Visão promocional dos recursos do HA TV PiP ao lado de um mockup Picture-in-Picture do Android TV" },
     visualCards: [{ title: "Superfície de controle de automações", text: "Um plano de controle amigável ao Home Assistant para futura descoberta de receptores, pareamento e chamadas de serviço." }, { title: "Caminho local-first do receptor", text: "O app da TV controla reprodução e PiP enquanto o Home Assistant decide o que deve aparecer." }],
   } satisfies WebsiteContent;

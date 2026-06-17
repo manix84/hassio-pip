@@ -613,7 +613,7 @@ HA TV PiP should not become a hosted cloud relay. Remote mode uses the user's ow
 
 Make the app and integration easy for normal Home Assistant users to install.
 
-This is also the main translation implementation pass. Tier 1 languages should be completed before broad release; Tier 2 and Tier 3 languages can follow later.
+This is also the main translation implementation pass. Tier 1 languages are completed for the current Android, Home Assistant, and website surfaces; Tier 2 and Tier 3 languages are planned after beta hardening and broader testing.
 
 ## Android TV App
 
@@ -686,6 +686,7 @@ Preferred direction:
 - Home Assistant service names, descriptions, and field labels are mirrored into translation metadata with Tier 1 labels.
 - Website Tier 1 static locale routes are generated at build time with localized TypeScript content modules.
 - Website locale selection uses URL locale first, then saved user override, then browser language detection.
+- Tier 2 and Tier 3 languages are planned for a later translation expansion.
 - Native-speaker translation review is skipped for Stage 10 because it is not currently available. Treat translations as implementation-complete but awaiting future community/native review before broad public release.
 
 ## Success Criteria
@@ -871,3 +872,57 @@ action:
       title_color: "#50BFF2"
       message_color: "#fbf5f5"
 ```
+
+# Phase 12: Beta Release Hardening 🚧
+
+## Goal
+
+Make HA TV PiP ready for a first public beta / release-candidate workflow so people other than the project maintainer can install it, test it, and report useful feedback.
+
+Stage 12 is not a new feature stage. It is a release-quality stage that turns the current Android receiver, Home Assistant integration, website, docs, packaging, and automation into a coherent beta candidate.
+
+## Scope
+
+- Run full quality checks across Android TV app, Home Assistant integration, and website.
+- Build Android debug and release artifacts locally.
+- Package the Home Assistant integration locally and verify the HACS-friendly zip layout.
+- Build the website locally and confirm public-facing content reflects the current project status.
+- Add Stage 11 notification examples to the website and example automations.
+- Tighten install docs for Android TV APK installation, HACS custom repository installation, and manual Home Assistant custom integration installation.
+- Verify GitHub release packaging produces the Android APK, versioned integration zip, and stable HACS zip.
+- Do a local release dry-run before pushing a release candidate.
+- Commit and push Stage 11 completion changes before creating the release candidate.
+- Create a first GitHub release candidate from `main` once checks and docs are clean.
+
+## Success Criteria
+
+- `npm run check` passes from the repository root.
+- Android debug and release APK builds complete.
+- Home Assistant integration packaging creates both versioned and stable HACS zips.
+- Website production build completes.
+- Root README, Android README, Home Assistant README, website, roadmap, development docs, release notes, and examples all describe the same current state.
+- The GitHub release workflow can create or update `vX.Y.Z` with the expected assets.
+- A new user can understand how to install the Android APK, install the HA integration through HACS custom repository, pair a receiver, and run a test notification without reading source code.
+
+## Out of Scope
+
+- Play Store production deployment.
+- Default HACS repository inclusion.
+- Official Home Assistant core submission.
+- New receiver protocols.
+- WebRTC, transcoding, or broad camera codec support.
+- Fire TV / Vega OS / Apple TV receiver work.
+
+## Stage 12 Checklist
+
+- 🚧 Run full quality checks.
+- 🚧 Build Android debug APK.
+- 🚧 Build Android release APK.
+- 🚧 Package Home Assistant integration zips.
+- 🚧 Build website.
+- 🚧 Add Stage 11 examples to website.
+- 🚧 Add richer Stage 11 automation examples.
+- 🚧 Audit install docs.
+- 🚧 Verify release asset names and zip contents.
+- 🚧 Commit and push Stage 11 completion.
+- 🚧 Create first release candidate.

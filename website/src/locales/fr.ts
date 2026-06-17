@@ -2,7 +2,7 @@ import type { WebsiteContent } from "./types";
 
 export const fr = {
     codeBlock: { copyAriaLabel: "Copier le YAML Home Assistant dans le presse-papiers", copyFailed: "Échec de la copie", copied: "Copié", copyTitle: "Copier le YAML", toolbar: "YAML Home Assistant" },
-    currentStatus: { body: ["HA TV PiP prend maintenant en charge la découverte, l'appairage visible sur le téléviseur, le contrôle authentifié du récepteur, les popups de flux caméra, les instantanés, les aperçus d'instantané, la gestion du récepteur et le transport de récepteur distant.", "La passe de finition actuelle améliore l'interface TV, les surfaces de traduction, la documentation et la préparation de sortie, en gardant les éléments HACS et Play Store pour la fin."], eyebrow: "État actuel", title: "Phase 10 : finition produit en cours" },
+    currentStatus: { body: ["HA TV PiP prend maintenant en charge la découverte, l'appairage visible sur le téléviseur, le contrôle authentifié du récepteur, les popups de flux caméra, les instantanés, les notifications stylisées, la gestion du récepteur et le transport de récepteur distant.", "La passe Stage 12 actuelle prépare le projet pour une première bêta publique : contrôles complets, packaging de release, validation du zip HACS, mises à jour du site, documentation d'installation et préparation du release candidate."], eyebrow: "État actuel", title: "Stage 12 : durcissement bêta" },
     example: { eyebrow: "Exemple d'automatisation", title: "La direction prévue." },
     faqItems: [
       { question: "HA TV PiP est-il un service cloud ?", answer: "Non. Le contrôle local reste le comportement par défaut, et le mode récepteur distant connecte votre téléviseur en sortie à votre propre URL externe Home Assistant. HA TV PiP n'exécute pas de relais hébergé." },
@@ -21,7 +21,7 @@ export const fr = {
       { title: "Appairage sécurisé", description: "Un flux d'appairage visible sur la TV empêche les appareils LAN aléatoires de déclencher des popups caméra.", status: "complete" },
       { title: "Prise en charge des flux caméra", description: "Flux caméra HLS Home Assistant avec retour de compatibilité côté récepteur.", status: "complete" },
       { title: "Prise en charge des instantanés", description: "Popups d'image fixe pour les alertes rapides et les aperçus de secours pendant le chargement vidéo.", status: "complete" },
-      { title: "Mode récepteur distant", description: "Transport sortant du récepteur pour les TV de voyage sans redirection de port routeur.", status: "planned" },
+      { title: "Mode récepteur distant", description: "Transport sortant du récepteur pour les TV de voyage sans redirection de port routeur.", status: "complete" },
     ],
     featuresSection: { eyebrow: "Fonctionnalités", title: "Construit par phases, conçu comme une seule expérience." },
     flow: { eyebrow: "Fonctionnement", steps: ["Événement Home Assistant", "Intégration HA TV PiP", "Application récepteur Android TV", "Popup caméra PiP"], title: "Un chemin local d'abord, de l'événement au popup PiP." },
@@ -34,7 +34,7 @@ export const fr = {
     solution: { eyebrow: "La solution", imageAlt: "Maquette montrant les contrôles Home Assistant connectés à un récepteur PiP Android TV", steps: ["Installez l'application récepteur Android TV.", "Installez l'intégration Home Assistant.", "Appairez-les localement.", "Déclenchez des popups caméra depuis les automatisations."], title: "Une application récepteur pour la TV, un contrôleur dans Home Assistant." },
     statusLabels: { complete: "Terminé", future: "Futur", planned: "Prévu" },
     theme: { ariaLabel: "Sélecteur de thème", auto: "auto", dark: "sombre", light: "clair" },
-    translations: { eyebrow: "Traductions", tiers: [{ label: "Tier 1", languages: "Anglais, allemand, néerlandais, français, espagnol, italien, portugais brésilien, polonais" }, { label: "Tier 2", languages: "Suédois, norvégien, danois, finnois, tchèque, hongrois, turc, japonais, coréen" }, { label: "Tier 3", languages: "Chinois simplifié, chinois traditionnel, indonésien, hindi, arabe, ukrainien, roumain, grec" }], title: "L'internationalisation fait partie du plan produit." },
+    translations: { eyebrow: "Traductions", tiers: [{ label: "Tier 1", status: "complete", languages: "Anglais, allemand, néerlandais, français, espagnol, italien, portugais brésilien, polonais" }, { label: "Tier 2", status: "planned", languages: "Suédois, norvégien, danois, finnois, tchèque, hongrois, turc, japonais, coréen" }, { label: "Tier 3", status: "planned", languages: "Chinois simplifié, chinois traditionnel, indonésien, hindi, arabe, ukrainien, roumain, grec" }], title: "L'internationalisation fait partie du plan produit." },
     visualAlt: { network: "Maquette d'un réseau domotique local envoyant un flux caméra vers Android TV PiP", phase: "Aperçu promotionnel des fonctionnalités HA TV PiP à côté d'une maquette Picture-in-Picture Android TV" },
     visualCards: [{ title: "Surface de contrôle des automatisations", text: "Un plan de contrôle adapté à Home Assistant pour la future découverte des récepteurs, l'appairage et les appels de service." }, { title: "Chemin récepteur local d'abord", text: "L'application TV gère la lecture et le PiP tandis que Home Assistant décide ce qui doit apparaître." }],
   } satisfies WebsiteContent;

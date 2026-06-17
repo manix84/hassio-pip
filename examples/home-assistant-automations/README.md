@@ -2,6 +2,8 @@
 
 Automation examples use the Stage 7 `ha_tv_pip.show_camera` stream type options, the Stage 6 `ha_tv_pip.show_snapshot` service, and the Stage 11 `ha_tv_pip.show_notification` service.
 
+Stage 12 will expand these examples as part of beta release hardening so new testers have copy-ready automations for text-only notifications, camera footers, snapshot footers, and resize-only media popups.
+
 Current Stage 7 service shape:
 
 ```yaml

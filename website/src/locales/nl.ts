@@ -2,7 +2,7 @@ import type { WebsiteContent } from "./types";
 
 export const nl = {
     codeBlock: { copyAriaLabel: "Kopieer Home Assistant YAML naar het klembord", copyFailed: "Kopiëren mislukt", copied: "Gekopieerd", copyTitle: "YAML kopiëren", toolbar: "Home Assistant YAML" },
-    currentStatus: { body: ["HA TV PiP ondersteunt nu discovery, koppelen met code op de tv, geauthenticeerde receiverbediening, camera-pop-ups, snapshots, snapshotvoorbeelden, receiverbeheer en remote receiver transport.", "De huidige polish-ronde verbetert de tv-interface, vertaalvlakken, documentatie en releasegereedheid, terwijl HACS- en Play Store-materiaal tot het einde blijven liggen."], eyebrow: "Huidige status", title: "Fase 10: productpolish bezig" },
+    currentStatus: { body: ["HA TV PiP ondersteunt nu discovery, koppelen met code op de tv, geauthenticeerde receiverbediening, camera-pop-ups, snapshots, gestylede notificaties, receiverbeheer en remote receiver transport.", "De huidige Stage 12-ronde maakt het project klaar voor een eerste publieke beta: volledige checks, releasepackaging, HACS-zipvalidatie, website-updates, installatiedocs en release-candidate voorbereiding."], eyebrow: "Huidige status", title: "Stage 12: beta-release hardening" },
     example: { eyebrow: "Voorbeeldautomatisering", title: "Waar dit naartoe gaat." },
     faqItems: [
       { question: "Is HA TV PiP een clouddienst?", answer: "Nee. Lokale bediening blijft de standaard, en remote receiver mode verbindt je tv uitgaand met je eigen externe Home Assistant URL. HA TV PiP draait geen gehoste relay." },
@@ -21,7 +21,7 @@ export const nl = {
       { title: "Veilig koppelen", description: "Een koppelproces zichtbaar op de tv voorkomt dat willekeurige LAN-apparaten camera-pop-ups kunnen starten.", status: "complete" },
       { title: "Camerastreamondersteuning", description: "Home Assistant HLS-camerastreams met compatibiliteitsfeedback op de receiver.", status: "complete" },
       { title: "Snapshotondersteuning", description: "Stilstaande beelden voor snelle meldingen en fallbackvoorbeelden terwijl video laadt.", status: "complete" },
-      { title: "Remote receiver mode", description: "Uitgaand receivertransport voor reis-tv's zonder port forwarding op de router.", status: "planned" },
+      { title: "Remote receiver mode", description: "Uitgaand receivertransport voor reis-tv's zonder port forwarding op de router.", status: "complete" },
     ],
     featuresSection: { eyebrow: "Functies", title: "Gebouwd in fases, ontworpen als één ervaring." },
     flow: { eyebrow: "Zo werkt het", steps: ["Home Assistant-event", "HA TV PiP-integratie", "Android TV receiver-app", "PiP-camera-pop-up"], title: "Een local-first pad van event naar PiP-pop-up." },
@@ -34,7 +34,7 @@ export const nl = {
     solution: { eyebrow: "De oplossing", imageAlt: "Mockup van Home Assistant-bediening verbonden met een Android TV PiP receiver", steps: ["Installeer de Android TV receiver-app.", "Installeer de Home Assistant-integratie.", "Koppel ze lokaal.", "Trigger camera-pop-ups vanuit automatiseringen."], title: "Een receiver-app voor de tv, een controller in Home Assistant." },
     statusLabels: { complete: "Klaar", future: "Toekomst", planned: "Gepland" },
     theme: { ariaLabel: "Themakeuze", auto: "auto", dark: "donker", light: "licht" },
-    translations: { eyebrow: "Vertalingen", tiers: [{ label: "Tier 1", languages: "Engels, Duits, Nederlands, Frans, Spaans, Italiaans, Braziliaans Portugees, Pools" }, { label: "Tier 2", languages: "Zweeds, Noors, Deens, Fins, Tsjechisch, Hongaars, Turks, Japans, Koreaans" }, { label: "Tier 3", languages: "Vereenvoudigd Chinees, Traditioneel Chinees, Indonesisch, Hindi, Arabisch, Oekraïens, Roemeens, Grieks" }], title: "Internationalisering is onderdeel van het productplan." },
+    translations: { eyebrow: "Vertalingen", tiers: [{ label: "Tier 1", status: "complete", languages: "Engels, Duits, Nederlands, Frans, Spaans, Italiaans, Braziliaans Portugees, Pools" }, { label: "Tier 2", status: "planned", languages: "Zweeds, Noors, Deens, Fins, Tsjechisch, Hongaars, Turks, Japans, Koreaans" }, { label: "Tier 3", status: "planned", languages: "Vereenvoudigd Chinees, Traditioneel Chinees, Indonesisch, Hindi, Arabisch, Oekraïens, Roemeens, Grieks" }], title: "Internationalisering is onderdeel van het productplan." },
     visualAlt: { network: "Mockup van een lokaal smart-home netwerk dat een camerafeed naar Android TV PiP stuurt", phase: "Promotioneel overzicht van HA TV PiP-functies naast een Android TV Picture-in-Picture mockup" },
     visualCards: [{ title: "Automatiseringsbediening", text: "Een Home Assistant-vriendelijk bedieningsvlak voor toekomstige receiverdiscovery, koppelen en servicecalls." }, { title: "Local-first receiverpad", text: "De tv-app beheert playback en PiP, terwijl Home Assistant bepaalt wat moet verschijnen." }],
   } satisfies WebsiteContent;

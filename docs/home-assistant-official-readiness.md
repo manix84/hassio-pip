@@ -30,7 +30,8 @@ Official Home Assistant integration readiness
 - Entity registry support for receiver status and controls.
 - Entity translation keys.
 - Service schema for camera and snapshot commands.
-- Tier 1 translation files.
+- Tier 1 translation files complete for current integration surfaces.
+- Tier 2 and Tier 3 translation expansion planned after beta hardening.
 - Tests for config flow helpers, discovery parsing, receiver client behavior, entities, services, remote setup, and remote transport.
 - Brand assets included in the custom integration package.
 
@@ -67,8 +68,9 @@ These need a deeper pass before an upstream Home Assistant proposal:
 
 ## Suggested Next Steps 🧭
 
-1. Add Hassfest validation workflow.
-2. Add a Home Assistant dev-container or documented test environment.
-3. Audit config flow and entity classes against the latest Home Assistant integration quality scale.
-4. Write Home Assistant documentation pages for discovery, pairing, services, remote receiver mode, and troubleshooting.
-5. Decide whether official inclusion should happen before or after broader stream compatibility work.
+1. Complete Stage 12 beta release hardening first.
+2. Add Hassfest validation workflow.
+3. Add a Home Assistant dev-container or documented test environment.
+4. Audit config flow and entity classes against the latest Home Assistant integration quality scale.
+5. Write Home Assistant documentation pages for discovery, pairing, services, remote receiver mode, and troubleshooting.
+6. Decide whether official inclusion should happen before or after broader stream compatibility work.

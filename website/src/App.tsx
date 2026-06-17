@@ -366,7 +366,13 @@ function App() {
         <div className={styles.translationGrid}>
           {content.translations.tiers.map((tier) => (
             <article className={styles.translationItem} key={tier.label}>
-              <strong>{tier.label}</strong>
+              <div className={styles.translationHeader}>
+                <strong>{tier.label}</strong>
+                <StatusBadge
+                  label={content.statusLabels[tier.status]}
+                  status={tier.status}
+                />
+              </div>
               <p>{tier.languages}</p>
             </article>
           ))}

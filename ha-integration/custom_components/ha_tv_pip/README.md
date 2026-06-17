@@ -18,6 +18,10 @@ Phase 9 added optional remote receiver transport over the user's own Home Assist
 
 Phase 10 adds distribution polish, Tier 1 translations, clearer docs, and preparation for HACS and longer-term official Home Assistant readiness ✨.
 
+Stage 11 adds styled text notifications and optional camera/snapshot notification footers 🔔.
+
+Stage 12 focuses on beta release hardening: HACS zip validation, install documentation, service examples, full quality checks, and release-candidate packaging before broader testing 📦.
+
 Distribution goals are HACS first, then long-term official Home Assistant integration readiness once the integration is mature enough. The monorepo uses root `hacs.json` with `zip_release` so HACS installs the stable `ha-tv-pip-integration.zip` release asset instead of the raw monorepo tree.
 
 ## HACS Installation 🧩

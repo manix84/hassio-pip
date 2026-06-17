@@ -1,5 +1,13 @@
 # What's New ✨
 
+## 0.46.0 - Stage 12 Planning 📦
+
+- Defined Stage 12 as beta release hardening instead of a new feature stage 🚧
+- Added release-candidate goals for full checks, Android builds, HACS zip validation, website build validation, and release packaging ✅
+- Updated root, Android, Home Assistant, website, examples, roadmap, development, Play Store, and official Home Assistant readiness docs 📝
+- Updated the website locale status content so public pages point to Stage 12 and beta-readiness work 🌍
+- Marked Tier 1 translations complete and Tier 2/Tier 3 translations planned across docs and the website 🌐
+
 ## 0.45.0 - Stage 11 Complete ✅
 
 - Completed Stage 11 enhanced notifications after Chromecast manual testing 📺

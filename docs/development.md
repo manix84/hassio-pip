@@ -669,6 +669,45 @@ For custom-repository installs, users should add `https://github.com/manix84/ha-
 
 Default HACS repository inclusion is a separate later step. Before submitting to the HACS default repository list, confirm the public GitHub repository has a description, topics, passing HACS validation, passing Hassfest validation, and at least one full GitHub Release.
 
+## Stage 12 Beta Release Hardening
+
+Stage 12 is the next development focus after Stage 11. It should be treated as a release-quality pass rather than a feature-expansion pass.
+
+Run the full repository check before release-candidate work:
+
+```sh
+npm run check
+```
+
+Build and package each project area:
+
+```sh
+npm run android:assemble:debug
+npm run android:assemble:release
+npm run package:integration
+npm run website:build
+```
+
+Verify release packaging expectations:
+
+- Android APK asset: `ha-tv-pip-android-vX.Y.Z.apk`.
+- Versioned integration zip: `ha-tv-pip-integration-vX.Y.Z.zip`.
+- Stable HACS integration zip: `ha-tv-pip-integration.zip`.
+- Integration zip internal path: `custom_components/ha_tv_pip/`.
+- Root `package.json`, Android `versionName`, HA `manifest.json`, and project `package.json` files all match.
+
+Documentation work in Stage 12 should include:
+
+- Root README install flow.
+- Android TV app install and sideload guidance.
+- HACS custom-repository install guidance.
+- Manual custom integration fallback guidance.
+- Website current status and Stage 11 notification examples.
+- Example automations for text-only notifications, camera with footer, snapshot with footer, and resize-only media popups.
+- Release notes for the beta candidate.
+
+Stage 12 should finish with a GitHub release candidate from `main` after local checks, builds, packaging, website build, and docs are clean.
+
 ---
 
 ### Home Assistant Development

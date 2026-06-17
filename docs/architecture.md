@@ -521,7 +521,7 @@ The Home Assistant integration should use `strings.json` and `translations/*.jso
 
 The website should use lightweight static locale content and routes when translation work starts.
 
-Translation implementation belongs to the Phase 10 polish pass. Tier 1 languages from `docs/translations.md` should be in place before broad release, with Tier 2 and Tier 3 languages added later.
+Translation implementation belongs to the Phase 10 polish pass. Tier 1 languages from `docs/translations.md` are complete for the current Android, Home Assistant, and website surfaces. Tier 2 and Tier 3 languages are planned after beta hardening and broader testing.
 
 ---
 

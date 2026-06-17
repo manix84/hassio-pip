@@ -10,11 +10,11 @@ export const de = {
     },
     currentStatus: {
       body: [
-        "HA TV PiP unterstützt jetzt Erkennung, sichtbares Pairing auf dem Fernseher, authentifizierte Receiver-Steuerung, Kamerastream-Popups, Schnappschüsse, Snapshot-Vorschauen, Receiver-Verwaltung und Remote-Receiver-Transport.",
-        "Der aktuelle Feinschliff verbessert die TV-Receiver-Oberfläche, Übersetzungsflächen, Dokumentation und Release-Bereitschaft. HACS- und Play-Store-Materialien bleiben bis zum Ende zurückgestellt.",
+        "HA TV PiP unterstützt jetzt Erkennung, sichtbares Pairing auf dem Fernseher, authentifizierte Receiver-Steuerung, Kamerastream-Popups, Schnappschüsse, gestaltete Benachrichtigungen, Receiver-Verwaltung und Remote-Receiver-Transport.",
+        "Der aktuelle Stage-12-Durchlauf härtet das Projekt für eine erste öffentliche Beta: vollständige Checks, Release-Pakete, HACS-Zip-Validierung, Website-Updates, Installationsdokumentation und Release-Candidate-Vorbereitung.",
       ],
       eyebrow: "Aktueller Stand",
-      title: "Phase 10: Produkt-Feinschliff läuft",
+      title: "Stage 12: Beta-Release-Härtung",
     },
     example: { eyebrow: "Beispiel-Automation", title: "Wohin es geht." },
     faqItems: [
@@ -99,7 +99,7 @@ export const de = {
         title: "Remote-Receiver-Modus",
         description:
           "Ausgehender Receiver-Transport für Reise-TVs ohne Router-Portweiterleitung.",
-        status: "planned",
+        status: "complete",
       },
     ],
     featuresSection: {
@@ -176,9 +176,9 @@ export const de = {
     translations: {
       eyebrow: "Übersetzungen",
       tiers: [
-        { label: "Tier 1", languages: "Englisch, Deutsch, Niederländisch, Französisch, Spanisch, Italienisch, Brasilianisches Portugiesisch, Polnisch" },
-        { label: "Tier 2", languages: "Schwedisch, Norwegisch, Dänisch, Finnisch, Tschechisch, Ungarisch, Türkisch, Japanisch, Koreanisch" },
-        { label: "Tier 3", languages: "Vereinfachtes Chinesisch, Traditionelles Chinesisch, Indonesisch, Hindi, Arabisch, Ukrainisch, Rumänisch, Griechisch" },
+        { label: "Tier 1", status: "complete", languages: "Englisch, Deutsch, Niederländisch, Französisch, Spanisch, Italienisch, Brasilianisches Portugiesisch, Polnisch" },
+        { label: "Tier 2", status: "planned", languages: "Schwedisch, Norwegisch, Dänisch, Finnisch, Tschechisch, Ungarisch, Türkisch, Japanisch, Koreanisch" },
+        { label: "Tier 3", status: "planned", languages: "Vereinfachtes Chinesisch, Traditionelles Chinesisch, Indonesisch, Hindi, Arabisch, Ukrainisch, Rumänisch, Griechisch" },
       ],
       title: "Internationalisierung ist Teil des Produktplans.",
     },

@@ -6,6 +6,8 @@ This document prepares HA TV PiP for a future Android TV / Google TV Play Store 
 
 HA TV PiP is still pre-release software. GitHub Releases remain the distribution target for now, while HACS custom-repository installation is prepared for the Home Assistant integration.
 
+Stage 12 focuses on beta release hardening through GitHub Releases and HACS custom-repository installs. Play Store deployment should wait until after that beta release path is proven.
+
 The Android app package name is:
 
 ```txt
