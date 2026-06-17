@@ -14,6 +14,8 @@ class ShowCommandTest {
               "url": "https://example.com/front-door.m3u8",
               "streamType": "hls",
               "previewUrl": "https://example.com/front-door.jpg",
+              "fallbackUrl": "https://example.com/api/camera_proxy_stream/camera.front_door",
+              "fallbackStreamType": "mjpeg",
               "durationSeconds": 30,
               "enterPip": true
             }
@@ -23,6 +25,11 @@ class ShowCommandTest {
         assertEquals("Front Door", command.title)
         assertEquals("https://example.com/front-door.m3u8", command.url)
         assertEquals("https://example.com/front-door.jpg", command.previewUrl)
+        assertEquals(
+            "https://example.com/api/camera_proxy_stream/camera.front_door",
+            command.fallbackUrl
+        )
+        assertEquals(StreamType.Mjpeg, command.fallbackStreamType)
         assertEquals(StreamType.Hls, command.streamType)
         assertEquals(30, command.durationSeconds)
         assertTrue(command.enterPip)
@@ -182,6 +189,38 @@ class ShowCommandTest {
         assertTrue(result.isFailure)
         assertEquals(
             "`previewUrl` must be an HTTP or HTTPS URL",
+            result.exceptionOrNull()?.message
+        )
+    }
+
+    @Test
+    fun rejectsInvalidFallbackUrl() {
+        val result = ShowCommand.fromJson(
+            """{"url":"https://example.com/video.m3u8","fallbackUrl":"file:///tmp/video.mjpeg"}"""
+        )
+
+        assertTrue(result.isFailure)
+        assertEquals(
+            "`fallbackUrl` must be an HTTP or HTTPS URL",
+            result.exceptionOrNull()?.message
+        )
+    }
+
+    @Test
+    fun rejectsInvalidFallbackStreamType() {
+        val result = ShowCommand.fromJson(
+            """
+            {
+              "url": "https://example.com/video.m3u8",
+              "fallbackUrl": "https://example.com/video.mjpeg",
+              "fallbackStreamType": "webrtc"
+            }
+            """.trimIndent()
+        )
+
+        assertTrue(result.isFailure)
+        assertEquals(
+            "Unsupported `fallbackStreamType`: webrtc",
             result.exceptionOrNull()?.message
         )
     }

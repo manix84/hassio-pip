@@ -584,7 +584,8 @@ Phase 7 currently adds:
 - Optional `stream_camera_entity` support for selecting a separate Android TV-compatible live stream entity
 - Receiver-side MJPEG overlay rendering for Home Assistant camera proxy streams
 - Home Assistant-side fallback from HLS to MJPEG, then snapshot, when stream URL resolution fails
-- Receiver-side snapshot preview fallback when accepted video streams fail during playback
+- Receiver-side playable fallback from accepted HLS playback to MJPEG when the Android decoder rejects the HLS stream and a fallback stream was provided
+- Receiver-side snapshot preview fallback when no playable fallback is available or the playable fallback also fails
 - Stream type selection logging before receiver commands are sent
 
 ## Planned

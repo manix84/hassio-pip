@@ -265,6 +265,8 @@ class PlayerActivity : ComponentActivity() {
                     .putExtra(EXTRA_URL, command.url)
                     .putExtra(EXTRA_STREAM_TYPE, command.streamType.wireName)
                     .putExtra(EXTRA_PREVIEW_URL, command.previewUrl)
+                    .putExtra(EXTRA_FALLBACK_URL, command.fallbackUrl)
+                    .putExtra(EXTRA_FALLBACK_STREAM_TYPE, command.fallbackStreamType?.wireName)
                     .putExtra(EXTRA_SHOW_NOTIFICATION, command.showNotification)
                     .putExtra(EXTRA_MESSAGE, command.message)
                     .putExtra(EXTRA_POSITION, command.style.position.wireName)
@@ -343,6 +345,8 @@ class PlayerActivity : ComponentActivity() {
         const val EXTRA_URL = "com.hatvpip.receiver.extra.URL"
         const val EXTRA_STREAM_TYPE = "com.hatvpip.receiver.extra.STREAM_TYPE"
         const val EXTRA_PREVIEW_URL = "com.hatvpip.receiver.extra.PREVIEW_URL"
+        const val EXTRA_FALLBACK_URL = "com.hatvpip.receiver.extra.FALLBACK_URL"
+        const val EXTRA_FALLBACK_STREAM_TYPE = "com.hatvpip.receiver.extra.FALLBACK_STREAM_TYPE"
         const val EXTRA_SHOW_NOTIFICATION = "com.hatvpip.receiver.extra.SHOW_NOTIFICATION"
         const val EXTRA_MESSAGE = "com.hatvpip.receiver.extra.MESSAGE"
         const val EXTRA_POSITION = "com.hatvpip.receiver.extra.POSITION"
@@ -364,6 +368,8 @@ class PlayerActivity : ComponentActivity() {
                 putExtra(EXTRA_URL, command.url)
                 putExtra(EXTRA_STREAM_TYPE, command.streamType.wireName)
                 putExtra(EXTRA_PREVIEW_URL, command.previewUrl)
+                putExtra(EXTRA_FALLBACK_URL, command.fallbackUrl)
+                putExtra(EXTRA_FALLBACK_STREAM_TYPE, command.fallbackStreamType?.wireName)
                 putExtra(EXTRA_SHOW_NOTIFICATION, command.showNotification)
                 putExtra(EXTRA_MESSAGE, command.message)
                 putExtra(EXTRA_POSITION, command.style.position.wireName)
@@ -391,6 +397,13 @@ private fun Intent.toShowCommand(): ShowCommand =
             else -> StreamType.Hls
         },
         previewUrl = getStringExtra(PlayerActivity.EXTRA_PREVIEW_URL),
+        fallbackUrl = getStringExtra(PlayerActivity.EXTRA_FALLBACK_URL),
+        fallbackStreamType = when (getStringExtra(PlayerActivity.EXTRA_FALLBACK_STREAM_TYPE)) {
+            StreamType.Hls.wireName -> StreamType.Hls
+            StreamType.Mjpeg.wireName -> StreamType.Mjpeg
+            StreamType.Snapshot.wireName -> StreamType.Snapshot
+            else -> null
+        },
         showNotification = getBooleanExtra(PlayerActivity.EXTRA_SHOW_NOTIFICATION, false),
         message = getStringExtra(PlayerActivity.EXTRA_MESSAGE),
         style = NotificationStyle(

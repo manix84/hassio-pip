@@ -709,6 +709,13 @@ async def _async_show_camera_command(
             )
 
     try:
+        fallback_url = None
+        if request.stream_type == STREAM_TYPE_AUTO:
+            fallback_url = _optional_camera_mjpeg_stream_url(
+                hass,
+                stream_entity,
+                prefer_external=prefer_external,
+            )
         return ShowCameraCommand(
             title=title,
             url=await _async_camera_stream_url(
@@ -720,6 +727,8 @@ async def _async_show_camera_command(
             enter_pip=request.enter_pip,
             stream_type=STREAM_TYPE_HLS,
             preview_url=preview_url,
+            fallback_url=fallback_url,
+            fallback_stream_type=STREAM_TYPE_MJPEG if fallback_url else None,
             **_presentation_payload(request),
         )
     except ServiceValidationError as error:
@@ -917,6 +926,27 @@ def _camera_mjpeg_stream_url(
         f"{path}?{query}",
         prefer_external=prefer_external,
     )
+
+
+def _optional_camera_mjpeg_stream_url(
+    hass: Any,
+    entity_id: str,
+    *,
+    prefer_external: bool = False,
+) -> str | None:
+    try:
+        return _camera_mjpeg_stream_url(
+            hass,
+            entity_id,
+            prefer_external=prefer_external,
+        )
+    except ServiceValidationError as error:
+        _LOGGER.warning(
+            "MJPEG fallback unavailable for %s: %s",
+            entity_id,
+            error,
+        )
+        return None
 
 
 def _optional_camera_snapshot_url(

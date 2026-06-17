@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.8.0 - Receiver-Side Stream Fallback 📺
+
+- Added optional playable fallback media fields so automatic HLS commands can carry an MJPEG fallback URL 📹
+- Updated the Android overlay receiver to switch from failed HLS playback to MJPEG when a fallback stream is provided 🔁
+- Added tests for Home Assistant payloads and Android command parsing for fallback stream fields 🧪
+
 ## 1.7.0 - Receiver Playback Diagnostics 🔎
 
 - Added nested Android receiver playback diagnostics to `/status`, including preview URL and update time 🔎

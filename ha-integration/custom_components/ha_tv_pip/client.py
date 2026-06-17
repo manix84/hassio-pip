@@ -41,6 +41,8 @@ class ShowCameraCommand:
     enter_pip: bool
     stream_type: str = "hls"
     preview_url: str | None = None
+    fallback_url: str | None = None
+    fallback_stream_type: str | None = None
     show_notification: bool = False
     message: str | None = None
     position: str | None = None
@@ -66,6 +68,10 @@ def show_camera_payload(command: ShowCameraCommand) -> dict[str, Any]:
         payload["durationSeconds"] = command.duration_seconds
     if command.preview_url is not None:
         payload["previewUrl"] = command.preview_url
+    if command.fallback_url is not None:
+        payload["fallbackUrl"] = command.fallback_url
+    if command.fallback_stream_type is not None:
+        payload["fallbackStreamType"] = command.fallback_stream_type
     if command.show_notification:
         payload["showNotification"] = True
     if command.message is not None:

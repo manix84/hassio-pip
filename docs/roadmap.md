@@ -484,7 +484,7 @@ Initial implementation:
 - `stream_type: mjpeg_first` tries MJPEG first, then HLS, then snapshot.
 - `stream_type: snapshot` sends a snapshot command through `ha_tv_pip.show_camera`.
 - `stream_camera_entity` lets users choose a separate live-stream camera entity, such as a lower-resolution or H.264 substream, while keeping the primary camera entity for titles and snapshot fallback.
-- Receiver overlays keep the snapshot preview visible if video playback fails after the HLS URL is accepted.
+- Receiver overlays switch from failed HLS playback to an MJPEG fallback when automatic mode supplied one, or keep the snapshot preview visible when no playable fallback is available.
 - `webrtc` remains a future stream type.
 
 ## Success Criteria
@@ -501,7 +501,7 @@ Initial implementation:
 - MJPEG can be forced explicitly and is also used automatically when Home Assistant cannot resolve HLS.
 - MJPEG-first mode supports cameras where MJPEG is the preferred receiver path but HLS remains useful as fallback.
 - Automatic mode falls back to a snapshot command when Home Assistant cannot resolve either HLS or MJPEG.
-- Receiver overlay fallback was tested with a camera stream that produced an HLS URL but failed decoder playback; the snapshot preview remained visible with a small fallback message instead of a black box.
+- Receiver overlay fallback supports HLS-to-MJPEG switching when the HLS URL is accepted but Android playback fails. If no playable fallback is available, the snapshot preview remains visible instead of a black box.
 - WebRTC, stream profile selection, and transcoding remain future capabilities.
 
 ---

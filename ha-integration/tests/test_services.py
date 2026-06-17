@@ -569,6 +569,11 @@ def test_show_camera_command_auto_prefers_hls(
         "http://10.0.0.2:8123/api/camera_proxy/camera.front_door"
         "?token=snapshot-token"
     )
+    assert command.fallback_url == (
+        "http://10.0.0.2:8123/api/camera_proxy_stream/camera.front_door"
+        "?token=snapshot-token"
+    )
+    assert command.fallback_stream_type == "mjpeg"
     assert command.width == 800
     assert command.height == 450
     assert command.message is None
@@ -627,6 +632,10 @@ def test_show_camera_command_can_use_separate_stream_camera_entity(
     assert command.preview_url == (
         "http://10.0.0.2:8123/api/camera_proxy/camera.front_door"
         "?token=main-token"
+    )
+    assert command.fallback_url == (
+        "http://10.0.0.2:8123/api/camera_proxy_stream/camera.front_door_sub"
+        "?token=sub-token"
     )
 
 

@@ -17,6 +17,8 @@ data class ShowCommand(
     val durationSeconds: Int?,
     val enterPip: Boolean,
     val previewUrl: String?,
+    val fallbackUrl: String?,
+    val fallbackStreamType: StreamType?,
     val showNotification: Boolean,
     val message: String?,
     val style: NotificationStyle
@@ -30,6 +32,8 @@ data class ShowCommand(
                 durationSeconds = null,
                 enterPip = false,
                 previewUrl = null,
+                fallbackUrl = null,
+                fallbackStreamType = null,
                 showNotification = false,
                 message = null,
                 style = NotificationStyle()
@@ -70,6 +74,20 @@ data class ShowCommand(
                         "`previewUrl` must be an HTTP or HTTPS URL"
                     }
                 }
+                val fallbackUrl = json.optString("fallbackUrl").trim().ifBlank { null }
+                if (fallbackUrl != null) {
+                    require(fallbackUrl.startsWith("http://") || fallbackUrl.startsWith("https://")) {
+                        "`fallbackUrl` must be an HTTP or HTTPS URL"
+                    }
+                }
+                val fallbackStreamType = fallbackUrl?.let {
+                    when (val value = json.optString("fallbackStreamType", StreamType.Mjpeg.wireName)) {
+                        StreamType.Hls.wireName -> StreamType.Hls
+                        StreamType.Mjpeg.wireName -> StreamType.Mjpeg
+                        StreamType.Snapshot.wireName -> StreamType.Snapshot
+                        else -> error("Unsupported `fallbackStreamType`: $value")
+                    }
+                }
 
                 ShowCommand(
                     title = json.optString("title", "HA TV PiP").ifBlank { "HA TV PiP" },
@@ -78,6 +96,8 @@ data class ShowCommand(
                     durationSeconds = durationSeconds,
                     enterPip = json.optBoolean("enterPip", true),
                     previewUrl = previewUrl,
+                    fallbackUrl = fallbackUrl,
+                    fallbackStreamType = fallbackStreamType,
                     showNotification = json.optBoolean(
                         "showNotification",
                         streamType == StreamType.Notification || json.has("message")

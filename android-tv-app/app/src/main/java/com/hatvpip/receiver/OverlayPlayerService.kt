@@ -35,6 +35,8 @@ class OverlayPlayerService : Service() {
     private var title: String = ""
     private var url: String = PlayerActivity.TEST_STREAM_URL
     private var previewUrl: String? = null
+    private var fallbackUrl: String? = null
+    private var fallbackStreamType: StreamType? = null
     private var showNotification: Boolean = false
     private var message: String? = null
     private var style: NotificationStyle = NotificationStyle()
@@ -57,6 +59,15 @@ class OverlayPlayerService : Service() {
                 title = intent?.getStringExtra(PlayerActivity.EXTRA_TITLE) ?: title
                 url = intent?.getStringExtra(PlayerActivity.EXTRA_URL) ?: url
                 previewUrl = intent?.getStringExtra(PlayerActivity.EXTRA_PREVIEW_URL)
+                fallbackUrl = intent?.getStringExtra(PlayerActivity.EXTRA_FALLBACK_URL)
+                fallbackStreamType = when (
+                    intent?.getStringExtra(PlayerActivity.EXTRA_FALLBACK_STREAM_TYPE)
+                ) {
+                    StreamType.Hls.wireName -> StreamType.Hls
+                    StreamType.Mjpeg.wireName -> StreamType.Mjpeg
+                    StreamType.Snapshot.wireName -> StreamType.Snapshot
+                    else -> null
+                }
                 showNotification = intent?.getBooleanExtra(
                     PlayerActivity.EXTRA_SHOW_NOTIFICATION,
                     false
@@ -230,6 +241,7 @@ class OverlayPlayerService : Service() {
             addSnapshotView(root, imageUrl, updateStateOnLoad = false)
         }
         lateinit var playerView: PlayerView
+        var fallbackStarted = false
         val overlayPlayer = buildReceiverPlayer(this).also { exoPlayer ->
             exoPlayer.addListener(
                 object : Player.Listener {
@@ -263,6 +275,29 @@ class OverlayPlayerService : Service() {
 
                     override fun onPlayerError(error: PlaybackException) {
                         val message = error.toDisplayMessage()
+                        val playableFallbackUrl = fallbackUrl
+                        if (
+                            !fallbackStarted &&
+                            playableFallbackUrl != null &&
+                            fallbackStreamType == StreamType.Mjpeg
+                        ) {
+                            fallbackStarted = true
+                            AppLog.error(
+                                "Overlay playback failed, starting MJPEG fallback: $message",
+                                error
+                            )
+                            exoPlayer.release()
+                            playerView.visibility = PlayerView.GONE
+                            url = playableFallbackUrl
+                            streamType = StreamType.Mjpeg
+                            updatePlaybackState(
+                                status = PlaybackStatus.Buffering,
+                                isPlaying = false,
+                                errorMessage = message
+                            )
+                            addMjpegView(root, previewImageView)
+                            return
+                        }
                         val hasPreviewFallback = previewImageView != null
                         if (hasPreviewFallback) {
                             playerView.alpha = 0f
@@ -308,8 +343,8 @@ class OverlayPlayerService : Service() {
         root.addView(playerView)
     }
 
-    private fun addMjpegView(root: FrameLayout) {
-        val previewImageView = previewUrl?.let { imageUrl ->
+    private fun addMjpegView(root: FrameLayout, existingPreviewImageView: ImageView? = null) {
+        val previewImageView = existingPreviewImageView ?: previewUrl?.let { imageUrl ->
             addSnapshotView(root, imageUrl, updateStateOnLoad = false)
         }
         val streamImageView = ImageView(this).apply {

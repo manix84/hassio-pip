@@ -115,6 +115,28 @@ def test_show_camera_payload_can_send_mjpeg_stream_type() -> None:
     assert payload["previewUrl"] == "https://example.test/api/camera_proxy/camera.front_door"
 
 
+def test_show_camera_payload_can_send_playable_fallback() -> None:
+    payload = show_camera_payload(
+        ShowCameraCommand(
+            title="Front Door",
+            url="https://example.test/api/hls/front-door",
+            stream_type="hls",
+            preview_url="https://example.test/api/camera_proxy/camera.front_door",
+            fallback_url=(
+                "https://example.test/api/camera_proxy_stream/camera.front_door"
+            ),
+            fallback_stream_type="mjpeg",
+            duration_seconds=30,
+            enter_pip=True,
+        )
+    )
+
+    assert payload["fallbackUrl"] == (
+        "https://example.test/api/camera_proxy_stream/camera.front_door"
+    )
+    assert payload["fallbackStreamType"] == "mjpeg"
+
+
 def test_show_camera_payload_includes_notification_style() -> None:
     payload = show_camera_payload(
         ShowCameraCommand(

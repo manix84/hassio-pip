@@ -289,6 +289,7 @@ class LocalControlServer(
                 mode = initialMode,
                 title = command.title,
                 url = command.url,
+                previewUrl = command.previewUrl,
                 streamType = command.streamType.wireName
             )
         )
@@ -302,6 +303,8 @@ class LocalControlServer(
                 .put("url", command.url)
                 .put("streamType", command.streamType.wireName)
                 .put("previewUrl", command.previewUrl)
+                .put("fallbackUrl", command.fallbackUrl)
+                .put("fallbackStreamType", command.fallbackStreamType?.wireName)
                 .put("durationSeconds", command.durationSeconds)
                 .put("enterPip", command.enterPip)
         )
