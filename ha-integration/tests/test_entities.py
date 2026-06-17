@@ -68,7 +68,25 @@ def _status() -> ReceiverStatus:
         remote_status="connected",
         last_request={"method": "GET", "path": "/status", "status": 200},
         error=None,
-        raw={"url": "http://example.test/private.m3u8", "playbackState": "playing"},
+        raw={
+            "url": "http://example.test/private.m3u8",
+            "fallbackUrl": "http://example.test/private.mjpeg",
+            "playbackState": "playing",
+            "playback": {
+                "url": "http://example.test/nested-private.m3u8",
+                "previewUrl": "http://example.test/private.jpg",
+                "fallbackUrl": "http://example.test/nested-private.mjpeg",
+                "streamType": "hls",
+            },
+            "remote": {
+                "homeAssistantUrl": "https://example.ui.nabu.casa",
+                "accessToken": "remote-token",
+            },
+            "pairing": {
+                "state": "paired",
+                "token": "local-token",
+            },
+        },
     )
 
 
@@ -319,4 +337,15 @@ def test_diagnostics_redacts_token_and_url(monkeypatch) -> None:  # type: ignore
 
     assert result["entry"][CONF_TOKEN] == diagnostics.REDACTED
     assert result["receiver_status"]["url"] == diagnostics.REDACTED
+    assert result["receiver_status"]["fallbackUrl"] == diagnostics.REDACTED
+    assert result["receiver_status"]["playback"]["url"] == diagnostics.REDACTED
+    assert result["receiver_status"]["playback"]["previewUrl"] == diagnostics.REDACTED
+    assert result["receiver_status"]["playback"]["fallbackUrl"] == diagnostics.REDACTED
+    assert result["receiver_status"]["playback"]["streamType"] == "hls"
+    assert (
+        result["receiver_status"]["remote"]["homeAssistantUrl"]
+        == diagnostics.REDACTED
+    )
+    assert result["receiver_status"]["remote"]["accessToken"] == diagnostics.REDACTED
+    assert result["receiver_status"]["pairing"]["token"] == diagnostics.REDACTED
     assert result["receiver_error"] is None

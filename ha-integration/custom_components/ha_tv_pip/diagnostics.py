@@ -8,6 +8,14 @@ from .client import ReceiverClientError, async_get_receiver_status
 from .const import CONF_HOST, CONF_PORT, CONF_TOKEN
 
 REDACTED = "**REDACTED**"
+REDACTED_KEYS = {
+    "accessToken",
+    "fallbackUrl",
+    "homeAssistantUrl",
+    "previewUrl",
+    "token",
+    "url",
+}
 
 
 async def async_get_config_entry_diagnostics(hass: Any, entry: Any) -> dict[str, Any]:
@@ -32,8 +40,17 @@ async def async_get_config_entry_diagnostics(hass: Any, entry: Any) -> dict[str,
         diagnostics["receiver_error"] = str(error)
         return diagnostics
 
-    receiver_status = dict(status.raw)
-    if "url" in receiver_status:
-        receiver_status["url"] = REDACTED
+    receiver_status = _redact(status.raw)
     diagnostics["receiver_status"] = receiver_status
     return diagnostics
+
+
+def _redact(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {
+            key: REDACTED if key in REDACTED_KEYS else _redact(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, list):
+        return [_redact(item) for item in value]
+    return value
