@@ -1,6 +1,6 @@
 {
   "name": "ha-tv-pip",
-  "version": "0.45.0",
+  "version": "0.46.0",
   "private": true,
   "description": "Monorepo for the HA TV PiP Android TV receiver and future Home Assistant integration.",
   "license": "MIT",

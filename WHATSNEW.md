@@ -1,5 +1,15 @@
 # What's New ✨
 
+## 0.45.0 - Stage 11 Complete ✅
+
+- Completed Stage 11 enhanced notifications after Chromecast manual testing 📺
+- Added explicit receiver support for title-only media notification footers without requiring a message 🔔
+- Kept resize-only camera and snapshot commands clean so width/height do not accidentally show a text footer 📐
+- Stacked video or snapshot media above notification text inside one continuous rounded glass popup ✨
+- Added translucent alpha-hex background support for glass-style notification overlays 🎨
+- Added useful Home Assistant service field examples without forcing examples on receiver/entity selectors 🏠
+- Expanded HA and Android tests for notification payloads, title-only footers, resize-only media, and service metadata 🧪
+
 ## 0.41.0 - Stage 11 Enhanced Notifications 🔔
 
 - Started Stage 11 with `ha_tv_pip.show_notification` for styled TV text alerts 🏠

@@ -789,7 +789,7 @@ Apple TV support is desirable but exploratory. tvOS has different constraints ar
 
 Future platform work should keep the local receiver protocol platform-neutral so Home Assistant can target receiver capabilities rather than Android-specific behavior.
 
-# Phase 11: Enhanced Notifications / Styled Overlays 🚧
+# Phase 11: Enhanced Notifications / Styled Overlays ✅
 
 ## Goal
 
@@ -803,15 +803,19 @@ Stage 11 adds a richer overlay command model inspired by PiPup-style notificatio
 - ✅ Send notification commands through the existing local HTTP and remote WebSocket receiver transports.
 - ✅ Render text-only notification overlays on Android TV.
 - ✅ Allow camera and snapshot commands to carry optional notification text/styling.
-- ✅ Render rounded notification cards for text-only and combined media popups.
+- ✅ Render rounded glass notification cards for text-only and combined media popups.
+- ✅ Stack media above notification text inside one continuous rounded container.
+- ✅ Support title-only media footers without requiring a message.
 - ✅ Support title and message text.
 - ✅ Support popup corner position.
 - ✅ Support title, message, and background colors.
 - ✅ Support title and message text sizes.
 - ✅ Support optional overlay width and height with sensible defaults.
 - ✅ Validate color, size, position, duration, and receiver target inputs.
-- 🚧 Add optional image/snapshot notification media in a later Stage 11 slice.
-- 🚧 Add website examples and richer automation snippets in a later Stage 11 slice.
+- ✅ Add service metadata examples for useful presentation fields.
+- ✅ Confirm text-only, title-only media, title+message media, and resize-only media flows on Chromecast.
+- ⏭️ Add optional image/snapshot notification media in a future polish stage.
+- ⏭️ Add website examples and richer automation snippets in a future website polish pass.
 
 ## Receiver Payload
 
@@ -843,7 +847,7 @@ Current optional fields:
 - `titleColor`, `messageColor`, and `backgroundColor` should accept validated hex or alpha-hex colors.
 - `titleSize` and `messageSize` should be clamped to TV-readable ranges.
 - `width` and `height` are optional pixel dimensions. Text-only notifications default to `512px` wide and content height; media popups default to `640x360`.
-- These options can be reused by camera/snapshot overlays when `message` is provided.
+- These options can be reused by camera/snapshot overlays when `title` or `message` is provided. Width and height can also be used by themselves to resize a media popup without showing a text footer.
 - Defaults should remain readable and Home Assistant-friendly without requiring users to configure every field.
 
 ## Example Automation

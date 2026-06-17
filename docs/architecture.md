@@ -260,38 +260,27 @@ ha_tv_pip.show_camera
 
 The Stage 5 service resolves Home Assistant camera HLS URLs and sends authenticated `/show` commands to paired receivers. It uses `receiver_device_id` to target receiver devices because the integration does not expose entities yet.
 
-Planned services:
+Implemented receiver display services include `ha_tv_pip.show_camera`, `ha_tv_pip.show_snapshot`, and `ha_tv_pip.show_notification`. Camera and snapshot commands can also carry optional notification presentation fields for title/message footers.
 
-```txt
-ha_tv_pip.show_snapshot
-ha_tv_pip.close
-ha_tv_pip.test_receiver
-```
-
-Future services may include:
-
-```txt
-ha_tv_pip.show_message
-ha_tv_pip.show_notification
-ha_tv_pip.show_dashboard
-```
-
-Future enhanced-notification services should support optional presentation fields inspired by existing Android TV notification popup tools:
+Enhanced notification fields are inspired by existing Android TV notification popup tools while using explicit wire names:
 
 ```json
 {
-  "position": 0,
+  "streamType": "notification",
+  "position": "top_right",
   "title": "Home Assistant",
   "titleColor": "#50BFF2",
-  "titleSize": 10,
+  "titleSize": 24,
   "message": "",
   "messageColor": "#fbf5f5",
-  "messageSize": 14,
-  "backgroundColor": "#B30F0E0E"
+  "messageSize": 18,
+  "backgroundColor": "#B30F0E0E",
+  "width": 512,
+  "height": 240
 }
 ```
 
-The receiver protocol should validate colors, clamp text sizes to TV-readable ranges, and map position values to explicit screen corners. These fields should remain optional so camera, snapshot, and future notification commands continue to work with sensible defaults.
+The receiver protocol validates colors, clamps text sizes to TV-readable ranges, maps position values to explicit screen corners, and keeps these fields optional so camera, snapshot, and notification commands work with sensible defaults. Media popups use an explicit `showNotification` flag for title/message footers; width and height can resize media without forcing text to appear.
 
 ---
 

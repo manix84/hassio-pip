@@ -864,25 +864,29 @@ Example:
 
 This contract should remain stable as the project grows.
 
-Future enhanced notifications should extend this model with optional presentation fields rather than replacing the existing camera and snapshot command shape:
+Enhanced notifications extend this model with optional presentation fields rather than replacing the existing camera and snapshot command shape:
 
 ```json
 {
-  "position": 0,
+  "showNotification": true,
+  "position": "top_right",
   "title": "Home Assistant",
   "titleColor": "#50BFF2",
-  "titleSize": 10,
+  "titleSize": 24,
   "message": "",
   "messageColor": "#fbf5f5",
-  "messageSize": 14,
-  "backgroundColor": "#B30F0E0E"
+  "messageSize": 18,
+  "backgroundColor": "#B30F0E0E",
+  "width": 512,
+  "height": 240
 }
 ```
 
 Implementation notes:
 
 - Keep all fields optional and provide readable defaults.
-- Validate hex colors before sending them to Android UI code.
+- Validate hex and alpha-hex colors before sending them to Android UI code.
+- Send `showNotification: true` for media title/message footers so width/height can resize a popup without forcing footer text.
 - Clamp title and message sizes to safe TV-readable ranges.
 - Prefer named Home Assistant service options where possible, while still mapping cleanly to the receiver JSON payload.
 - Keep `position` documented as a stable corner mapping.

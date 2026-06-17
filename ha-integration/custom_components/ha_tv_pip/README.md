@@ -99,7 +99,7 @@ data:
 
 The service defaults to `stream_type: auto`, which resolves an HLS stream URL through Home Assistant's camera stream API and sends it to the paired receiver with the stored bearer token. If Home Assistant cannot produce an HLS stream in automatic mode, the integration falls back to a snapshot command. Advanced users can force `stream_type: hls` or `stream_type: snapshot`.
 When `snapshot_fallback` is enabled, the integration also sends a snapshot preview so the receiver can show a still image while the video stream loads. `snapshot_camera_entity` is optional and defaults to `camera_entity`; set it when a separate camera entity provides a better still image or substream preview.
-`message` and the styling fields are optional; when present, the receiver renders the text below the camera or snapshot inside the same rounded glass popup.
+`title`, `message`, and the styling fields are optional; when either `title` or `message` is present, the receiver renders the text below the camera or snapshot inside the same rounded glass popup. Width and height can be used by themselves to resize the media popup without showing a text footer.
 For cameras with multiple streams, use a TV-compatible H.264/HLS stream where possible. Lower-resolution secondary streams are often more reliable for TV popups than high-resolution main streams. The receiver enables Media3 decoder fallback, but unsupported camera codecs still need a compatible camera profile or future transcoding support.
 
 ## Snapshot Service 🖼️
@@ -115,7 +115,7 @@ data:
   message: Motion detected
 ```
 
-The service resolves a Home Assistant camera proxy snapshot URL and sends it to the paired receiver as `streamType: snapshot`. Snapshot mode is useful for alerts where fast display is more important than live playback. Optional `message` and styling fields can add text below the snapshot inside the same rounded popup.
+The service resolves a Home Assistant camera proxy snapshot URL and sends it to the paired receiver as `streamType: snapshot`. Snapshot mode is useful for alerts where fast display is more important than live playback. Optional `title`, `message`, and styling fields can add text below the snapshot inside the same rounded popup.
 
 ## Notification Service 🔔
 
@@ -136,7 +136,7 @@ data:
   height: 240
 ```
 
-The service sends a styled text notification to the paired receiver as `streamType: notification`. It is useful for alert-style messages that do not need a camera stream or snapshot. Position values are `top_right`, `top_left`, `bottom_right`, and `bottom_left`; colors must be six-digit or alpha hex values. Optional `width` and `height` values are pixels; text-only notifications default to `512px` wide and content height, while media popups default to `640x360`. Notification cards use rounded corners on the TV.
+The service sends a styled text notification to the paired receiver as `streamType: notification`. It is useful for alert-style messages that do not need a camera stream or snapshot. Position values are `top_right`, `top_left`, `bottom_right`, and `bottom_left`; colors must be six-digit or alpha hex values. Optional `width` and `height` values are pixels; text-only notifications default to `512px` wide and content height, while media popups default to `640x360`. Notifications use rounded glass-style containers on the TV.
 
 ## Remote Receiver Mode 🌍
 
