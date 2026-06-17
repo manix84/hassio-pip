@@ -321,6 +321,7 @@ class PlayerActivity : ComponentActivity() {
                 mode = mode,
                 title = command.title,
                 url = command.url,
+                previewUrl = command.previewUrl,
                 streamType = command.streamType.wireName,
                 errorMessage = playbackState.errorMessage
             )

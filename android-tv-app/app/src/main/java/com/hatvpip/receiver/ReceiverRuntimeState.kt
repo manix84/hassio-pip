@@ -15,8 +15,10 @@ data class ReceiverPlaybackSnapshot(
     val mode: ReceiverPlaybackMode = ReceiverPlaybackMode.Idle,
     val title: String? = null,
     val url: String? = null,
+    val previewUrl: String? = null,
     val streamType: String? = null,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val updatedAtMillis: Long = System.currentTimeMillis()
 ) {
     val wirePlaybackState: String
         get() = when {

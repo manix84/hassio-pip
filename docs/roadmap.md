@@ -109,7 +109,22 @@ Example `/status` response:
   "deviceId": "stable-device-id",
   "deviceName": "Living Room TV",
   "pairingRequired": false,
-  "playbackState": "idle"
+  "playbackState": "idle",
+  "displayMode": "idle",
+  "streamType": null,
+  "error": null,
+  "playback": {
+    "state": "idle",
+    "status": "idle",
+    "isPlaying": false,
+    "displayMode": "idle",
+    "title": null,
+    "url": null,
+    "previewUrl": null,
+    "streamType": null,
+    "error": null,
+    "updatedAtMillis": 0
+  }
 }
 ```
 
@@ -136,7 +151,7 @@ Example `/show` request:
 Completed behaviour:
 
 - The Android TV app starts an unauthenticated local HTTP endpoint on port `8765`.
-- `GET /status` reports app version, stable device id, playback state, display mode, title, and URL.
+- `GET /status` reports app version, stable device id, playback state, display mode, title, URL, preview URL, stream type, error detail, and nested playback diagnostics.
 - `POST /show` accepts HLS commands.
 - `POST /close` closes playback and stops the overlay fallback.
 - On Google TV devices that reject native PiP, `enterPip: true` can start the overlay fallback directly.

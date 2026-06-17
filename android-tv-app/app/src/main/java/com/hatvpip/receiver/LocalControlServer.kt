@@ -190,8 +190,23 @@ class LocalControlServer(
             .put("displayMode", playback.mode.wireName)
             .put("title", playback.title)
             .put("url", playback.url)
+            .put("previewUrl", playback.previewUrl)
             .put("streamType", playback.streamType)
             .put("error", playback.errorMessage)
+            .put(
+                "playback",
+                JSONObject()
+                    .put("state", playback.wirePlaybackState)
+                    .put("status", playback.status.name.lowercase())
+                    .put("isPlaying", playback.isPlaying)
+                    .put("displayMode", playback.mode.wireName)
+                    .put("title", playback.title)
+                    .put("url", playback.url)
+                    .put("previewUrl", playback.previewUrl)
+                    .put("streamType", playback.streamType)
+                    .put("error", playback.errorMessage)
+                    .put("updatedAtMillis", playback.updatedAtMillis)
+            )
 
         return HttpResponse.json(status = 200, body = body)
     }

@@ -1080,6 +1080,7 @@ curl -X POST http://ANDROID_TV_IP:8765/close \
 Stage 4 adds pairing and request authentication. Use `Reset Pairing` on the TV app when testing a fresh token exchange.
 
 The Android TV main screen displays the local endpoint address when available. Duplicate `/show` requests replace current playback, and `durationSeconds` should close either full-screen playback or the overlay fallback.
+The `/status` response keeps legacy top-level playback fields and also includes a nested `playback` object with `state`, `status`, `isPlaying`, `displayMode`, `title`, `url`, `previewUrl`, `streamType`, `error`, and `updatedAtMillis` for debugging stream compatibility without showing fallback implementation details in the TV popup.
 
 Stage 3 local discovery testing:
 

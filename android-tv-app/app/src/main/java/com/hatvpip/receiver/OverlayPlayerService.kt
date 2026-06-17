@@ -488,6 +488,7 @@ class OverlayPlayerService : Service() {
                 mode = ReceiverPlaybackMode.Overlay,
                 title = title,
                 url = url,
+                previewUrl = previewUrl,
                 streamType = streamType.wireName,
                 errorMessage = errorMessage
             )
