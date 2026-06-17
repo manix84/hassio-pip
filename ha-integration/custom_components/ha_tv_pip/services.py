@@ -40,11 +40,15 @@ else:
 _LOGGER = logging.getLogger(__name__)
 
 ATTR_CAMERA_ENTITY = "camera_entity"
+ATTR_AREA_ID = "area_id"
 ATTR_DEVICE_ID = "device_id"
 ATTR_DURATION_SECONDS = "duration_seconds"
 ATTR_ENTER_PIP = "enter_pip"
+ATTR_ENTITY_ID = "entity_id"
+ATTR_FLOOR_ID = "floor_id"
 ATTR_BACKGROUND_COLOR = "background_color"
 ATTR_HEIGHT = "height"
+ATTR_LABEL_ID = "label_id"
 ATTR_MESSAGE = "message"
 ATTR_MESSAGE_COLOR = "message_color"
 ATTR_MESSAGE_SIZE = "message_size"
@@ -109,7 +113,24 @@ ERROR_MESSAGES = {
     "snapshot_unavailable": (
         "Home Assistant could not create a snapshot URL for the camera."
     ),
+    "unsupported_target_type": (
+        "HA TV PiP actions must target a paired receiver device. Use "
+        "target.device_id and choose an HA TV PiP receiver."
+    ),
 }
+TARGET_ATTRS = (
+    ATTR_DEVICE_ID,
+    ATTR_ENTITY_ID,
+    ATTR_AREA_ID,
+    ATTR_LABEL_ID,
+    ATTR_FLOOR_ID,
+)
+UNSUPPORTED_TARGET_ATTRS = (
+    ATTR_ENTITY_ID,
+    ATTR_AREA_ID,
+    ATTR_LABEL_ID,
+    ATTR_FLOOR_ID,
+)
 
 
 @dataclass(frozen=True)
@@ -188,9 +209,13 @@ async def async_register_services(hass: Any) -> None:
         fromlist=["entity_id"],
     )
 
+    target_schema = {
+        vol.Optional(attr): vol.Any(str, [str], None) for attr in TARGET_ATTRS
+    }
+
     base_schema = {
+        **target_schema,
         vol.Required(ATTR_CAMERA_ENTITY): cv.entity_id,
-        vol.Optional(ATTR_DEVICE_ID): vol.Any(str, [str], None),
         vol.Optional(ATTR_ENTER_PIP, default=True): bool,
         vol.Optional(ATTR_TITLE): str,
         vol.Optional(ATTR_MESSAGE): str,
@@ -253,7 +278,7 @@ async def async_register_services(hass: Any) -> None:
     )
     notification_schema = vol.Schema(
         {
-            vol.Optional(ATTR_DEVICE_ID): vol.Any(str, [str], None),
+            **target_schema,
             vol.Optional(ATTR_TITLE, default=DEFAULT_NOTIFICATION_TITLE): str,
             vol.Optional(ATTR_MESSAGE): str,
             vol.Optional(ATTR_DURATION_SECONDS, default=15): vol.All(
@@ -458,6 +483,7 @@ async def async_handle_show_notification(hass: Any, call: Any) -> None:
 def _request_from_call(call: Any) -> ShowCameraRequest:
     data = dict(getattr(call, "data", {}))
     target = getattr(call, "target", {}) or {}
+    _reject_unsupported_target_types(data, target)
     device_ids = _tuple_value(target.get(ATTR_DEVICE_ID) or data.get(ATTR_DEVICE_ID))
 
     duration_value = data.get(ATTR_DURATION_SECONDS, 30)
@@ -507,6 +533,7 @@ def _request_from_call(call: Any) -> ShowCameraRequest:
 def _notification_request_from_call(call: Any) -> ShowNotificationRequest:
     data = dict(getattr(call, "data", {}))
     target = getattr(call, "target", {}) or {}
+    _reject_unsupported_target_types(data, target)
     device_ids = _tuple_value(target.get(ATTR_DEVICE_ID) or data.get(ATTR_DEVICE_ID))
     duration_value = data.get(ATTR_DURATION_SECONDS, 15)
     duration_seconds = int(duration_value) if duration_value is not None else None
@@ -865,6 +892,15 @@ def _tuple_value(value: Any) -> tuple[str, ...]:
     if isinstance(value, str):
         return (value,)
     return tuple(str(item) for item in value)
+
+
+def _reject_unsupported_target_types(
+    data: dict[str, Any],
+    target: dict[str, Any],
+) -> None:
+    for attr in UNSUPPORTED_TARGET_ATTRS:
+        if _tuple_value(target.get(attr) or data.get(attr)):
+            raise ServiceValidationError("unsupported_target_type")
 
 
 def _optional_text(value: Any) -> str | None:

@@ -182,6 +182,44 @@ def test_request_from_call_ignores_empty_ha_target_device_id_from_data() -> None
     assert request.device_ids == ()
 
 
+@pytest.mark.parametrize(
+    "target_key,target_value",
+    [
+        ("entity_id", "sensor.not_a_receiver"),
+        ("area_id", "living_room"),
+        ("label_id", "security"),
+        ("floor_id", "ground_floor"),
+    ],
+)
+def test_request_from_call_rejects_non_device_targets(
+    target_key: str,
+    target_value: str,
+) -> None:
+    with pytest.raises(ServiceValidationError) as error:
+        _request_from_call(
+            FakeCall(
+                data={ATTR_CAMERA_ENTITY: "camera.front_door"},
+                target={target_key: target_value},
+            )
+        )
+
+    assert error.value.code == "unsupported_target_type"
+
+
+def test_request_from_call_rejects_ha_injected_non_device_target_data() -> None:
+    with pytest.raises(ServiceValidationError) as error:
+        _request_from_call(
+            FakeCall(
+                data={
+                    ATTR_CAMERA_ENTITY: "camera.front_door",
+                    "area_id": "living_room",
+                },
+            )
+        )
+
+    assert error.value.code == "unsupported_target_type"
+
+
 def test_request_from_call_accepts_title_and_duration() -> None:
     request = _request_from_call(
         FakeCall(
@@ -284,6 +322,15 @@ def test_notification_request_from_call_accepts_style_defaults_and_target() -> N
     assert request.width == 512
     assert request.height == 240
     assert request.device_ids == ("device-1",)
+
+
+def test_notification_request_from_call_rejects_non_device_targets() -> None:
+    with pytest.raises(ServiceValidationError) as error:
+        _notification_request_from_call(
+            FakeCall(data={}, target={"label_id": "security"}),
+        )
+
+    assert error.value.code == "unsupported_target_type"
 
 
 def test_notification_request_rejects_invalid_color() -> None:
