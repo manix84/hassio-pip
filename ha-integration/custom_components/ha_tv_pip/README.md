@@ -2,27 +2,36 @@
 
 [![Home Assistant Integration Quality 🏠](https://github.com/manix84/ha-tv-pip/actions/workflows/quality-ha-integration.yml/badge.svg)](https://github.com/manix84/ha-tv-pip/actions/workflows/quality-ha-integration.yml) [![Release 📦](https://github.com/manix84/ha-tv-pip/actions/workflows/release.yml/badge.svg)](https://github.com/manix84/ha-tv-pip/actions/workflows/release.yml)
 
-This directory contains the Home Assistant custom integration for HA TV PiP 🚧
+HA TV PiP lets Home Assistant show camera streams, snapshots, and styled notifications on Android TV and Google TV receivers 📺
 
-Stage 3 added Zeroconf discovery support 🔎. Home Assistant can match HA TV PiP receiver advertisements and create or update a config entry from the discovered device id, host, port, receiver name, app version, pairing state, and API version.
+Install the Android TV receiver app on each TV, then install this Home Assistant integration to discover, pair, and control those receivers from automations.
 
-Stage 4 added pairing 🤝 and request authentication 🔐. Setup starts pairing, asks for the six-digit code shown on the TV, stores the returned token, and keeps the token out of logs.
+Current beta features:
 
-Stage 5 added the first control service: `ha_tv_pip.show_camera` 📹 for displaying camera feeds on paired Android TV or Google TV devices.
+- Local network discovery with Zeroconf / mDNS 🔎
+- TV-visible pairing code and bearer-token authenticated control 🔐
+- Camera stream, snapshot, and notification services 📹
+- Receiver entities for status, connectivity, PiP controls, launcher controls, and diagnostics 🧰
+- Optional remote receiver mode through your own Home Assistant external URL 🌍
 
-Stage 6 and Stage 7 added snapshot support, snapshot previews, and stream type options 🖼️.
+HA TV PiP is still pre-release software. HACS custom-repository installation is the current integration distribution path. Play Store distribution for the Android TV app is planned; until then, install the APK from GitHub Releases.
 
-Stage 8 added receiver entities, PiP controls, launcher controls, and diagnostics 🧰.
+## Before You Install 📺
 
-Phase 9 added optional remote receiver transport over the user's own Home Assistant WebSocket API 🌍.
+You need both parts:
 
-Phase 10 adds distribution polish, Tier 1 translations, clearer docs, and preparation for HACS and longer-term official Home Assistant readiness ✨.
+1. Android TV receiver app installed on the Android TV / Google TV device.
+2. Home Assistant custom integration installed through HACS.
 
-Stage 11 adds styled text notifications and optional camera/snapshot notification footers 🔔.
+Recommended order:
 
-Stage 12 focuses on beta release hardening: HACS zip validation, install documentation, service examples, full quality checks, and release-candidate packaging before broader testing 📦.
+1. Download the latest Android APK from the GitHub Release assets.
+2. Install the APK on your Android TV / Google TV device.
+3. Open the receiver app once and confirm it is running on your network.
+4. Install this integration through HACS.
+5. Use the discovered receiver card in Home Assistant to pair the TV.
 
-Distribution goals are HACS first, then long-term official Home Assistant integration readiness once the integration is mature enough. The monorepo uses root `hacs.json` with `zip_release` so HACS installs the stable `ha-tv-pip-integration.zip` release asset instead of the raw monorepo tree.
+When the app is available from the Play Store, use the Play Store install first and then add the Home Assistant integration.
 
 ## HACS Installation 🧩
 
@@ -37,6 +46,21 @@ Until HA TV PiP is accepted as a default HACS repository:
 7. Add the integration from Settings > Devices & services.
 
 The HACS release zip contains `custom_components/ha_tv_pip/` at the archive root. It does not include the monorepo path `ha-integration/custom_components/ha_tv_pip/`.
+
+## Setup 🤝
+
+After installation and Home Assistant restart:
+
+1. Open Settings > Devices & services.
+2. Wait for the discovered HA TV PiP receiver card.
+3. Select Add.
+4. Confirm the receiver.
+5. Enter the six-digit pairing code shown on the TV.
+6. Finish setup and assign the receiver to an area if desired.
+
+Discovery is the preferred setup path. Manual setup is available as a fallback if Home Assistant and the TV are on the same network but discovery is blocked.
+
+If the receiver was previously paired with another Home Assistant instance, open the TV app and use Reset Pairing before pairing again.
 
 ## Brand Images 🎨
 
@@ -84,6 +108,26 @@ Launcher controls are marked as Home Assistant configuration entities so they ar
 
 The integration also exposes config entry diagnostics with pairing tokens and active stream URLs redacted.
 If the launcher icon is hidden, use the Open Launcher button or Android Settings > Apps > HA TV PiP to recover access to the receiver UI.
+
+## Common Options ⚙️
+
+Remote receiver mode:
+
+- Configure from the integration options flow.
+- Uses your own Home Assistant external URL and long-lived access token.
+- The TV connects outbound to Home Assistant, so you do not need to forward ports to the TV.
+- This is not a HA TV PiP cloud service.
+
+Launcher visibility:
+
+- Hide Launcher removes the app from compatible Android TV launcher screens.
+- Open Launcher lets Home Assistant reopen the receiver UI later.
+- PiP, snapshot, and notification commands do not require the user to manually open the app first after normal receiver startup behavior is available on the TV.
+
+Diagnostics:
+
+- Config entry diagnostics redact pairing tokens and active stream URLs.
+- Use diagnostics when reporting setup, pairing, stream compatibility, or remote receiver issues.
 
 ## Camera Service 📹
 
@@ -149,6 +193,13 @@ Phase 9 adds optional remote receiver transport for external TVs.
 The integration registers a Home Assistant WebSocket command that a paired Android TV receiver can use after authenticating to the user's own Home Assistant instance. Once connected, `ha_tv_pip.show_camera`, `ha_tv_pip.show_snapshot`, and `ha_tv_pip.show_notification` prefer the remote WebSocket transport and fall back to local HTTP if the receiver is not connected remotely.
 
 Remote mode is not a HA TV PiP cloud service. It uses the user's Home Assistant external URL, including Nabu Casa URLs where available, and the integration remains `local_push`.
+
+## Known Limitations 🚧
+
+- Some Android TV devices reject native PiP for sideloaded apps; the receiver includes an overlay fallback when permission is granted.
+- High-resolution or non-H.264 camera streams may not decode on every TV device.
+- Transcoding, WebRTC support, Play Store production deployment, default HACS inclusion, and official Home Assistant core submission are future goals.
+- Tier 1 translations are implemented for current surfaces, but native-speaker review is still pending.
 
 ## Translations 🌍
 
