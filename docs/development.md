@@ -467,9 +467,17 @@ Example:
 
 ### MINOR Bumps 🚦
 
-MINOR bumps are best-effort and are used for likely API, protocol, discovery, pairing, service schema, or compatibility changes.
+MINOR bumps are conservative. The automatic hook defaults normal runtime work to PATCH, even when the change touches API, service, discovery, pairing, or compatibility code. This keeps frequent project releases small and predictable.
 
-Explicit markers in staged diffs trigger MINOR:
+Use a MINOR bump when a change is meaningfully user-visible, adds a larger capability, or changes an integration/receiver contract in a way that downstream users should notice in the release number.
+
+Automatic MINOR bumps happen when staged changes look like larger product work:
+
+- An explicit MINOR marker is present in the staged diff.
+- Runtime changes span both the Android TV app and the Home Assistant integration.
+- Runtime changes are unusually large, currently 250 changed lines or more.
+
+Explicit markers:
 
 ```txt
 [minor]
@@ -482,19 +490,7 @@ Explicit markers in staged diffs trigger MINOR:
 [compatibility]
 ```
 
-Likely contract files also trigger MINOR:
-
-```txt
-custom_components/ha_tv_pip/services.yaml
-custom_components/ha_tv_pip/config_flow.py
-custom_components/ha_tv_pip/manifest.json
-custom_components/ha_tv_pip/const.py
-android-tv-app/app/src/**/models/**
-android-tv-app/app/src/**/receiver/**
-android-tv-app/app/src/**/pairing/**
-android-tv-app/app/src/**/discovery/**
-android-tv-app/app/src/**/api/**
-```
+You can also force a MINOR bump with `VERSION_BUMP=minor`.
 
 When MINOR is bumped, PATCH resets to `0`:
 

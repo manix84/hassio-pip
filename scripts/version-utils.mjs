@@ -29,16 +29,22 @@ const PATCH_PATH_PATTERNS = [
   /^custom_components\/ha_tv_pip\//
 ];
 
-const MINOR_FILE_PATTERNS = [
-  /^custom_components\/ha_tv_pip\/services\.yaml$/,
-  /^custom_components\/ha_tv_pip\/config_flow\.py$/,
-  /^custom_components\/ha_tv_pip\/manifest\.json$/,
-  /^custom_components\/ha_tv_pip\/const\.py$/,
-  /^android-tv-app\/app\/src\/.*\/models\//,
-  /^android-tv-app\/app\/src\/.*\/receiver\//,
-  /^android-tv-app\/app\/src\/.*\/pairing\//,
-  /^android-tv-app\/app\/src\/.*\/discovery\//,
-  /^android-tv-app\/app\/src\/.*\/api\//
+const MINOR_RUNTIME_CHANGE_LINE_THRESHOLD = 250;
+
+const RUNTIME_AREAS = [
+  {
+    name: "Android TV app",
+    patterns: [
+      /^android-tv-app\/app\/src\//,
+      /^android-tv-app\/src\//
+    ]
+  },
+  {
+    name: "Home Assistant integration",
+    patterns: [
+      /^custom_components\/ha_tv_pip\//
+    ]
+  }
 ];
 
 const SUPPORT_ONLY_PATTERNS = [
@@ -71,24 +77,6 @@ const MINOR_MARKERS = [
   "[pairing]",
   "[discovery]",
   "[compatibility]"
-];
-
-const MINOR_TERMS = [
-  "command payload",
-  "service schema",
-  "pairing token",
-  "discovery metadata",
-  "api version",
-  "protocol version",
-  "streamType",
-  "durationSeconds",
-  "enterPip",
-  "deviceId",
-  "pairingRequired",
-  "/show",
-  "/close",
-  "/status",
-  "/pair"
 ];
 
 export function readJson(path) {
@@ -193,10 +181,6 @@ export function isPatchRuntimeFile(path) {
   return PATCH_PATH_PATTERNS.some((pattern) => pattern.test(path));
 }
 
-export function isMinorCandidateFile(path) {
-  return MINOR_FILE_PATTERNS.some((pattern) => pattern.test(path));
-}
-
 function changedContentLines(diff) {
   return diff
     .split("\n")
@@ -276,6 +260,32 @@ export function hasRuntimeChanges(stagedFiles) {
   });
 }
 
+function runtimeFiles(stagedFiles) {
+  return stagedFiles.filter((path) => {
+    if (!isPatchRuntimeFile(path)) {
+      return false;
+    }
+    if (isVersionFile(path)) {
+      return !isVersionOnlyDiff(path);
+    }
+    return true;
+  });
+}
+
+function changedRuntimeAreas(stagedFiles) {
+  return RUNTIME_AREAS
+    .filter((area) => stagedFiles.some((path) => area.patterns.some((pattern) => pattern.test(path))))
+    .map((area) => area.name);
+}
+
+function changedRuntimeLineCount(stagedFiles) {
+  const files = runtimeFiles(stagedFiles);
+  if (files.length === 0) {
+    return 0;
+  }
+  return changedContentLines(getStagedDiff(files)).length;
+}
+
 export function detectMinorReason(stagedFiles, diff) {
   const lowerDiff = diff.toLowerCase();
   const marker = MINOR_MARKERS.find((value) => lowerDiff.includes(value));
@@ -283,14 +293,14 @@ export function detectMinorReason(stagedFiles, diff) {
     return `minor marker found in staged diff: ${marker}`;
   }
 
-  const minorFile = stagedFiles.find((path) => isMinorCandidateFile(path));
-  if (minorFile) {
-    return `staged API/protocol candidate changed: ${minorFile}`;
+  const runtimeAreas = changedRuntimeAreas(stagedFiles);
+  if (runtimeAreas.length > 1) {
+    return `coordinated runtime areas changed: ${runtimeAreas.join(", ")}`;
   }
 
-  const term = MINOR_TERMS.find((value) => lowerDiff.includes(value.toLowerCase()));
-  if (term) {
-    return `staged diff contains API/protocol term: ${term}`;
+  const runtimeLineCount = changedRuntimeLineCount(stagedFiles);
+  if (runtimeLineCount >= MINOR_RUNTIME_CHANGE_LINE_THRESHOLD) {
+    return `large runtime change (${runtimeLineCount} changed lines)`;
   }
 
   return null;
