@@ -1,5 +1,11 @@
 # What's New ✨
 
+## Unreleased - Public Beta Support Hardening 🧪
+
+- Added a dedicated troubleshooting guide for discovery, pairing, popup display, stream compatibility, launcher recovery, remote receiver mode, and support data collection 🩺
+- Replaced the loose bug report Markdown template with a structured GitHub issue form that asks for receiver version, integration version, Home Assistant version, TV model, camera platform, stream strategy, service YAML, and redacted diagnostics 🐛
+- Linked beta support guidance from the root README, Home Assistant integration README, roadmap, development docs, and website footer 📚
+
 ## 1.26.0 - Camera Stream Source Visibility 🔎
 
 - Added `stream_source` metadata to compatibility and last-result surfaces so users can see whether a popup used the main camera, alternate stream entity, snapshot entity, or manual restream URL 🔎

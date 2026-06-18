@@ -17,6 +17,20 @@ Current beta features:
 
 HA TV PiP is still pre-release software. HACS custom-repository installation is the current integration distribution path. Play Store distribution for the Android TV app is planned; until then, install the APK from GitHub Releases.
 
+## Beta Support Checklist 🧪
+
+Before reporting a setup or playback issue:
+
+1. Confirm the Android receiver app and this Home Assistant integration are on the same release version.
+2. Confirm the Android receiver app opens and reports the local endpoint as running.
+3. Use the receiver device's Test PiP button to verify basic receiver control.
+4. For camera issues, run `ha_tv_pip.calibrate_camera` with `save: false` and review the recommendation.
+5. Download config entry diagnostics from the integration entry. Tokens and active stream URLs are redacted, but review them before sharing.
+
+Common setup, discovery, pairing, stream compatibility, launcher recovery, and remote receiver checks are documented in the project troubleshooting guide:
+
+<https://github.com/manix84/ha-tv-pip/blob/main/docs/troubleshooting.md>
+
 ## Before You Install 📺
 
 You need both parts:

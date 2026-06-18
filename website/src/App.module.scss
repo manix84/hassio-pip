@@ -577,7 +577,7 @@
 
 .footer nav {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 1rem;
   justify-content: flex-end;
 }
@@ -597,6 +597,62 @@
 .footer a:hover,
 .footer a:focus-visible {
   text-decoration: underline;
+}
+
+.footerPrimaryNav {
+  align-items: center;
+  position: relative;
+  white-space: nowrap;
+}
+
+.footerMore {
+  position: relative;
+}
+
+.footerMore summary {
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: var(--link);
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: 700;
+  height: 1.75rem;
+  justify-content: center;
+  list-style: none;
+  min-width: 2rem;
+  padding: 0 0.45rem;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.footerMore summary::-webkit-details-marker {
+  display: none;
+}
+
+.footerMore summary:hover,
+.footerMore summary:focus-visible {
+  background: var(--surface);
+  border-color: var(--border);
+  outline: none;
+}
+
+.footerMoreMenu {
+  background: var(--bg-elevated);
+  bottom: calc(100% + 0.4rem);
+  border: 1px solid var(--border);
+  border-radius: 0.65rem;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  min-width: 12rem;
+  padding: 0.75rem;
+  position: absolute;
+  right: 0;
+  z-index: 10;
 }
 
 .footer .localeNav a {
@@ -653,6 +709,16 @@
 
   .footer nav {
     justify-content: flex-start;
+  }
+
+  .footerPrimaryNav {
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+
+  .footerMoreMenu {
+    left: 0;
+    right: auto;
   }
 
   .footerNavigation {

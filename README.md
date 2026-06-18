@@ -80,6 +80,7 @@ ha-tv-pip/
 │   ├── development.md
 │   ├── home-assistant-official-readiness.md
 │   ├── play-store.md
+│   ├── troubleshooting.md
 │   └── translations.md
 ├── examples/
 │   └── home-assistant-automations/
@@ -235,6 +236,21 @@ Until HA TV PiP is accepted as a default HACS repository, add it as a custom rep
 5. Install HA TV PiP.
 6. Restart Home Assistant.
 7. Add the integration from Settings > Devices & services, preferably using the discovered receiver card.
+
+## Beta Readiness 🧪
+
+HA TV PiP is usable as beta software, but it should still be treated as a fast-moving local receiver project rather than a finished app-store product.
+
+Before reporting a bug or testing a new release:
+
+- Install matching Android receiver and Home Assistant integration versions.
+- Confirm the Android receiver app opens and reports the local endpoint as running.
+- Pair through the discovered Home Assistant receiver card where possible.
+- Use the receiver device's Test PiP button to verify basic control.
+- Run `ha_tv_pip.calibrate_camera` for camera-specific stream issues before changing automations.
+- Download Home Assistant config entry diagnostics when opening an issue.
+
+For common setup, pairing, camera, launcher, and remote receiver issues, see [Troubleshooting](docs/troubleshooting.md).
 
 ## Home Assistant Integration Plan 🏠
 

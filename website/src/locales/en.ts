@@ -75,6 +75,11 @@ export const en = {
           "Android TV devices can reject unsupported codecs or very high-resolution streams. HA TV PiP supports snapshot fallbacks, separate stream camera entities, manual restream URLs, automatic MJPEG fallback, MJPEG-first mode, receiver capability checks, and camera compatibility testing. If HLS/MJPEG are unavailable or only snapshots work, calibration results flag that a TV-safe restreamed source is likely needed. Start with a lower-resolution or MJPEG camera entity, or use a go2rtc HLS/MJPEG URL if you already have one. Automatic go2rtc helpers, WebRTC, and transcoding are planned future provider paths.",
       },
       {
+        question: "What should I include in a beta bug report?",
+        answer:
+          "Include the Android receiver version, Home Assistant integration version, Home Assistant version, TV model, camera platform, stream strategy, service YAML, and redacted config entry diagnostics. The troubleshooting guide lists the checks to run before opening an issue.",
+      },
+      {
         question: "Can I hide the receiver app from my TV home screen?",
         answer:
           "Yes. The Home Assistant integration exposes Hide Launcher and Open Launcher controls so the app can behave more like an appliance after setup.",
@@ -161,6 +166,7 @@ export const en = {
       releases: "Releases",
       roadmap: "Roadmap",
       translations: "Translations",
+      troubleshooting: "Troubleshooting",
     },
     hero: {
       alt: "Living room Android TV showing a security camera feed in Picture-in-Picture",

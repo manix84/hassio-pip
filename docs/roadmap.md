@@ -835,6 +835,7 @@ Completed:
 - ✅ `Restreaming Provider Status` sensor for showing planned/configured/active provider state directly on the receiver device.
 - ✅ Restreaming provider metadata in compatibility and calibration responses, including current workaround paths, planned provider families, and documentation URL.
 - ✅ Manual `restream_url` and `restream_provider` support for per-camera defaults and direct TV-safe HLS/MJPEG sources such as go2rtc.
+- ✅ Public beta support hardening with a focused troubleshooting guide, structured bug report template, and clearer install/support checklist.
 
 Still future:
 

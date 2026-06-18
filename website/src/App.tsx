@@ -11,7 +11,12 @@ import { FlowDiagram } from "./components/FlowDiagram";
 import { Section } from "./components/Section";
 import { StatusBadge } from "./components/StatusBadge";
 import { ThemeToggle, type ThemeMode } from "./components/ThemeToggle";
-import { supportedLocales, websiteContent, type WebsiteLocale } from "./locales";
+import {
+  supportedLocales,
+  websiteContent,
+  type WebsiteContent,
+  type WebsiteLocale,
+} from "./locales";
 
 export {
   faqItems,
@@ -28,10 +33,34 @@ const architectureUrl =
   "https://github.com/manix84/ha-tv-pip/blob/main/docs/architecture.md";
 const developmentUrl =
   "https://github.com/manix84/ha-tv-pip/blob/main/docs/development.md";
+const troubleshootingUrl =
+  "https://github.com/manix84/ha-tv-pip/blob/main/docs/troubleshooting.md";
 const translationsUrl =
   "https://github.com/manix84/ha-tv-pip/blob/main/docs/translations.md";
 const releasesUrl = "https://github.com/manix84/ha-tv-pip/releases";
 const licenseUrl = "https://github.com/manix84/ha-tv-pip/blob/main/LICENSE";
+const footerLinkUrls = {
+  architecture: architectureUrl,
+  development: developmentUrl,
+  github: githubUrl,
+  license: licenseUrl,
+  releases: releasesUrl,
+  roadmap: roadmapUrl,
+  translations: translationsUrl,
+  troubleshooting: troubleshootingUrl,
+} satisfies Record<keyof WebsiteContent["footerLinks"], string>;
+const primaryFooterLinks = [
+  "architecture",
+  "development",
+  "github",
+  "license",
+  "releases",
+] satisfies Array<keyof WebsiteContent["footerLinks"]>;
+const overflowFooterLinks = [
+  "roadmap",
+  "translations",
+  "troubleshooting",
+] satisfies Array<keyof WebsiteContent["footerLinks"]>;
 
 export const localePreferenceKey = "ha-tv-pip-locale";
 type ExampleTab = "standard" | "mjpeg";
@@ -120,7 +149,9 @@ export function getPreferredLocale(
   return "en";
 }
 
-export function getSavedLocale(savedPreference?: string | null): WebsiteLocale | null {
+export function getSavedLocale(
+  savedPreference?: string | null
+): WebsiteLocale | null {
   const savedLocale = savedPreference?.toLowerCase();
   return supportedLocaleCodes.has(savedLocale as WebsiteLocale)
     ? (savedLocale as WebsiteLocale)
@@ -233,7 +264,9 @@ function App() {
 
   useEffect(() => {
     const routeLocale = getRouteLocaleFromPath(window.location.pathname);
-    const savedLocale = getSavedLocale(window.localStorage.getItem(localePreferenceKey));
+    const savedLocale = getSavedLocale(
+      window.localStorage.getItem(localePreferenceKey)
+    );
 
     if (!savedLocale && routeLocale) {
       window.localStorage.setItem(localePreferenceKey, routeLocale);
@@ -248,7 +281,8 @@ function App() {
   }, [locale]);
 
   const content = websiteContent[locale];
-  const activeExample = exampleTab === "standard" ? automationExample : mjpegAutomationExample;
+  const activeExample =
+    exampleTab === "standard" ? automationExample : mjpegAutomationExample;
   const visualCards = content.visualCards.map((card, index) => ({
     ...card,
     image: index === 0 ? controlMockup : networkMockup,
@@ -262,11 +296,18 @@ function App() {
 
   return (
     <main>
-      <ThemeToggle labels={content.theme} mode={themeMode} onChange={setThemeMode} />
+      <ThemeToggle
+        labels={content.theme}
+        mode={themeMode}
+        onChange={setThemeMode}
+      />
       <section className={styles.hero}>
         <div className={styles.heroContent}>
           <div className={styles.heroText}>
-            <StatusBadge label={content.statusLabels.complete} status="complete" />
+            <StatusBadge
+              label={content.statusLabels.complete}
+              status="complete"
+            />
             <p className={styles.version}>
               {content.hero.versionLabel} {__PROJECT_VERSION__}
             </p>
@@ -280,12 +321,11 @@ function App() {
             </div>
           </div>
           <figure className={styles.heroProductVisual}>
-            <img
-              alt={content.hero.alt}
-              src={heroCleanMockup}
-            />
+            <img alt={content.hero.alt} src={heroCleanMockup} />
             <figcaption className={styles.heroOverlay}>
-              <span className={styles.overlayKicker}>{content.hero.overlayKicker}</span>
+              <span className={styles.overlayKicker}>
+                {content.hero.overlayKicker}
+              </span>
               <strong>{content.hero.overlayTitle}</strong>
               <span>{content.hero.overlayState}</span>
             </figcaption>
@@ -321,10 +361,7 @@ function App() {
             ))}
           </div>
           <figure className={styles.imageCard}>
-            <img
-              alt={content.solution.imageAlt}
-              src={controlMockup}
-            />
+            <img alt={content.solution.imageAlt} src={controlMockup} />
           </figure>
         </div>
       </Section>
@@ -340,10 +377,7 @@ function App() {
             steps={content.flow.steps}
           />
           <figure className={styles.imageCard}>
-            <img
-              alt={content.visualAlt.network}
-              src={networkMockup}
-            />
+            <img alt={content.visualAlt.network} src={networkMockup} />
           </figure>
         </div>
       </Section>
@@ -460,7 +494,9 @@ function App() {
           </div>
           <div
             aria-labelledby={
-              exampleTab === "standard" ? "example-tab-standard" : "example-tab-mjpeg"
+              exampleTab === "standard"
+                ? "example-tab-standard"
+                : "example-tab-mjpeg"
             }
             id="example-panel"
             role="tabpanel"
@@ -512,16 +548,32 @@ function App() {
           <span>v{__PROJECT_VERSION__}</span>
         </div>
         <div className={styles.footerNavigation}>
-          <nav aria-label={content.footerAriaLabel}>
-            <a href={githubUrl}>{content.footerLinks.github}</a>
-            <a href={roadmapUrl}>{content.footerLinks.roadmap}</a>
-            <a href={architectureUrl}>{content.footerLinks.architecture}</a>
-            <a href={developmentUrl}>{content.footerLinks.development}</a>
-            <a href={translationsUrl}>{content.footerLinks.translations}</a>
-            <a href={releasesUrl}>{content.footerLinks.releases}</a>
-            <a href={licenseUrl}>{content.footerLinks.license}</a>
+          <nav
+            aria-label={content.footerAriaLabel}
+            className={styles.footerPrimaryNav}
+          >
+            {primaryFooterLinks.map((key) => (
+              <a href={footerLinkUrls[key]} key={key}>
+                {content.footerLinks[key]}
+              </a>
+            ))}
+            <details className={styles.footerMore}>
+              <summary aria-label="More footer links" title="More links">
+                <span aria-hidden="true">...</span>
+              </summary>
+              <div className={styles.footerMoreMenu}>
+                {overflowFooterLinks.map((key) => (
+                  <a href={footerLinkUrls[key]} key={key}>
+                    {content.footerLinks[key]}
+                  </a>
+                ))}
+              </div>
+            </details>
           </nav>
-          <nav className={styles.localeNav} aria-label={content.languageAriaLabel}>
+          <nav
+            className={styles.localeNav}
+            aria-label={content.languageAriaLabel}
+          >
             {supportedLocales.map((item) => {
               const href = getLocaleHref(window.location.pathname, item.code);
               return (

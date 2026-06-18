@@ -59,6 +59,7 @@ export type WebsiteContent = {
     releases: string;
     roadmap: string;
     translations: string;
+    troubleshooting: string;
   };
   hero: {
     alt: string;

@@ -1135,6 +1135,8 @@ Calibration and compatibility responses also include `restreaming_recommended`, 
 
 See [camera compatibility](camera-compatibility.md) for the current TV-safe stream workflow, calibration loop, snapshot fallback guidance, and planned restreaming provider model.
 
+See [troubleshooting](troubleshooting.md) for the public beta support path, including discovery, pairing, launcher recovery, remote receiver checks, stream compatibility checks, and the diagnostics expected in bug reports.
+
 Stored per-camera defaults are exposed in config entry diagnostics. A recommended troubleshooting loop is: run `ha_tv_pip.calibrate_camera` with `save: false`, inspect `recommended_defaults`, run again with `save: true` when the recommendation looks right, then use `ha_tv_pip.show_camera` with only the receiver target and `camera_entity`.
 
 The compatibility test includes `recommended_stream_type` and `recommendation_reason`. `auto` is recommended when HLS is available and the receiver can carry an MJPEG playable fallback. `mjpeg_first` is recommended when HLS and MJPEG are available but playable fallback is not, because it reduces receiver decoder risk while still allowing HLS fallback. HLS, MJPEG, or snapshot are recommended when only those paths are available.

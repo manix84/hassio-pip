@@ -1,0 +1,113 @@
+name: Bug report 🐛
+description: Report something broken in HA TV PiP
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. Please include diagnostics where possible so stream, pairing, receiver, and version issues can be diagnosed without exposing private URLs or tokens.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened? 🧩
+      description: Describe the issue and what you expected to happen.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Problem area 🚦
+      options:
+        - Android TV receiver app
+        - Home Assistant integration
+        - Camera stream compatibility
+        - Snapshot or notification popup
+        - Pairing or discovery
+        - Remote receiver mode
+        - Website or documentation
+        - Unsure
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce 🔁
+      placeholder: |
+        1. Install / update ...
+        2. Pair receiver ...
+        3. Call service ...
+        4. See error ...
+    validations:
+      required: true
+
+  - type: input
+    id: receiver_version
+    attributes:
+      label: Android receiver version 📺
+      description: Shown in the Android app dashboard or Home Assistant receiver diagnostics.
+      placeholder: "1.26.0"
+
+  - type: input
+    id: integration_version
+    attributes:
+      label: Home Assistant integration version 🏠
+      description: Shown in HACS or the integration manifest.
+      placeholder: "1.26.0"
+
+  - type: input
+    id: home_assistant_version
+    attributes:
+      label: Home Assistant version 🏡
+      placeholder: "2026.6.0"
+
+  - type: input
+    id: tv_model
+    attributes:
+      label: TV / streaming device model 🕹️
+      placeholder: "Chromecast with Google TV, Nvidia Shield, Android TV emulator..."
+
+  - type: input
+    id: android_version
+    attributes:
+      label: Android / Google TV version
+      placeholder: "Android TV 12, Google TV 14..."
+
+  - type: input
+    id: camera_type
+    attributes:
+      label: Camera platform or model 📹
+      description: Optional, but useful for stream compatibility problems.
+      placeholder: "Reolink, UniFi Protect, Frigate, generic RTSP..."
+
+  - type: input
+    id: stream_strategy
+    attributes:
+      label: Stream strategy used
+      description: Optional. Include if the issue involves video or snapshots.
+      placeholder: "auto, hls, mjpeg, mjpeg_first, snapshot, restream_url..."
+
+  - type: textarea
+    id: service_yaml
+    attributes:
+      label: Service call or automation YAML ⚙️
+      description: Remove private URLs, bearer tokens, device IDs, and camera names if needed.
+      render: yaml
+
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics or logs 🪵
+      description: Attach Home Assistant config entry diagnostics, Android receiver status, or relevant logs. The integration redacts tokens and active stream URLs, but please review before posting.
+      render: txt
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Privacy checklist 🔐
+      options:
+        - label: I removed or redacted access tokens, pairing codes, private URLs, device IDs, and camera feeds.
+          required: true

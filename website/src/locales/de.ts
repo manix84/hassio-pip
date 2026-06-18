@@ -40,6 +40,11 @@ export const de = {
           "Android-TV-Geräte können nicht unterstützte Codecs oder sehr hochauflösende Streams ablehnen. HA TV PiP unterstützt bereits Snapshot-Fallbacks und verbessert Stream-Auswahl und Kompatibilität weiter.",
       },
       {
+        question: "Was gehört in einen Beta-Bugreport?",
+        answer:
+          "Bitte nenne Android-Receiver-Version, Home-Assistant-Integrationsversion, Home-Assistant-Version, TV-Modell, Kamera-Plattform, Stream-Strategie, Service-YAML und bereinigte Diagnosen. Die Fehlerbehebungsanleitung listet die Prüfungen vor dem Öffnen eines Issues.",
+      },
+      {
         question: "Kann ich die Receiver-App vom TV-Startbildschirm ausblenden?",
         answer:
           "Ja. Die Home-Assistant-Integration bietet Hide Launcher- und Open Launcher-Steuerungen, damit sich die App nach der Einrichtung eher wie ein Gerät verhält.",
@@ -126,6 +131,7 @@ export const de = {
       releases: "Releases",
       roadmap: "Roadmap",
       translations: "Übersetzungen",
+      troubleshooting: "Fehlerbehebung",
     },
     hero: {
       alt: "Android TV im Wohnzimmer zeigt einen Sicherheitskamera-Feed in Picture-in-Picture",
