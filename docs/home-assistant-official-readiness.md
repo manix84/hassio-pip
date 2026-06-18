@@ -40,7 +40,8 @@ Official Home Assistant integration readiness
 - Root `hacs.json` exists.
 - HACS uses `zip_release`.
 - Release workflow uploads `ha-tv-pip-integration.zip`.
-- Zip internal path is `custom_components/ha_tv_pip/`.
+- Stable HACS zip contains the integration files at archive root because HACS extracts `zip_release` assets directly into `config/custom_components/ha_tv_pip/`.
+- Versioned manual-install zip preserves the `custom_components/ha_tv_pip/` path.
 - Integration `manifest.json` includes required HACS-facing metadata.
 - Root `brand/` directory includes HACS-facing `icon.png` and `logo.png`.
 - Root `icon.png` and `logo.png` compatibility aliases exist for older/simple HACS presentation paths.

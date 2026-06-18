@@ -611,15 +611,23 @@ dist/ha-tv-pip-integration-vX.Y.Z.zip
 dist/ha-tv-pip-integration.zip
 ```
 
-The zip preserves the Home Assistant install path:
+The versioned zip preserves the Home Assistant manual install path:
 
 ```txt
 custom_components/ha_tv_pip/
 ```
 
-It matches the repository source layout used by HACS.
+The stable HACS zip contains the integration files at archive root:
 
-The versioned zip is the human-readable release asset. The stable `ha-tv-pip-integration.zip` file is the HACS release asset referenced by root `hacs.json`.
+```txt
+manifest.json
+__init__.py
+brand/
+translations/
+...
+```
+
+The versioned zip is the human-readable/manual-install release asset. The stable `ha-tv-pip-integration.zip` file is the HACS release asset referenced by root `hacs.json`. HACS extracts `zip_release` assets directly into `config/custom_components/ha_tv_pip/`, so the stable HACS zip must not contain a leading `custom_components/ha_tv_pip/` folder.
 
 ## GitHub Release Assets
 
@@ -664,10 +672,13 @@ The repo therefore uses root `hacs.json` with:
 }
 ```
 
-The release workflow attaches that stable zip while creating the draft GitHub Release from `main`. Its internal path is:
+The release workflow attaches that stable zip while creating the draft GitHub Release from `main`. Its internal path starts at the integration files:
 
 ```txt
-custom_components/ha_tv_pip/
+manifest.json
+__init__.py
+brand/
+translations/
 ```
 
 For custom-repository installs, users should add `https://github.com/manix84/ha-tv-pip` in HACS as category `Integration`.
@@ -699,7 +710,8 @@ Verify release packaging expectations:
 - Android release APK asset: `ha-tv-pip-android-release-vX.Y.Z.apk`.
 - Versioned integration zip: `ha-tv-pip-integration-vX.Y.Z.zip`.
 - Stable HACS integration zip: `ha-tv-pip-integration.zip`.
-- Integration zip internal path: `custom_components/ha_tv_pip/`.
+- Versioned integration zip internal path: `custom_components/ha_tv_pip/`.
+- Stable HACS zip internal path: integration files at archive root.
 - Root `package.json`, Android `versionName`, HA `manifest.json`, and project `package.json` files all match.
 
 Documentation work in Stage 12 included:
@@ -732,7 +744,7 @@ Validated outputs:
 - `dist/ha-tv-pip-integration-v1.27.0.zip`
 - `dist/ha-tv-pip-integration.zip`
 
-The integration zips were checked to confirm they contain `custom_components/ha_tv_pip/` at the archive root and do not include unrelated monorepo paths such as `ha-integration/`, `android-tv-app/`, `docs/`, `dist/`, `.git/`, or `node_modules/`.
+The versioned integration zip was checked to confirm it contains `custom_components/ha_tv_pip/` at the archive root. The stable HACS zip was checked to confirm it contains the integration files directly at archive root. Neither zip should include unrelated monorepo paths such as `ha-integration/`, `android-tv-app/`, `docs/`, `dist/`, `.git/`, or `node_modules/`.
 
 Recommended beta update order:
 

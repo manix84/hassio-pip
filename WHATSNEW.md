@@ -1,5 +1,12 @@
 # What's New ✨
 
+## 1.27.5 - HACS Zip Install Fix 🧩
+
+- Fixed the stable HACS release zip layout so HACS installs files directly into `config/custom_components/ha_tv_pip/` instead of creating a nested `custom_components/ha_tv_pip/` folder 📦
+- Kept the versioned integration zip in manual-install layout with `custom_components/ha_tv_pip/` preserved for users inspecting or unpacking releases manually 🛠️
+- Added root-level `icon@2x.png` and `logo@2x.png` integration assets for consistency with the existing brand image set 🎨
+- Updated HACS packaging docs to explain the difference between the versioned manual zip and the stable HACS zip 📝
+
 ## 1.27.4 - HACS README And Icon Compatibility 🧩
 
 - Moved the install-first APK, integration, and pairing flow into the packaged Home Assistant integration README as well as the root README 📺

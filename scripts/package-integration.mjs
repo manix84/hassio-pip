@@ -1,4 +1,4 @@
-import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { resolve, join } from "node:path";
@@ -25,20 +25,26 @@ rmSync(outputPath, { force: true });
 rmSync(hacsOutputPath, { force: true });
 
 const tempRoot = await mkdtemp(join(tmpdir(), "ha-tv-pip-integration-"));
-const targetDir = join(tempRoot, "custom_components/ha_tv_pip");
+const manualRoot = join(tempRoot, "manual");
+const manualTargetDir = join(manualRoot, "custom_components/ha_tv_pip");
+const hacsRoot = join(tempRoot, "hacs");
 
 try {
-  mkdirSync(join(tempRoot, "custom_components"), { recursive: true });
-  cpSync(sourceDir, targetDir, {
+  const copyOptions = {
     recursive: true,
     filter: (source) => {
       const ignored = [".git", "node_modules", "dist", "__pycache__", ".DS_Store"];
       return !ignored.some((segment) => source.split(/[\\/]/).includes(segment));
     }
-  });
+  };
+
+  mkdirSync(join(manualRoot, "custom_components"), { recursive: true });
+  cpSync(sourceDir, manualTargetDir, copyOptions);
+  mkdirSync(hacsRoot, { recursive: true });
+  cpSync(sourceDir, hacsRoot, copyOptions);
 
   const zip = spawnSync("zip", ["-r", outputPath, "custom_components/ha_tv_pip"], {
-    cwd: tempRoot,
+    cwd: manualRoot,
     stdio: "inherit"
   });
 
@@ -50,7 +56,19 @@ try {
     throw new Error(`zip exited with status ${zip.status}`);
   }
 
-  copyFileSync(outputPath, hacsOutputPath);
+  const hacsZip = spawnSync("zip", ["-r", hacsOutputPath, "."], {
+    cwd: hacsRoot,
+    stdio: "inherit"
+  });
+
+  if (hacsZip.error) {
+    throw new Error(`Failed to run zip: ${hacsZip.error.message}`);
+  }
+
+  if (hacsZip.status !== 0) {
+    throw new Error(`zip exited with status ${hacsZip.status}`);
+  }
+
   console.log(`Created ${outputPath}`);
   console.log(`Created ${hacsOutputPath}`);
 } finally {

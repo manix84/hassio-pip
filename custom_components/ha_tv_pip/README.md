@@ -34,7 +34,7 @@ Until HA TV PiP is accepted as a default HACS repository:
 5. Install HA TV PiP.
 6. Restart Home Assistant.
 
-The HACS release zip contains `custom_components/ha_tv_pip/` at the archive root, matching the repository source layout.
+The HACS release zip contains the integration files at archive root because HACS extracts the release asset directly into `config/custom_components/ha_tv_pip/`.
 
 ### 3. Pair the Receiver 🔐
 

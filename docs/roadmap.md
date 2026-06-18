@@ -972,7 +972,7 @@ Stage 12 completed in `0.48.0`. It was not a new feature stage; it was a release
 
 - `npm run check` passes from the repository root.
 - Android debug and release APK builds complete.
-- Home Assistant integration packaging creates both versioned and stable HACS zips.
+- Home Assistant integration packaging creates both versioned and stable HACS zips: the versioned zip preserves `custom_components/ha_tv_pip/`, while the stable HACS zip contains integration files at archive root for HACS `zip_release` extraction.
 - Website production build completes.
 - Root README, Android README, Home Assistant README, website, roadmap, development docs, release notes, and examples all describe the same current state.
 - The GitHub release workflow can create draft release `vX.Y.Z` with the expected assets attached, then publish it.
