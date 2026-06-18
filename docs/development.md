@@ -1131,6 +1131,8 @@ Per-camera defaults are stored through `ha_tv_pip.set_camera_defaults` and remov
 
 Calibration and compatibility responses also include `restreaming_recommended`, `restreaming_reason`, `restreaming_next_step`, and `restreaming_options`. These fields are populated when HLS and MJPEG are unavailable, or when the receiver/camera path is snapshot-only. Treat them as a signal to try a different camera entity, a lower-resolution profile, a TV-safe H.264/HLS or MJPEG substream, go2rtc, WebRTC, or future transcoding support.
 
+See [camera compatibility](camera-compatibility.md) for the current TV-safe stream workflow, calibration loop, snapshot fallback guidance, and planned restreaming provider model.
+
 Stored per-camera defaults are exposed in config entry diagnostics. A recommended troubleshooting loop is: run `ha_tv_pip.calibrate_camera` with `save: false`, inspect `recommended_defaults`, run again with `save: true` when the recommendation looks right, then use `ha_tv_pip.show_camera` with only the receiver target and `camera_entity`.
 
 The compatibility test includes `recommended_stream_type` and `recommendation_reason`. `auto` is recommended when HLS is available and the receiver can carry an MJPEG playable fallback. `mjpeg_first` is recommended when HLS and MJPEG are available but playable fallback is not, because it reduces receiver decoder risk while still allowing HLS fallback. HLS, MJPEG, or snapshot are recommended when only those paths are available.

@@ -225,6 +225,8 @@ Calibration tests HLS, MJPEG, and snapshot availability, returns a summary with 
 
 If live HLS/MJPEG paths are unavailable, the response includes `restreaming_recommended: true`, `restreaming_reason`, `restreaming_next_step`, and `restreaming_options`. This means the current camera entity is likely snapshot-only for HA TV PiP, or needs a TV-safe source such as another camera entity, a lower-resolution profile, go2rtc, WebRTC, or future transcoding support.
 
+For the full setup workflow, see the project camera compatibility guide: <https://github.com/manix84/ha-tv-pip/blob/main/docs/camera-compatibility.md>.
+
 For lower-level troubleshooting, use `ha_tv_pip.test_camera_stream`:
 
 ```yaml
@@ -296,6 +298,8 @@ The service defaults to the receiver's preferred stream strategy, or `stream_typ
 `title`, `message`, and the styling fields are optional; when either `title` or `message` is present, the receiver renders the text below the camera or snapshot inside the same rounded glass popup. Width and height can be used by themselves to resize the media popup without showing a text footer.
 If a receiver reports that a requested stream type, snapshot mode, notification mode, or media text footer is unsupported, Home Assistant stops before sending the command and returns a clear service error. Older receivers that do not report capabilities keep the previous best-effort behaviour.
 For cameras with multiple streams, use a TV-compatible H.264/HLS stream where possible, or try `stream_type: mjpeg` when HLS is unsupported on the receiver. Lower-resolution secondary streams are often more reliable for TV popups than high-resolution main streams. The receiver enables Media3 decoder fallback, but unsupported camera codecs still need a compatible camera profile, MJPEG fallback, go2rtc/WebRTC, or future transcoding support.
+
+Restreaming providers are not active yet. Diagnostics include a planned provider section so future support tooling can distinguish "not configured" from "not implemented". HLS, MJPEG, and snapshots remain the supported paths today.
 
 ## Snapshot Service 🖼️
 

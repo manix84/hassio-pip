@@ -1,5 +1,12 @@
 # What's New ✨
 
+## 1.22.2 - Camera Compatibility Guide 🧵
+
+- Added a dedicated camera compatibility guide covering TV-safe streams, calibration, snapshot fallback, and future restreaming provider expectations 📹
+- Added an inactive planned restreaming provider block to Home Assistant diagnostics for future go2rtc, WebRTC, and transcoding support 🩺
+- Linked the new guide from the root README, development docs, roadmap, Home Assistant integration README, and website copy 📝
+- Added diagnostics test coverage for the planned provider structure 🧪
+
 ## 1.22.1 - Restreaming Next Steps And Website Accessibility 🧭
 
 - Added `restreaming_next_step` and `restreaming_options` to camera compatibility and calibration results so users get actionable guidance after a failed or snapshot-only live path 🧵

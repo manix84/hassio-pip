@@ -629,6 +629,14 @@ def test_diagnostics_redacts_token_and_url(monkeypatch) -> None:  # type: ignore
             "height": 405,
         }
     }
+    assert result["restreaming_providers"] == {
+        "enabled": False,
+        "status": "planned",
+        "configured_provider": None,
+        "active_provider": None,
+        "supported_providers": [],
+        "planned_providers": ["go2rtc", "webrtc", "transcoding"],
+    }
     assert result["receiver_status"]["url"] == diagnostics.REDACTED
     assert result["receiver_status"]["fallbackUrl"] == diagnostics.REDACTED
     assert result["receiver_status"]["playback"]["url"] == diagnostics.REDACTED

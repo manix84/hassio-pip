@@ -46,6 +46,8 @@ The current compatibility pass adds Home Assistant-side camera stream testing an
 
 Compatibility tests now flag when a camera likely needs a TV-safe restreamed source. If HLS and MJPEG are unavailable, or the receiver can only use snapshots, results include `restreaming_recommended`, `restreaming_reason`, `restreaming_next_step`, and `restreaming_options` so users know to try another camera entity, a lower-resolution profile, go2rtc, WebRTC, or future transcoding support.
 
+See [camera compatibility](docs/camera-compatibility.md) for the current HLS/MJPEG/snapshot workflow, what a TV-safe stream source means, and how future restreaming providers are expected to fit in.
+
 Receiver/integration compatibility checks now compare receiver API and capability metadata with the Home Assistant integration. Older receivers without capability metadata are treated as legacy best-effort, degraded receivers expose missing optional features in diagnostics, and camera popups drop optional title/message footer fields when the receiver cannot render them.
 
 Camera troubleshooting now includes a `Last Camera Result` receiver sensor and redacted diagnostics for the latest camera or snapshot command. The result records the requested stream strategy, final stream type sent to the receiver, transport path, fallback usage, popup size, status, and failure reason where available without storing camera URLs.

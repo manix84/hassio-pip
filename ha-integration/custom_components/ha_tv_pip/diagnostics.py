@@ -18,6 +18,15 @@ REDACTED_KEYS = {
     "url",
 }
 
+RESTREAMING_PROVIDERS = {
+    "enabled": False,
+    "status": "planned",
+    "configured_provider": None,
+    "active_provider": None,
+    "supported_providers": [],
+    "planned_providers": ["go2rtc", "webrtc", "transcoding"],
+}
+
 
 async def async_get_config_entry_diagnostics(hass: Any, entry: Any) -> dict[str, Any]:
     """Return diagnostics for a HA TV PiP config entry."""
@@ -43,6 +52,7 @@ async def async_get_config_entry_diagnostics(hass: Any, entry: Any) -> dict[str,
             .get(CAMERA_LAST_RESULT_KEY, {})
             .get(entry.entry_id, {})
         ),
+        "restreaming_providers": dict(RESTREAMING_PROVIDERS),
         "receiver_status": None,
         "receiver_error": None,
     }

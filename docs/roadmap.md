@@ -826,6 +826,8 @@ Completed:
 - ✅ Restreaming guidance in camera compatibility and calibration results for snapshot-only or unavailable live stream paths.
 - ✅ `Camera Restreaming Recommended` binary sensor for showing restreaming guidance directly on the receiver device.
 - ✅ Stable `restreaming_next_step` and `restreaming_options` fields for action responses and sensor attributes.
+- ✅ Dedicated camera compatibility guide covering TV-safe streams, calibration, fallback setup, and future restreaming provider expectations.
+- ✅ Planned inactive restreaming provider diagnostics block so future support tools can report provider availability clearly.
 
 Still future:
 
