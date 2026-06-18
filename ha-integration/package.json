@@ -1,6 +1,6 @@
 {
   "name": "@ha-tv-pip/ha-integration",
-  "version": "1.22.0",
+  "version": "1.22.1",
   "private": true,
   "description": "Home Assistant custom integration for HA TV PiP.",
   "license": "MIT",

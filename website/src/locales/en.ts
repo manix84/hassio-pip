@@ -11,7 +11,7 @@ export const en = {
     currentStatus: {
       body: [
         "HA TV PiP now supports discovery, TV-visible pairing, authenticated receiver control, camera stream popups, snapshots, styled notifications, receiver management, remote receiver transport, and per-camera receiver defaults.",
-        "Post-1.0 compatibility work is underway. The Home Assistant integration can calibrate a camera against a receiver, preview and save recommended defaults, flag when a TV-safe restreamed source is likely needed, expose saved defaults in diagnostics, show the latest recommendation on the receiver device, and report whether the installed receiver is current, degraded, legacy, or incompatible.",
+        "Post-1.0 compatibility work is underway. The Home Assistant integration can calibrate a camera against a receiver, preview and save recommended defaults, flag when a TV-safe restreamed source is likely needed, expose suggested next steps on the receiver device, and report whether the installed receiver is current, degraded, legacy, or incompatible.",
       ],
       eyebrow: "Current status",
       title: "Stage 12: Beta release hardening",
@@ -42,7 +42,7 @@ export const en = {
       {
         question: "Why do some camera streams show snapshots or errors?",
         answer:
-          "Android TV devices can reject unsupported codecs or very high-resolution streams. HA TV PiP supports snapshot fallbacks, separate stream camera entities, automatic MJPEG fallback, MJPEG-first mode, receiver capability checks, and camera compatibility testing. If HLS/MJPEG are unavailable or only snapshots work, calibration results now flag that a TV-safe restreamed source such as a lower-resolution profile, go2rtc, WebRTC, or future transcoding support is likely needed.",
+          "Android TV devices can reject unsupported codecs or very high-resolution streams. HA TV PiP supports snapshot fallbacks, separate stream camera entities, automatic MJPEG fallback, MJPEG-first mode, receiver capability checks, and camera compatibility testing. If HLS/MJPEG are unavailable or only snapshots work, calibration results now flag that a TV-safe restreamed source is likely needed and expose suggested next steps such as a lower-resolution profile, go2rtc, WebRTC, or future transcoding support.",
       },
       {
         question: "Can I hide the receiver app from my TV home screen?",

@@ -1291,6 +1291,8 @@ def _camera_calibration_summary(result: dict[str, Any]) -> dict[str, Any]:
             result.get("restreaming_recommended", False)
         ),
         "restreaming_reason": result.get("restreaming_reason"),
+        "restreaming_next_step": result.get("restreaming_next_step"),
+        "restreaming_options": result.get("restreaming_options", []),
         "saved": saved,
         "next_step": _camera_calibration_next_step(compatible, saved),
     }
@@ -1347,7 +1349,7 @@ async def _async_camera_compatibility_report(
         results,
         capabilities,
     )
-    restreaming_recommended, restreaming_reason = _restreaming_recommendation(
+    restreaming_guidance = _restreaming_guidance(
         results,
         recommended,
     )
@@ -1361,8 +1363,7 @@ async def _async_camera_compatibility_report(
         "preferred_stream_type": request.stream_type,
         "recommended_stream_type": recommended,
         "recommendation_reason": recommendation_reason,
-        "restreaming_recommended": restreaming_recommended,
-        "restreaming_reason": restreaming_reason,
+        **restreaming_guidance,
         "results": results,
     }
     result["recommended_defaults"] = _recommended_camera_defaults_payload(
@@ -1425,10 +1426,10 @@ def _recommended_stream_type(
     return None, "no_compatible_stream_available"
 
 
-def _restreaming_recommendation(
+def _restreaming_guidance(
     results: list[dict[str, Any]],
     recommended_stream_type: str | None,
-) -> tuple[bool, str | None]:
+) -> dict[str, Any]:
     """Return guidance for cameras that likely need a restreamed TV-safe source."""
 
     available = {
@@ -1438,10 +1439,34 @@ def _restreaming_recommendation(
     }
     has_live_stream = bool({STREAM_TYPE_HLS, STREAM_TYPE_MJPEG} & available)
     if has_live_stream:
-        return False, None
+        return {"restreaming_recommended": False}
     if recommended_stream_type == STREAM_TYPE_SNAPSHOT:
-        return True, "snapshot_only_live_stream_restreaming_recommended"
-    return True, "no_supported_stream_paths_restreaming_recommended"
+        return {
+            "restreaming_recommended": True,
+            "restreaming_reason": (
+                "snapshot_only_live_stream_restreaming_recommended"
+            ),
+            "restreaming_next_step": "configure_tv_safe_live_stream_source",
+            "restreaming_options": [
+                "try_stream_camera_entity",
+                "try_lower_resolution_profile",
+                "try_mjpeg_or_h264_substream",
+                "try_go2rtc_or_webrtc_bridge",
+                "wait_for_transcoding_support",
+            ],
+        }
+    return {
+        "restreaming_recommended": True,
+        "restreaming_reason": "no_supported_stream_paths_restreaming_recommended",
+        "restreaming_next_step": "check_camera_access_or_configure_tv_safe_source",
+        "restreaming_options": [
+            "check_camera_entity_access",
+            "try_different_camera_entity",
+            "try_lower_resolution_profile",
+            "try_go2rtc_or_webrtc_bridge",
+            "wait_for_transcoding_support",
+        ],
+    }
 
 
 def _store_camera_compatibility(

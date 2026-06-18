@@ -825,6 +825,7 @@ Completed:
 - ✅ Stored per-camera defaults in config entry diagnostics.
 - ✅ Restreaming guidance in camera compatibility and calibration results for snapshot-only or unavailable live stream paths.
 - ✅ `Camera Restreaming Recommended` binary sensor for showing restreaming guidance directly on the receiver device.
+- ✅ Stable `restreaming_next_step` and `restreaming_options` fields for action responses and sensor attributes.
 
 Still future:
 

@@ -178,7 +178,7 @@ data:
   save: false
 ```
 
-Inspect `summary`, `recommendation_reason`, `restreaming_recommended`, `restreaming_reason`, and `recommended_defaults` in the action response.
+Inspect `summary`, `recommendation_reason`, `restreaming_recommended`, `restreaming_reason`, `restreaming_next_step`, `restreaming_options`, and `recommended_defaults` in the action response.
 
 Save the recommendation when it looks right:
 
@@ -223,7 +223,7 @@ data:
 
 Calibration tests HLS, MJPEG, and snapshot availability, returns a summary with the recommended stream strategy and next step, and can save the recommendation as per-camera defaults.
 
-If live HLS/MJPEG paths are unavailable, the response includes `restreaming_recommended: true` and a `restreaming_reason`. This means the current camera entity is likely snapshot-only for HA TV PiP, or needs a TV-safe source such as another camera entity, a lower-resolution profile, go2rtc, WebRTC, or future transcoding support.
+If live HLS/MJPEG paths are unavailable, the response includes `restreaming_recommended: true`, `restreaming_reason`, `restreaming_next_step`, and `restreaming_options`. This means the current camera entity is likely snapshot-only for HA TV PiP, or needs a TV-safe source such as another camera entity, a lower-resolution profile, go2rtc, WebRTC, or future transcoding support.
 
 For lower-level troubleshooting, use `ha_tv_pip.test_camera_stream`:
 
@@ -245,7 +245,7 @@ The compatibility test checks whether Home Assistant can resolve HLS, MJPEG, and
 
 The result also includes `recommendation_reason`, which explains why the integration recommends `auto`, `mjpeg_first`, `hls`, `mjpeg`, or `snapshot`. For example, a receiver that supports playable fallback may prefer `auto`, while a receiver without playable fallback can recommend `mjpeg_first` when both HLS and MJPEG are available.
 
-`restreaming_recommended` is separate from `recommended_stream_type`. A `snapshot` recommendation can be useful for fast alerts, while `snapshot_only_live_stream_restreaming_recommended` explains that a live popup probably needs a different stream source. `no_supported_stream_paths_restreaming_recommended` means Home Assistant could not resolve any supported HLS, MJPEG, or snapshot path for the selected camera/receiver pair.
+`restreaming_recommended` is separate from `recommended_stream_type`. A `snapshot` recommendation can be useful for fast alerts, while `snapshot_only_live_stream_restreaming_recommended` explains that a live popup probably needs a different stream source. `no_supported_stream_paths_restreaming_recommended` means Home Assistant could not resolve any supported HLS, MJPEG, or snapshot path for the selected camera/receiver pair. Use `restreaming_next_step` and `restreaming_options` as stable action hints when building dashboards or troubleshooting notes.
 
 The response includes `recommended_defaults`, which previews the exact per-camera defaults that would be stored. Inspect that payload first if you want to verify the recommendation before saving it.
 
@@ -253,7 +253,7 @@ Set `save_recommendation: true` to save the recommended stream strategy as per-c
 
 After a compatibility test runs, the receiver device's `Last Camera Compatibility` sensor shows the latest recommended stream type. Its attributes include the tested camera, recommendation reason, stream availability results, and timestamp.
 
-The receiver device also exposes a `Camera Restreaming Recommended` binary sensor. It turns on when the latest compatibility result says live video likely needs another TV-safe source, and its attributes include the camera entity, recommended stream type, recommendation reason, restreaming reason, and timestamp.
+The receiver device also exposes a `Camera Restreaming Recommended` binary sensor. It turns on when the latest compatibility result says live video likely needs another TV-safe source, and its attributes include the camera entity, recommended stream type, recommendation reason, restreaming reason, next step, suggested options, and timestamp.
 
 After a real camera or snapshot action runs, the receiver device's `Last Camera Result` sensor shows whether the latest command was accepted or failed. Its attributes include the requested stream strategy, final stream type, transport, fallback usage, popup size, and failure reason where available. URLs are not stored.
 

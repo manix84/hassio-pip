@@ -121,6 +121,8 @@ class ReceiverCameraRestreamingRecommendedBinarySensor(
                 "recommended_stream_type": result.get("recommended_stream_type"),
                 "recommendation_reason": result.get("recommendation_reason"),
                 "restreaming_reason": result.get("restreaming_reason"),
+                "restreaming_next_step": result.get("restreaming_next_step"),
+                "restreaming_options": result.get("restreaming_options"),
                 "tested_at": result.get("tested_at"),
             }.items()
             if value is not None

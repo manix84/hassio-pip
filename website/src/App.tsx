@@ -428,12 +428,14 @@ function App() {
         id="faq"
         title={content.faqSection.title}
       >
-        <div className={styles.faqGrid}>
+        <div className={styles.faqList}>
           {content.faqItems.map((item) => (
-            <article className={styles.faqItem} key={item.question}>
-              <h3>{item.question}</h3>
+            <details className={styles.faqItem} key={item.question}>
+              <summary>
+                <span>{item.question}</span>
+              </summary>
               <p>{item.answer}</p>
-            </article>
+            </details>
           ))}
         </div>
       </Section>

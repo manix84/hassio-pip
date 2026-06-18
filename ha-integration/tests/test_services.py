@@ -1740,6 +1740,8 @@ def test_calibrate_camera_can_save_recommendation_with_summary(
         "recommendation_reason": "mjpeg_first_reduces_receiver_decoder_risk",
         "restreaming_recommended": False,
         "restreaming_reason": None,
+        "restreaming_next_step": None,
+        "restreaming_options": [],
         "saved": True,
         "next_step": "use_show_camera_without_repeating_defaults",
     }
@@ -1828,6 +1830,14 @@ def test_camera_stream_test_recommends_restreaming_for_snapshot_only(
         result["restreaming_reason"]
         == "snapshot_only_live_stream_restreaming_recommended"
     )
+    assert result["restreaming_next_step"] == "configure_tv_safe_live_stream_source"
+    assert result["restreaming_options"] == [
+        "try_stream_camera_entity",
+        "try_lower_resolution_profile",
+        "try_mjpeg_or_h264_substream",
+        "try_go2rtc_or_webrtc_bridge",
+        "wait_for_transcoding_support",
+    ]
     assert result["recommended_defaults"] == {ATTR_STREAM_TYPE: "snapshot"}
 
 
@@ -1893,6 +1903,14 @@ def test_calibrate_camera_flags_restreaming_when_no_paths_work(
         "recommendation_reason": "no_compatible_stream_available",
         "restreaming_recommended": True,
         "restreaming_reason": "no_supported_stream_paths_restreaming_recommended",
+        "restreaming_next_step": "check_camera_access_or_configure_tv_safe_source",
+        "restreaming_options": [
+            "check_camera_entity_access",
+            "try_different_camera_entity",
+            "try_lower_resolution_profile",
+            "try_go2rtc_or_webrtc_bridge",
+            "wait_for_transcoding_support",
+        ],
         "saved": False,
         "next_step": "try_different_camera_entity_or_stream_source",
     }

@@ -44,7 +44,7 @@ Post-1.0 compatibility polish now includes receiver-level Home Assistant default
 
 The current compatibility pass adds Home Assistant-side camera stream testing and per-camera defaults. Users can test HLS, MJPEG, and snapshot availability for a camera/receiver pair, then store camera-specific stream, fallback, position, duration, width, and height defaults so automations stay simpler.
 
-Compatibility tests now flag when a camera likely needs a TV-safe restreamed source. If HLS and MJPEG are unavailable, or the receiver can only use snapshots, results include `restreaming_recommended` and `restreaming_reason` so users know to try another camera entity, a lower-resolution profile, go2rtc, WebRTC, or future transcoding support.
+Compatibility tests now flag when a camera likely needs a TV-safe restreamed source. If HLS and MJPEG are unavailable, or the receiver can only use snapshots, results include `restreaming_recommended`, `restreaming_reason`, `restreaming_next_step`, and `restreaming_options` so users know to try another camera entity, a lower-resolution profile, go2rtc, WebRTC, or future transcoding support.
 
 Receiver/integration compatibility checks now compare receiver API and capability metadata with the Home Assistant integration. Older receivers without capability metadata are treated as legacy best-effort, degraded receivers expose missing optional features in diagnostics, and camera popups drop optional title/message footer fields when the receiver cannot render them.
 
@@ -56,7 +56,7 @@ Compatibility test responses include `recommended_defaults`, so users can inspec
 
 The receiver device also exposes a `Last Camera Compatibility` sensor so the latest compatibility test recommendation is visible without opening diagnostics.
 
-When the latest compatibility result indicates that live video likely needs another TV-safe source, the receiver device's `Camera Restreaming Recommended` binary sensor turns on with the camera, recommendation, restreaming reason, and test timestamp in its attributes.
+When the latest compatibility result indicates that live video likely needs another TV-safe source, the receiver device's `Camera Restreaming Recommended` binary sensor turns on with the camera, recommendation, restreaming reason, next step, suggested options, and test timestamp in its attributes.
 
 For a simpler setup flow, `ha_tv_pip.calibrate_camera` tests the camera, returns a friendly summary, and can save the recommended per-camera defaults in one action with `save: true`.
 

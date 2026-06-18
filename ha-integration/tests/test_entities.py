@@ -376,6 +376,13 @@ def test_camera_restreaming_binary_sensor_reads_latest_result() -> None:
                             "restreaming_reason": (
                                 "snapshot_only_live_stream_restreaming_recommended"
                             ),
+                            "restreaming_next_step": (
+                                "configure_tv_safe_live_stream_source"
+                            ),
+                            "restreaming_options": [
+                                "try_stream_camera_entity",
+                                "try_lower_resolution_profile",
+                            ],
                             "tested_at": "2026-06-18T10:05:00+00:00",
                         },
                     }
@@ -396,6 +403,11 @@ def test_camera_restreaming_binary_sensor_reads_latest_result() -> None:
         "recommended_stream_type": "snapshot",
         "recommendation_reason": "snapshot_available",
         "restreaming_reason": "snapshot_only_live_stream_restreaming_recommended",
+        "restreaming_next_step": "configure_tv_safe_live_stream_source",
+        "restreaming_options": [
+            "try_stream_camera_entity",
+            "try_lower_resolution_profile",
+        ],
         "tested_at": "2026-06-18T10:05:00+00:00",
     }
 
