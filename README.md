@@ -119,6 +119,7 @@ npm run ha:test
 npm run website:dev
 npm run website:build
 npm run website:build:dry-run
+npm run website:a11y
 npm run website:test
 ```
 

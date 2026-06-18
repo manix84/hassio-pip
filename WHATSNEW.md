@@ -1,10 +1,13 @@
 # What's New ✨
 
-## 1.22.1 - Restreaming Next Steps 🧭
+## 1.22.1 - Restreaming Next Steps And Website Accessibility 🧭
 
 - Added `restreaming_next_step` and `restreaming_options` to camera compatibility and calibration results so users get actionable guidance after a failed or snapshot-only live path 🧵
 - Exposed the same next-step guidance on the `Camera Restreaming Recommended` binary sensor attributes 🔎
 - Updated tests and docs for the expanded restreaming guidance fields 🧪
+- Added website accessibility tests for FAQ disclosure controls, theme selector labels, copy feedback, and localized image alt text ♿
+- Added a dedicated `website: accessibility` GitHub Actions job while keeping the tests inside `website:test` for pre-commit coverage 🧪
+- Animated the FAQ answer reveal and global theme paint changes with CSS transitions, including a reduced-motion fallback ✨
 
 ## 1.22.0 - Camera Restreaming Sensor 🧵
 

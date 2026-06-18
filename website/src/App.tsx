@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import styles from "./App.module.scss";
 import controlMockup from "./assets/home-assistant-control.png";
 import networkMockup from "./assets/local-network-pip.png";
@@ -35,12 +35,45 @@ const licenseUrl = "https://github.com/manix84/ha-tv-pip/blob/main/LICENSE";
 
 export const localePreferenceKey = "ha-tv-pip-locale";
 type ExampleTab = "standard" | "mjpeg";
+type FaqItem = {
+  answer: string;
+  question: string;
+};
 
 const routedLocaleCodes = new Set<WebsiteLocale>(
   supportedLocales
     .filter((locale) => locale.code !== "en")
     .map((locale) => locale.code)
 );
+
+export function FaqDisclosure({ item }: { item: FaqItem }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const panelId = useId();
+
+  return (
+    <article className={styles.faqItem}>
+      <button
+        aria-controls={panelId}
+        aria-expanded={isOpen}
+        className={styles.faqQuestion}
+        onClick={() => setIsOpen((current) => !current)}
+        type="button"
+      >
+        <span>{item.question}</span>
+      </button>
+      <div
+        aria-hidden={!isOpen}
+        className={styles.faqAnswer}
+        data-open={isOpen ? "true" : "false"}
+        id={panelId}
+      >
+        <div>
+          <p>{item.answer}</p>
+        </div>
+      </div>
+    </article>
+  );
+}
 
 const supportedLocaleCodes = new Set<WebsiteLocale>(
   supportedLocales.map((locale) => locale.code)
@@ -430,12 +463,7 @@ function App() {
       >
         <div className={styles.faqList}>
           {content.faqItems.map((item) => (
-            <details className={styles.faqItem} key={item.question}>
-              <summary>
-                <span>{item.question}</span>
-              </summary>
-              <p>{item.answer}</p>
-            </details>
+            <FaqDisclosure item={item} key={item.question} />
           ))}
         </div>
       </Section>

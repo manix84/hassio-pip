@@ -10,6 +10,19 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
+    files: ["**/*.{js,mjs,cjs,ts,tsx,mts,cts}"],
+    rules: {
+      curly: ["error", "all"],
+      eqeqeq: ["error", "always"],
+      "no-tabs": ["error", { allowIndentationTabs: false }],
+      "no-var": "error",
+      "prefer-const": [
+        "error",
+        { destructuring: "all", ignoreReadBeforeAssign: false },
+      ],
+    },
+  },
+  {
     files: ["**/*.{ts,tsx,mts,cts}"],
     languageOptions: {
       ecmaVersion: 2022,
@@ -25,11 +38,6 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      curly: ["error", "all"],
-      eqeqeq: ["error", "always"],
-      "no-tabs": ["error", { allowIndentationTabs: false }],
-      "no-var": "error",
-      "prefer-const": ["error", { destructuring: "all" }],
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-unused-vars": [
         "warn",

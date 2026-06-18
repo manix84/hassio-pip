@@ -36,6 +36,7 @@
     "website:build": "npm --prefix website run build",
     "website:build:dry-run": "npm run website:build",
     "website:check": "npm --prefix website run check",
+    "website:a11y": "npm --prefix website run a11y",
     "website:dev": "npm --prefix website run dev",
     "website:lint": "npm --prefix website run lint",
     "website:preview": "npm --prefix website run preview",

@@ -19,7 +19,7 @@ const defaultLabels: Record<ThemeMode, string> & { ariaLabel: string } = {
 
 export function ThemeToggle({ labels = defaultLabels, mode, onChange }: ThemeToggleProps) {
   return (
-    <div className={styles.toggle} aria-label={labels.ariaLabel}>
+    <div className={styles.toggle} aria-label={labels.ariaLabel} role="group">
       {modes.map((themeMode) => (
         <button
           aria-pressed={mode === themeMode}

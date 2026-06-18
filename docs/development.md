@@ -171,6 +171,7 @@ npm run package:integration
 npm run website:dev
 npm run website:build
 npm run website:build:dry-run
+npm run website:a11y
 npm run website:lint
 npm run website:test
 npm run website:typecheck
@@ -200,6 +201,7 @@ npm run ha:lint
 npm run ha:test
 npm run ha:typecheck
 npm run website:lint
+npm run website:a11y
 npm run website:test
 npm run website:typecheck
 npm run android:build:dry-run
@@ -211,7 +213,7 @@ Quality tooling by area:
 
 - Android TV app: Android Gradle Plugin lint, JVM unit tests, and Kotlin debug compilation.
 - Home Assistant integration: Ruff, pytest, and MyPy against the custom integration package.
-- Website: ESLint for React/TypeScript, Vitest, and `tsc --noEmit` for type checking.
+- Website: ESLint for React/TypeScript, Vitest, static accessibility assertions, and `tsc --noEmit` for type checking.
 
 Dry-run builds by area:
 
@@ -219,7 +221,7 @@ Dry-run builds by area:
 - Home Assistant integration: packages the custom integration zip from `custom_components/ha_tv_pip/`.
 - Website: runs the Vite production build.
 
-GitHub Actions runs project-specific quality workflows for the Android TV app, Home Assistant integration, and website. Each workflow still exposes separate jobs, such as `website: lint`, `website: test`, `website: typecheck`, and `website: build dry-run`. The Website Deploy workflow only builds/deploys the site, and the Release workflow only packages release assets.
+GitHub Actions runs project-specific quality workflows for the Android TV app, Home Assistant integration, and website. Each workflow still exposes separate jobs, such as `website: lint`, `website: accessibility`, `website: test`, `website: typecheck`, and `website: build dry-run`. The Website Deploy workflow only builds/deploys the site, and the Release workflow only packages release assets.
 
 Install Home Assistant integration dev tools with:
 
@@ -966,7 +968,7 @@ Automated checks now cover all three project areas:
 
 - Android TV app: Gradle lint, Kotlin compilation, and unit tests.
 - Home Assistant integration: Ruff linting, Mypy type checking, and pytest.
-- Website: ESLint, TypeScript type checking, and Vitest.
+- Website: ESLint, TypeScript type checking, Vitest, and static accessibility assertions for key interactive and media surfaces.
 
 Manual TV testing is still required for receiver behaviour that depends on real Android TV / Google TV system features.
 

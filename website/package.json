@@ -6,10 +6,11 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
+    "a11y": "vitest run src/WebsiteAccessibility.test.tsx",
     "dev": "vite",
     "build": "npm run typecheck && vite build && node scripts/create-locale-routes.mjs",
     "check": "npm run lint && npm run typecheck && npm run test",
-    "lint": "eslint src vite.config.ts",
+    "lint": "eslint eslint.config.js vite.config.ts scripts src && node scripts/check-eslint-rules.mjs",
     "preview": "vite preview",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
