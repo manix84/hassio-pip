@@ -28,6 +28,7 @@ The latest receiver/integration flow includes:
 - `Last Camera Compatibility`, `Camera Restreaming Recommended`, and `Last Camera Result` entities on the receiver device.
 - Receiver/integration compatibility checks for current, degraded, legacy, and incompatible receiver states.
 - Redacted diagnostics for camera results, per-camera defaults, receiver status, compatibility, and planned restreaming provider support.
+- Restreaming provider metadata that points users toward today's TV-safe stream workarounds before future go2rtc, WebRTC, or transcoding support exists.
 
 See [camera compatibility](docs/camera-compatibility.md) for the current HLS/MJPEG/snapshot workflow, what a TV-safe stream source means, and how future restreaming providers are expected to fit in.
 

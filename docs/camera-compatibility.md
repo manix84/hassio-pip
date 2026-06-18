@@ -87,6 +87,14 @@ When this happens, try these before changing automations everywhere:
 
 Restreaming providers are not implemented yet. Diagnostics expose a planned inactive provider block so support tools and future UI can report that provider support is intentionally unavailable rather than silently missing.
 
+The provider status metadata also includes today's recommended paths:
+
+- `use_stream_camera_entity`: point the automation at a known TV-safe stream entity.
+- `use_mjpeg_first`: prefer MJPEG first when a camera exposes both HLS and MJPEG.
+- `use_snapshot_fallback`: show a still image while live video loads or when live video fails.
+- `use_camera_substream`: choose a lower-resolution or H.264 compatibility profile.
+- `save_per_camera_defaults`: store the working values once a camera has been calibrated.
+
 Planned provider families:
 
 - `go2rtc`: future helper path for turning camera sources into TV-safe streams.
@@ -98,7 +106,7 @@ These future providers should be optional. The local-first HLS, MJPEG, and snaps
 ## Troubleshooting Notes 🩺
 
 - Check the receiver device's `Last Camera Compatibility` sensor after running a compatibility test.
-- Check the `Camera Restreaming Recommended` binary sensor when live video falls back to snapshots.
+- Check the `Camera Restreaming Recommended` binary sensor when live video falls back to snapshots. Its attributes include current workaround paths, planned provider families, and a documentation URL.
 - Check the `Last Camera Result` sensor after a real popup command.
 - Download diagnostics from the Home Assistant integration entry when opening an issue. URLs and tokens are redacted.
 - If remote receiver mode is used, confirm the TV can reach the configured Home Assistant external URL.

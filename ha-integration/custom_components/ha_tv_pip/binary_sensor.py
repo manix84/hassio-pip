@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any
 from .client import ReceiverClientError, async_get_receiver_status
 from .const import DOMAIN
 from .entity import ReceiverEntity
+from .restreaming import restreaming_provider_metadata
 from .services import CAMERA_COMPATIBILITY_KEY
 
 if TYPE_CHECKING:
@@ -114,6 +115,11 @@ class ReceiverCameraRestreamingRecommendedBinarySensor(
 
         result = _latest_camera_compatibility_result(self.hass, self.entry.entry_id)
         self._attr_is_on = bool(result.get("restreaming_recommended", False))
+        if not result:
+            self._attr_extra_state_attributes = {}
+            return
+
+        provider_metadata = restreaming_provider_metadata()
         self._attr_extra_state_attributes = {
             key: value
             for key, value in {
@@ -123,6 +129,19 @@ class ReceiverCameraRestreamingRecommendedBinarySensor(
                 "restreaming_reason": result.get("restreaming_reason"),
                 "restreaming_next_step": result.get("restreaming_next_step"),
                 "restreaming_options": result.get("restreaming_options"),
+                "restreaming_provider_status": provider_metadata.get("status"),
+                "restreaming_supported_providers": provider_metadata.get(
+                    "supported_providers"
+                ),
+                "restreaming_planned_providers": provider_metadata.get(
+                    "planned_providers"
+                ),
+                "restreaming_recommended_current_paths": provider_metadata.get(
+                    "recommended_current_paths"
+                ),
+                "restreaming_documentation_url": provider_metadata.get(
+                    "documentation_url"
+                ),
                 "tested_at": result.get("tested_at"),
             }.items()
             if value is not None

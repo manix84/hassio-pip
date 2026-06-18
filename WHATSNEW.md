@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.24.1 - Restreaming Guidance Metadata 🧵
+
+- Added current workaround paths and a documentation URL to restreaming provider metadata so diagnostics and sensors point users toward TV-safe stream fixes 🩺
+- Exposed provider status, planned providers, current paths, and docs link on the `Camera Restreaming Recommended` binary sensor 🔎
+- Updated the camera compatibility docs to separate current HLS/MJPEG/snapshot workarounds from future go2rtc, WebRTC, and transcoding plans 📚
+
 ## 1.24.0 - Restreaming Provider Status 🧵
 
 - Added a `Restreaming Provider Status` sensor to the Home Assistant receiver device so future go2rtc, WebRTC, and transcoding support is visible as planned but inactive 🩺

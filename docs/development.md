@@ -1131,7 +1131,7 @@ Per-camera defaults are stored through `ha_tv_pip.set_camera_defaults` and remov
 
 `ha_tv_pip.calibrate_camera` wraps the compatibility test in a friendlier workflow. It returns a `summary` object with compatibility, recommended stream type, recommendation reason, whether defaults were saved, and a next-step hint. Use `save: true` to store the recommended stream strategy plus any explicit calibration fields as per-camera defaults.
 
-Calibration and compatibility responses also include `restreaming_recommended`, `restreaming_reason`, `restreaming_next_step`, and `restreaming_options`. These fields are populated when HLS and MJPEG are unavailable, or when the receiver/camera path is snapshot-only. Treat them as a signal to try a different camera entity, a lower-resolution profile, a TV-safe H.264/HLS or MJPEG substream, go2rtc, WebRTC, or future transcoding support.
+Calibration and compatibility responses also include `restreaming_recommended`, `restreaming_reason`, `restreaming_next_step`, and `restreaming_options`. These fields are populated when HLS and MJPEG are unavailable, or when the receiver/camera path is snapshot-only. Treat them as a signal to try a different camera entity, a lower-resolution profile, a TV-safe H.264/HLS or MJPEG substream, or, in the future, go2rtc, WebRTC, or transcoding support.
 
 See [camera compatibility](camera-compatibility.md) for the current TV-safe stream workflow, calibration loop, snapshot fallback guidance, and planned restreaming provider model.
 
@@ -1147,7 +1147,9 @@ Set `save_recommendation: true` on `ha_tv_pip.test_camera_stream` to write the r
 
 The latest compatibility test is also exposed through the receiver's `Last Camera Compatibility` sensor. The sensor state is the recommended stream type and the attributes include the tested camera, recommendation reason, stream availability results, and timestamp.
 
-The receiver also exposes a `Camera Restreaming Recommended` binary sensor. It turns on when the latest compatibility result includes `restreaming_recommended: true`, with attributes for the camera entity, recommended stream type, recommendation reason, restreaming reason, next step, suggested options, and timestamp.
+The receiver also exposes a `Camera Restreaming Recommended` binary sensor. It turns on when the latest compatibility result includes `restreaming_recommended: true`, with attributes for the camera entity, recommended stream type, recommendation reason, restreaming reason, next step, suggested options, current workaround paths, planned provider families, documentation URL, and timestamp.
+
+The `Restreaming Provider Status` sensor and diagnostics expose the same provider metadata. Provider support is currently `planned`; current recommended paths are `use_stream_camera_entity`, `use_mjpeg_first`, `use_snapshot_fallback`, `use_camera_substream`, and `save_per_camera_defaults`.
 
 Real camera and snapshot actions store a redacted last result under the receiver. The `Last Camera Result` sensor and config entry diagnostics expose status, stage, requested stream type, final stream type, transport, fallback flags, size, and failure reason without storing stream URLs.
 
