@@ -183,6 +183,16 @@ def test_options_flow_init_step_returns_remote_setup_form(
     }
 
 
+def test_options_flow_init_step_tolerates_missing_hass() -> None:
+    flow = ReceiverOptionsFlow(types.SimpleNamespace(options={}))
+
+    result = asyncio.run(flow.async_step_init())
+
+    assert result["type"] == "form"
+    assert result["step_id"] == "init"
+    assert result["description_placeholders"] == {"suggested_url": "not configured"}
+
+
 def test_options_flow_stores_receiver_defaults_and_remote_setup(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

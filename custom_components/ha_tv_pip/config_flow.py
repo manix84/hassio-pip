@@ -252,7 +252,8 @@ class ReceiverOptionsFlow(config_entries.OptionsFlow):  # type: ignore[misc]
 
         errors: dict[str, str] = {}
         entry = self._entry
-        suggested_url = suggested_remote_home_assistant_url(self.hass)
+        hass = getattr(self, "hass", None)
+        suggested_url = suggested_remote_home_assistant_url(hass)
         current_url = str(
             entry.options.get(
                 CONF_REMOTE_HOME_ASSISTANT_URL,
@@ -364,7 +365,7 @@ class ReceiverOptionsFlow(config_entries.OptionsFlow):  # type: ignore[misc]
                     options[CONF_REMOTE_ACCESS_TOKEN] = remote_token
 
                 if not await async_sync_remote_setup_values(
-                    self.hass,
+                    hass,
                     entry,
                     remote_url,
                     remote_token,

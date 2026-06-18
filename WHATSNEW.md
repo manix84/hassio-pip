@@ -1,5 +1,10 @@
 # What's New ✨
 
+## 1.27.8 - Options Flow Startup Guard 🧩
+
+- Hardened the Home Assistant options flow so it can render even if Home Assistant has not attached the runtime `hass` object before the first options step loads 🛡️
+- Added regression coverage for opening the options flow without `hass` available, matching the suspected 500 path on some installations 🧪
+
 ## 1.27.7 - Options Flow Compatibility 🧩
 
 - Made the Home Assistant options flow keep its config entry reference directly, improving compatibility with older Home Assistant Core versions when opening the integration Configuration screen 🛠️
