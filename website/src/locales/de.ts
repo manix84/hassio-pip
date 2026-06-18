@@ -11,12 +11,13 @@ export const de = {
     currentStatus: {
       body: [
         "HA TV PiP unterstützt jetzt Erkennung, sichtbares Pairing auf dem Fernseher, authentifizierte Receiver-Steuerung, Kamerastream-Popups, Schnappschüsse, gestaltete Benachrichtigungen, Receiver-Verwaltung und Remote-Receiver-Transport.",
-        "Stage 12 ist abgeschlossen. Der erste Release Candidate ist mit Android-Debug- und Release-APKs, HACS-fähigen Integrations-Zips, geprüften Checks, Website-Updates, Installationsdokumentation und erweiterten Benachrichtigungsbeispielen veröffentlicht.",
+        "Die Post-v1.0-Kompatibilitätsarbeit läuft. Kamera-Kalibrierung, gespeicherte Empfehlungen, TV-sichere Stream-Hinweise, Receiver-Diagnosen und geplante Restreaming-Erweiterungen stehen im Fokus.",
       ],
       eyebrow: "Aktueller Stand",
-      title: "Stage 12: Beta-Release-Härtung",
+      title: "Post-v1.0-Kompatibilitätspolitur",
     },
     example: { eyebrow: "Beispiel-Automation", mjpegTitle: "MJPEG-Fallback", standardTitle: "Standard-HLS-Pfad", tabAriaLabel: "Beispiel-Automationstyp", title: "Wohin es geht." },
+    deviceSupport: { eyebrow: "Geräteunterstützung", title: "Plattformunterstützung wächst vorsichtig.", items: [{ title: "Android TV und Google TV", label: "Unterstützt", status: "complete", description: "Das aktuelle Receiver-Ziel und die Plattform für aktive Entwicklung." }, { title: "Fire TV und Vega OS", label: "Als Nächstes", status: "planned", description: "Am nächsten am Android-Receiver-Modell und daher der wahrscheinlichste nächste Schritt." }, { title: "Samsung Tizen, LG webOS, Roku und Apple TV", label: "Recherche", status: "future", description: "Wichtige Plattformen, die voraussichtlich eigene Receiver-Designs benötigen." }, { title: "VIDAA, TiVo OS und Betreiberplattformen", label: "Watchlist", status: "future", description: "Beobachten, bis ein klarer Distributionsweg und ein sinnvolles Receiver-Modell erkennbar sind." }] },
     faqItems: [
       {
         question: "Ist HA TV PiP ein Cloud-Dienst?",

@@ -640,7 +640,7 @@ HA TV PiP should not become a hosted cloud relay. Remote mode uses the user's ow
 
 Make the app and integration easy for normal Home Assistant users to install.
 
-This is also the main translation implementation pass. Tier 1 languages are completed for the current Android, Home Assistant, and website surfaces; Tier 2 and Tier 3 languages are planned after beta hardening and broader testing.
+This was also the main translation implementation pass. Tier 1 languages are completed for the current Android, Home Assistant, and website surfaces; Tier 2 and Tier 3 languages are planned after the Post-v1.0 compatibility surfaces settle and broader testing is available.
 
 ## Android TV App
 

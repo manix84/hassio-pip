@@ -14,7 +14,7 @@ export const en = {
         "Post-1.0 compatibility work is underway. The Home Assistant integration can calibrate a camera against a receiver, preview and save recommended defaults, flag when a TV-safe restreamed source is likely needed, expose suggested next steps on the receiver device, and report whether the installed receiver is current, degraded, legacy, or incompatible. Future restreaming providers are now documented as planned extension points, not active requirements.",
       ],
       eyebrow: "Current status",
-      title: "Stage 12: Beta release hardening",
+      title: "Post-v1.0 compatibility polish",
     },
     example: {
       eyebrow: "Example automation",
@@ -22,6 +22,36 @@ export const en = {
       standardTitle: "Default HLS path",
       tabAriaLabel: "Example automation type",
       title: "Where this is headed.",
+    },
+    deviceSupport: {
+      eyebrow: "Device support",
+      items: [
+        {
+          description: "The current receiver app target and the platform used for active development.",
+          label: "Supported",
+          status: "complete",
+          title: "Android TV and Google TV",
+        },
+        {
+          description: "Closest to the Android receiver model, so this is the most likely next platform family.",
+          label: "Next likely",
+          status: "planned",
+          title: "Fire TV and Vega OS",
+        },
+        {
+          description: "Useful platforms to investigate, but each may need a separate receiver design.",
+          label: "Research",
+          status: "future",
+          title: "Samsung Tizen, LG webOS, Roku, and Apple TV",
+        },
+        {
+          description: "Track these until a clear app distribution path and receiver capability model emerges.",
+          label: "Watchlist",
+          status: "future",
+          title: "VIDAA, TiVo OS, and operator TV platforms",
+        },
+      ],
+      title: "Platform support will expand carefully.",
     },
     faqItems: [
       {

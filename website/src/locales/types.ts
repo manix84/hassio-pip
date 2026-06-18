@@ -14,6 +14,16 @@ export type WebsiteContent = {
     eyebrow: string;
     title: string;
   };
+  deviceSupport: {
+    eyebrow: string;
+    items: Array<{
+      description: string;
+      label: string;
+      status: StatusKind;
+      title: string;
+    }>;
+    title: string;
+  };
   example: {
     eyebrow: string;
     mjpegTitle: string;

@@ -37,6 +37,19 @@ describe("App content", () => {
     expect(tierOne?.languages).toContain("Polish");
   });
 
+  it("describes the current status as post-v1.0 work", () => {
+    expect(websiteContent.en.currentStatus.title).toContain("Post-v1.0");
+    expect(websiteContent.en.currentStatus.body.join(" ")).toContain(
+      "Post-1.0 compatibility work"
+    );
+
+    for (const locale of supportedLocales) {
+      expect(websiteContent[locale.code].currentStatus.title).not.toContain(
+        "Stage 12"
+      );
+    }
+  });
+
   it("defines static routes for every tier one website locale", () => {
     expect(supportedLocales.map((locale) => locale.code)).toEqual([
       "en",
@@ -61,6 +74,7 @@ describe("App content", () => {
       expect(content.features).toHaveLength(8);
       expect(content.faqItems).toHaveLength(6);
       expect(content.roadmap.items).toHaveLength(8);
+      expect(content.deviceSupport.items).toHaveLength(4);
       expect(content.translations.tiers).toHaveLength(3);
       expect(content.statusLabels.complete).toBeTruthy();
 

@@ -44,7 +44,7 @@ Translation planning lives in:
 docs/translations.md
 ```
 
-New user-facing strings should be designed with translation in mind even before translated files exist. The main translation implementation pass is planned for Phase 10 distribution polish.
+New user-facing strings should be designed with translation in mind. The main Tier 1 translation implementation pass happened during Phase 10 distribution polish.
 
 ---
 
@@ -1047,11 +1047,13 @@ Choose the simplest implementation that supports future expansion.
 Current development target:
 
 ```txt
-Phase 10
-Distribution polish and TV-first setup
+Post-v1.0 compatibility polish
+Camera compatibility, receiver diagnostics, and restreaming groundwork
 ```
 
-Phase 10 keeps onboarding, pairing, and troubleshooting inside the main Android TV dashboard for now. Separate screens are deferred until the setup flow becomes large enough to justify deeper navigation.
+The active Post-v1.0 track focuses on practical camera compatibility, per-camera defaults, receiver capability diagnostics, and visible restreaming guidance. Stage 12 remains completed release hardening history, not the current active phase.
+
+The Android TV dashboard keeps onboarding, pairing, troubleshooting, receiver controls, and diagnostics in one TV-first surface for now. Separate screens are deferred until the setup flow becomes large enough to justify deeper navigation.
 
 Phase 1 is complete in `0.4.0`. It validated:
 

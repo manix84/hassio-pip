@@ -31,7 +31,7 @@ Official Home Assistant integration readiness
 - Entity translation keys.
 - Service schema for camera and snapshot commands.
 - Tier 1 translation files complete for current integration surfaces.
-- Tier 2 and Tier 3 translation expansion planned after beta hardening.
+- Tier 2 and Tier 3 translation expansion planned after the Post-v1.0 compatibility surfaces settle.
 - Tests for config flow helpers, discovery parsing, receiver client behavior, entities, services, remote setup, and remote transport.
 - Brand assets included in the custom integration package.
 

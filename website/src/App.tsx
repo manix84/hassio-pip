@@ -409,6 +409,24 @@ function App() {
       </Section>
 
       <Section
+        eyebrow={content.deviceSupport.eyebrow}
+        id="device-support"
+        title={content.deviceSupport.title}
+      >
+        <div className={styles.deviceSupportGrid}>
+          {content.deviceSupport.items.map((item) => (
+            <article className={styles.deviceSupportItem} key={item.title}>
+              <div className={styles.deviceSupportHeader}>
+                <strong>{item.title}</strong>
+                <StatusBadge label={item.label} status={item.status} />
+              </div>
+              <p>{item.description}</p>
+            </article>
+          ))}
+        </div>
+      </Section>
+
+      <Section
         eyebrow={content.example.eyebrow}
         id="examples"
         title={content.example.title}

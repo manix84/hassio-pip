@@ -1,9 +1,11 @@
 .badge {
   border-radius: 999px;
   display: inline-flex;
+  flex-shrink: 0;
   font-size: 0.75rem;
   font-weight: 800;
   padding: 0.35rem 0.65rem;
+  white-space: nowrap;
 }
 
 .complete {

@@ -197,9 +197,9 @@ Remote mode is for sending notifications to an external TV. It does not make HA 
 
 ## Translation Plan 🌍
 
-Translation planning has started across the Android TV app, Home Assistant integration, and website. Phase 10 moved the main Android receiver UI, player, notification, setup, and troubleshooting strings into resources, added Tier 1 Android and Home Assistant translation files, and added Tier 1 website locale routes with localized TypeScript content modules.
+Translation support exists across the Android TV app, Home Assistant integration, and website. Phase 10 moved the main Android receiver UI, player, notification, setup, and troubleshooting strings into resources, added Tier 1 Android and Home Assistant translation files, and added Tier 1 website locale routes with localized TypeScript content modules.
 
-English is the source language. Tier 1 translation targets are German, Dutch, French, Spanish, Italian, Brazilian Portuguese, and Polish, and are complete for the current app, integration, and website surfaces. Tier 2 and Tier 3 languages are planned after beta hardening and broader testing.
+English is the source language. Tier 1 translation targets are German, Dutch, French, Spanish, Italian, Brazilian Portuguese, and Polish, and are complete for the current app, integration, and website surfaces. Tier 2 and Tier 3 languages are planned after the Post-v1.0 compatibility surfaces settle and broader testing is available.
 
 See `docs/translations.md` for the full language plan.
 

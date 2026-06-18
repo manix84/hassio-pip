@@ -350,6 +350,40 @@
   padding: 1rem;
 }
 
+.deviceSupportGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.deviceSupportItem {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.deviceSupportHeader {
+  align-items: start;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+.deviceSupportHeader strong {
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+.deviceSupportItem p {
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 0;
+}
+
 .exampleTabs {
   display: grid;
   gap: 1rem;
@@ -582,6 +616,7 @@
   }
 
   .solutionSteps,
+  .deviceSupportGrid,
   .featureGrid,
   .roadmap,
   .translationGrid,
@@ -603,6 +638,7 @@
   }
 
   .solutionSteps,
+  .deviceSupportGrid,
   .featureGrid,
   .roadmap,
   .translationGrid,

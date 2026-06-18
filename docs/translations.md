@@ -4,7 +4,7 @@ HA TV PiP should be designed for translation across the Android TV app, Home Ass
 
 English is the source language and the default locale for all project areas.
 
-The main implementation pass for translations belongs to Phase 10 distribution polish. Tier 1 languages are implemented across the Android app, Home Assistant integration, and website. Tier 2 and Tier 3 languages are planned after beta hardening and broader testing.
+The main implementation pass for translations happened during Phase 10 distribution polish. Tier 1 languages are implemented across the Android app, Home Assistant integration, and website. Tier 2 and Tier 3 languages are planned after the Post-v1.0 compatibility surfaces settle and broader testing is available.
 
 ---
 
@@ -35,7 +35,7 @@ Implemented first during the Phase 10 polish/release pass:
 
 ## Tier 2 🚧 Planned
 
-Very worth adding after Tier 1 is stable and the beta release path is proven:
+Very worth adding after Tier 1 is stable and the Post-v1.0 compatibility surfaces settle:
 
 - Swedish
 - Norwegian
@@ -72,9 +72,9 @@ Current status:
 - Main dashboard strings are now in `res/values/strings.xml`.
 - Player screen, playback status, notification, compatibility, overlay fallback, setup guidance, and troubleshooting strings are now in Android resources.
 - ✅ Tier 1 Android resource folders now exist for German, Dutch, French, Spanish, Italian, Brazilian Portuguese, and Polish.
-- 🚧 Tier 2 and Tier 3 Android resource folders are planned after beta hardening.
+- 🚧 Tier 2 and Tier 3 Android resource folders are planned after the Post-v1.0 compatibility surfaces settle.
 
-Required during Phase 10 before broad release:
+Required during Post-v1.0 compatibility polish:
 
 - Move any remaining user-facing Compose or Android framework strings into `res/values/strings.xml`.
 - Keep the Tier 1 resource folders complete as new user-facing strings are added.
@@ -94,10 +94,10 @@ Current status:
 - ✅ Tier 1 translation files exist for config-flow and options-flow strings.
 - ✅ Entity names expose translation keys with Tier 1 translated names.
 - ✅ Service names, descriptions, and field labels are mirrored into translation metadata with Tier 1 labels.
-- 🚧 Tier 2 and Tier 3 Home Assistant translation files are planned after beta hardening.
+- 🚧 Tier 2 and Tier 3 Home Assistant translation files are planned after the Post-v1.0 compatibility surfaces settle.
 - Diagnostics wording should be expanded as the integration matures.
 
-Required during Phase 10 before HACS readiness:
+Required during Post-v1.0 compatibility polish:
 
 - Keep `translations/en.json` as the source translation file.
 - Keep Tier 1 translation files under `custom_components/ha_tv_pip/translations/` complete as new strings are added.
@@ -111,7 +111,7 @@ Required during Phase 10 before HACS readiness:
 
 The website should support static translated pages without becoming a full documentation platform.
 
-Preferred approach during the Phase 10 website polish pass:
+Preferred approach during Post-v1.0 website polish:
 
 - Keep the current English single-page site as the source.
 - Add lightweight locale content modules when translation work starts.
@@ -119,14 +119,14 @@ Preferred approach during the Phase 10 website polish pass:
 - Keep GitHub Pages deployment simple.
 - Do not add analytics or authentication for translation support.
 
-Current Phase 10 status:
+Current Post-v1.0 status:
 
 - ✅ Tier 1 locale routes are detected client-side.
 - ✅ Website language selection prefers the URL locale, then the user's saved override, then browser language detection.
 - ✅ Users can override the detected language from the website language selector.
 - ✅ The website build creates `dist/de/`, `dist/nl/`, `dist/fr/`, `dist/es/`, `dist/it/`, `dist/pt-br/`, and `dist/pl/` entry points for GitHub Pages.
 - ✅ Tier 1 website copy exists in separate TypeScript locale modules.
-- 🚧 Tier 2 and Tier 3 website locale routes are planned after beta hardening.
+- 🚧 Tier 2 and Tier 3 website locale routes are planned after the Post-v1.0 compatibility surfaces settle.
 - Native-speaker review is skipped for Stage 10 because it is not currently available. Future community/native review should happen before broad public release where possible.
 
 Website translation content now covered:
@@ -150,7 +150,7 @@ Recommended workflow:
 4. Run quality checks.
 5. Manually check long translated strings on small TV and mobile website layouts.
 6. Release with Tier 1 translations in place.
-7. Add Tier 2 and Tier 3 languages after the beta release path is stable.
+7. Add Tier 2 and Tier 3 languages after the Post-v1.0 compatibility surfaces and release path are stable.
 
 Translation contributions should preserve technical accuracy over literal phrasing.
 
