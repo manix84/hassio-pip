@@ -1499,6 +1499,7 @@ def test_camera_stream_test_stores_non_sensitive_compatibility_report(
         == "mjpeg_first_reduces_receiver_decoder_risk"
     )
     assert result["restreaming_recommended"] is False
+    assert "restreaming_provider" not in result
     assert result["recommended_defaults"] == {ATTR_STREAM_TYPE: "mjpeg_first"}
     assert result["tested_at"]
     assert result["results"] == [
@@ -1571,6 +1572,7 @@ def test_camera_stream_test_recommends_auto_with_playable_fallback(
 
     assert result["recommended_stream_type"] == "auto"
     assert result["restreaming_recommended"] is False
+    assert "restreaming_provider" not in result
     assert result["recommended_defaults"] == {ATTR_STREAM_TYPE: "auto"}
     assert (
         result["recommendation_reason"]
@@ -1745,6 +1747,7 @@ def test_calibrate_camera_can_save_recommendation_with_summary(
         "saved": True,
         "next_step": "use_show_camera_without_repeating_defaults",
     }
+    assert "restreaming_provider" not in result
     assert result["saved_as_defaults"] is True
     assert result["saved_defaults"] == {
         ATTR_HEIGHT: 405,
