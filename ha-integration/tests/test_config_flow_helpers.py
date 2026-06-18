@@ -167,9 +167,8 @@ def test_options_flow_factory_is_exposed_at_module_and_class_level() -> None:
 def test_options_flow_init_step_returns_remote_setup_form(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    flow = ReceiverOptionsFlow()
+    flow = ReceiverOptionsFlow(types.SimpleNamespace(options={}))
     flow.hass = object()
-    flow.config_entry = types.SimpleNamespace(options={})
     monkeypatch.setattr(
         "custom_components.ha_tv_pip.config_flow.suggested_remote_home_assistant_url",
         lambda hass: "https://example.ui.nabu.casa",
@@ -187,9 +186,8 @@ def test_options_flow_init_step_returns_remote_setup_form(
 def test_options_flow_stores_receiver_defaults_and_remote_setup(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    flow = ReceiverOptionsFlow()
+    flow = ReceiverOptionsFlow(types.SimpleNamespace(options={}))
     flow.hass = object()
-    flow.config_entry = types.SimpleNamespace(options={})
 
     monkeypatch.setattr(
         "custom_components.ha_tv_pip.config_flow.suggested_remote_home_assistant_url",

@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.27.7 - Options Flow Compatibility 🧩
+
+- Made the Home Assistant options flow keep its config entry reference directly, improving compatibility with older Home Assistant Core versions when opening the integration Configuration screen 🛠️
+- Kept support for newer Home Assistant Core versions that expose `OptionsFlow.config_entry` through the flow manager ✅
+- Verified Home Assistant integration linting, type checking, package structure tests, and the full HA test suite 🧪
+
 ## 1.27.6 - Config Flow Load Hardening 🧩
 
 - Moved shared stream and popup position constants into the lightweight integration constants module so the config/options flow no longer imports the full service implementation while loading 🛠️

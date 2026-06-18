@@ -56,7 +56,7 @@ class ZeroconfDiscoveryInfo(Protocol):
 def async_get_options_flow(config_entry: Any) -> Any:
     """Return the options flow for a configured receiver."""
 
-    return ReceiverOptionsFlow()
+    return ReceiverOptionsFlow(config_entry)
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg,misc]
@@ -228,33 +228,53 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
 class ReceiverOptionsFlow(config_entries.OptionsFlow):  # type: ignore[misc]
     """Options flow for receiver defaults and remote receiver provisioning."""
 
+    def __init__(self, config_entry: Any) -> None:
+        """Initialize the options flow with a Home Assistant config entry.
+
+        Home Assistant's newer OptionsFlow exposes `self.config_entry` after the
+        flow manager attaches runtime context. Keeping a local reference makes
+        the flow tolerant of older Core versions that do not expose that helper.
+        """
+
+        self._config_entry = config_entry
+
+    @property
+    def _entry(self) -> Any:
+        """Return the active config entry across supported Home Assistant versions."""
+
+        try:
+            return self.config_entry
+        except (AttributeError, ValueError):
+            return self._config_entry
+
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> Any:
         """Configure receiver defaults and remote provisioning from Home Assistant."""
 
         errors: dict[str, str] = {}
+        entry = self._entry
         suggested_url = suggested_remote_home_assistant_url(self.hass)
         current_url = str(
-            self.config_entry.options.get(
+            entry.options.get(
                 CONF_REMOTE_HOME_ASSISTANT_URL,
                 suggested_url,
             )
         ).strip()
         current_token = str(
-            self.config_entry.options.get(CONF_REMOTE_ACCESS_TOKEN, "")
+            entry.options.get(CONF_REMOTE_ACCESS_TOKEN, "")
         ).strip()
         current_stream_type = str(
-            self.config_entry.options.get(CONF_DEFAULT_STREAM_TYPE, STREAM_TYPE_AUTO)
+            entry.options.get(CONF_DEFAULT_STREAM_TYPE, STREAM_TYPE_AUTO)
         ).strip()
         if current_stream_type not in STREAM_TYPES:
             current_stream_type = STREAM_TYPE_AUTO
         current_position = str(
-            self.config_entry.options.get(CONF_DEFAULT_POSITION, "top_right")
+            entry.options.get(CONF_DEFAULT_POSITION, "top_right")
         ).strip()
         if current_position not in NOTIFICATION_POSITIONS:
             current_position = "top_right"
         current_duration = (
             _optional_default_int(
-                self.config_entry.options.get(CONF_DEFAULT_DURATION_SECONDS),
+                entry.options.get(CONF_DEFAULT_DURATION_SECONDS),
                 minimum=0,
                 maximum=3600,
             )
@@ -262,7 +282,7 @@ class ReceiverOptionsFlow(config_entries.OptionsFlow):  # type: ignore[misc]
         )
         current_width = (
             _optional_default_int(
-                self.config_entry.options.get(CONF_DEFAULT_WIDTH),
+                entry.options.get(CONF_DEFAULT_WIDTH),
                 minimum=0,
                 maximum=1600,
             )
@@ -270,14 +290,14 @@ class ReceiverOptionsFlow(config_entries.OptionsFlow):  # type: ignore[misc]
         )
         current_height = (
             _optional_default_int(
-                self.config_entry.options.get(CONF_DEFAULT_HEIGHT),
+                entry.options.get(CONF_DEFAULT_HEIGHT),
                 minimum=0,
                 maximum=900,
             )
             or 0
         )
         current_snapshot_fallback = bool(
-            self.config_entry.options.get(CONF_DEFAULT_SNAPSHOT_FALLBACK, True)
+            entry.options.get(CONF_DEFAULT_SNAPSHOT_FALLBACK, True)
         )
 
         if user_input is not None:
@@ -335,9 +355,9 @@ class ReceiverOptionsFlow(config_entries.OptionsFlow):  # type: ignore[misc]
                     options[CONF_DEFAULT_WIDTH] = default_width
                 if default_height > 0:
                     options[CONF_DEFAULT_HEIGHT] = default_height
-                if CONF_CAMERA_DEFAULTS in self.config_entry.options:
+                if CONF_CAMERA_DEFAULTS in entry.options:
                     options[CONF_CAMERA_DEFAULTS] = dict(
-                        self.config_entry.options[CONF_CAMERA_DEFAULTS]
+                        entry.options[CONF_CAMERA_DEFAULTS]
                     )
                 if remote_url and remote_token:
                     options[CONF_REMOTE_HOME_ASSISTANT_URL] = remote_url
@@ -345,7 +365,7 @@ class ReceiverOptionsFlow(config_entries.OptionsFlow):  # type: ignore[misc]
 
                 if not await async_sync_remote_setup_values(
                     self.hass,
-                    self.config_entry,
+                    entry,
                     remote_url,
                     remote_token,
                 ):
