@@ -1,5 +1,12 @@
 # What's New ✨
 
+## 1.27.12 - Release Signing Prep 📦
+
+- Added release asset validation so GitHub Releases check APK names, APK archive shape, integration zip layout, HACS zip layout, icons, ignored paths, and manifest version consistency before publishing 🔎
+- Split release packaging into clearer workflow jobs for setup, Android debug APK, Android release APK, Home Assistant integration, release asset checks, publishing, and cleanup 🧭
+- Prepared Android release signing through GitHub Actions secrets, with signed APK verification when secrets are configured and unsigned fallback for beta validation 🖊️
+- Documented the Android signing secret setup and kept keystores/passwords out of git by default 🔐
+
 ## 1.27.11 - Compatibility Diagnostics And Stream Strategy 🩺
 
 - Added a Last Command Result sensor so the Home Assistant receiver device shows the latest command type, accepted/failed status, transport, final stream type, failure stage, failure reason, and update time 🧭
