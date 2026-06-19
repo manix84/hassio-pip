@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.27.14 - Signed APK Install Guidance 📦
+
+- Updated user-facing install docs to recommend the signed release APK from GitHub Releases for normal sideload installs 📺
+- Kept the debug APK documented as a troubleshooting and maintainer-requested build rather than the default install path 🧪
+- Aligned the root README, Android app README, and packaged Home Assistant integration README with the signed APK release flow 📝
+
 ## 1.27.12 - Release Signing Prep 📦
 
 - Added release asset validation so GitHub Releases check APK names, APK archive shape, integration zip layout, HACS zip layout, icons, ignored paths, and manifest version consistency before publishing 🔎
