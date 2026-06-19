@@ -840,6 +840,8 @@ Completed:
 - ✅ Public beta support hardening with a focused troubleshooting guide, structured bug report template, and clearer install/support checklist.
 - ✅ HACS options-flow hardening in `v1.27.9+`, including frontend-serializable selector dropdowns and troubleshooting notes for the earlier `500` configuration-screen failure.
 - ✅ Receiver Compatibility sensor so users can see compatible, degraded, legacy, or incompatible receiver states directly on the Home Assistant device.
+- ✅ Last Command Result sensor so users can see the latest receiver command type, accepted/failed status, transport, final stream type, failure stage, and failure reason.
+- ✅ Automatic stream strategy now follows receiver capability metadata by preferring MJPEG first when the receiver does not support playable fallback.
 
 Still future:
 

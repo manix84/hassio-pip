@@ -9,7 +9,13 @@ from .client import ReceiverClientError, ReceiverStatus, async_get_receiver_stat
 from .const import DOMAIN
 from .entity import ReceiverEntity
 from .restreaming import RESTREAMING_PROVIDER_STATUS, restreaming_provider_metadata
-from .services import CAMERA_COMPATIBILITY_KEY, CAMERA_LAST_RESULT_KEY
+from .services import (
+    CAMERA_COMPATIBILITY_KEY,
+    CAMERA_LAST_RESULT_KEY,
+    LAST_COMMAND_RESULT_KEY,
+    LAST_COMMAND_RESULT_LISTENERS_KEY,
+    last_command_result_signal,
+)
 
 if TYPE_CHECKING:
 
@@ -37,6 +43,7 @@ async def async_setup_entry(hass: Any, entry: Any, async_add_entities: Any) -> N
             ReceiverLastErrorSensor(entry),
             ReceiverVersionSensor(entry),
             ReceiverCompatibilitySensor(entry),
+            ReceiverLastCommandResultSensor(hass, entry),
             ReceiverLastCameraCompatibilitySensor(hass, entry),
             ReceiverLastCameraResultSensor(hass, entry),
             ReceiverRestreamingProviderStatusSensor(entry),
@@ -176,6 +183,86 @@ class ReceiverLastCameraResultSensor(ReceiverEntity, SensorEntity):
         self._attr_extra_state_attributes = dict(result)
 
 
+class ReceiverLastCommandResultSensor(ReceiverEntity, SensorEntity):
+    """Last receiver command result stored by the Home Assistant integration."""
+
+    def __init__(self, hass: Any, entry: Any) -> None:
+        super().__init__(entry, key="last_command_result", name="Last Command Result")
+        self.hass = hass
+        self._attr_native_value: str = "none"
+        self._attr_extra_state_attributes: dict[str, Any] = {}
+        self._attr_should_poll = False
+
+    async def async_added_to_hass(self) -> None:
+        """Subscribe to immediate command result updates."""
+
+        data = self.hass.data.setdefault(DOMAIN, {})
+        listeners = data.setdefault(LAST_COMMAND_RESULT_LISTENERS_KEY, {})
+        entry_listeners = listeners.setdefault(self.entry.entry_id, [])
+        entry_listeners.append(self._handle_command_result)
+
+        async_on_remove = getattr(self, "async_on_remove", None)
+        if callable(async_on_remove):
+            async_on_remove(self._remove_direct_listener)
+
+        try:
+            dispatcher = __import__(
+                "homeassistant.helpers.dispatcher",
+                fromlist=["async_dispatcher_connect"],
+            )
+        except ModuleNotFoundError:
+            return
+
+        remove_listener = dispatcher.async_dispatcher_connect(
+            self.hass,
+            last_command_result_signal(self.entry.entry_id),
+            self._handle_command_result,
+        )
+        async_on_remove = getattr(self, "async_on_remove", None)
+        if callable(async_on_remove):
+            async_on_remove(remove_listener)
+
+    def _remove_direct_listener(self) -> None:
+        listeners = (
+            getattr(self.hass, "data", {})
+            .get(DOMAIN, {})
+            .get(LAST_COMMAND_RESULT_LISTENERS_KEY, {})
+            .get(self.entry.entry_id, [])
+        )
+        if self._handle_command_result in listeners:
+            listeners.remove(self._handle_command_result)
+
+    async def async_update(self) -> None:
+        """Refresh the last stored receiver command result."""
+
+        self._refresh_from_hass_data()
+
+    def _handle_command_result(self) -> None:
+        """Refresh state after a command result is stored."""
+
+        self._refresh_from_hass_data()
+        async_write_ha_state = getattr(self, "async_write_ha_state", None)
+        if callable(async_write_ha_state):
+            async_write_ha_state()
+
+    def _refresh_from_hass_data(self) -> None:
+        result = (
+            getattr(self.hass, "data", {})
+            .get(DOMAIN, {})
+            .get(LAST_COMMAND_RESULT_KEY, {})
+            .get(self.entry.entry_id, {})
+        )
+        if not isinstance(result, dict) or not result:
+            self._attr_native_value = "none"
+            self._attr_extra_state_attributes = {}
+            return
+
+        command_type = str(result.get("command_type", "unknown"))
+        status = str(result.get("status", "unknown"))
+        self._attr_native_value = f"{command_type}:{status}"
+        self._attr_extra_state_attributes = dict(result)
+
+
 class ReceiverLastCameraCompatibilitySensor(ReceiverEntity, SensorEntity):
     """Latest camera compatibility test result stored by the integration."""
 
@@ -296,9 +383,18 @@ def _compatibility_summary(status: ReceiverStatus) -> str:
     if state == "compatible":
         return "Receiver supports the current integration feature set."
     if state == "degraded":
-        return "Receiver is usable, but some optional features are unavailable."
+        return (
+            "Receiver is usable, but some optional features are unavailable. "
+            "Update the Android receiver app when practical."
+        )
     if state == "legacy":
-        return "Receiver is usable, but does not report detailed capabilities."
+        return (
+            "Receiver is usable, but does not report detailed capabilities. "
+            "Update the Android receiver app for safer automatic feature handling."
+        )
     if state == "incompatible":
-        return "Receiver is missing required API or display capabilities."
+        return (
+            "Receiver is missing required API or display capabilities. "
+            "Update the Android receiver app before sending camera commands."
+        )
     return "Receiver compatibility state is unknown."

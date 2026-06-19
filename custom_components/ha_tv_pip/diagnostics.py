@@ -9,7 +9,11 @@ from typing import Any
 from .client import ReceiverClientError, async_get_receiver_status
 from .const import CONF_CAMERA_DEFAULTS, CONF_HOST, CONF_PORT, CONF_TOKEN, DOMAIN
 from .restreaming import restreaming_provider_metadata
-from .services import CAMERA_COMPATIBILITY_KEY, CAMERA_LAST_RESULT_KEY
+from .services import (
+    CAMERA_COMPATIBILITY_KEY,
+    CAMERA_LAST_RESULT_KEY,
+    LAST_COMMAND_RESULT_KEY,
+)
 
 REDACTED = "**REDACTED**"
 REDACTED_KEYS = {
@@ -51,6 +55,12 @@ async def async_get_config_entry_diagnostics(hass: Any, entry: Any) -> dict[str,
             getattr(hass, "data", {})
             .get(DOMAIN, {})
             .get(CAMERA_LAST_RESULT_KEY, {})
+            .get(entry.entry_id, {})
+        ),
+        "last_command_result": _redact(
+            getattr(hass, "data", {})
+            .get(DOMAIN, {})
+            .get(LAST_COMMAND_RESULT_KEY, {})
             .get(entry.entry_id, {})
         ),
         "restreaming_providers": restreaming_provider_metadata(),

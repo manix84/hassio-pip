@@ -1315,6 +1315,11 @@ def test_show_notification_service_applies_receiver_popup_defaults(
         "position": "bottom_right",
         "width": 512,
     }
+    command_result = hass.data["ha_tv_pip"]["last_command_result"]["entry-1"]
+    assert command_result["command_type"] == "show_notification"
+    assert command_result["status"] == "accepted"
+    assert command_result["final_stream_type"] == "notification"
+    assert command_result["transport"] == "local"
 
 
 def test_set_camera_defaults_persists_per_camera_options() -> None:
@@ -2246,8 +2251,10 @@ def test_show_camera_service_stores_last_camera_result(
     )
 
     result = hass.data["ha_tv_pip"]["camera_last_result"]["entry-1"]
+    updated_at = result.pop("updated_at")
 
     assert result == {
+        "command_type": "show_camera",
         "camera_entity": "camera.front_door",
         "stream_camera_entity": "camera.front_door",
         "snapshot_camera_entity": "camera.front_door",
@@ -2266,6 +2273,10 @@ def test_show_camera_service_stores_last_camera_result(
         "height": 405,
         "has_notification_text": False,
     }
+    assert "T" in updated_at
+    assert hass.data["ha_tv_pip"]["last_command_result"]["entry-1"][
+        "command_type"
+    ] == "show_camera"
     assert "http" not in str(result)
 
 
@@ -2341,11 +2352,17 @@ def test_show_camera_service_stores_last_camera_failure(
 
     result = hass.data["ha_tv_pip"]["camera_last_result"]["entry-1"]
 
+    assert result["command_type"] == "show_camera"
     assert result["status"] == "failed"
     assert result["stage"] == "receiver_command"
     assert result["reason"] == "receiver_command_failed"
     assert result["detail"] == "decoder failed"
     assert result["final_stream_type"] == "hls"
+    assert result["updated_at"]
+    assert (
+        hass.data["ha_tv_pip"]["last_command_result"]["entry-1"]["status"]
+        == "failed"
+    )
     assert "http" not in str(result)
 
 
@@ -2634,6 +2651,37 @@ def test_show_camera_command_mjpeg_first_prefers_mjpeg(
     )
 
 
+def test_show_camera_command_auto_prefers_mjpeg_without_playable_fallback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setitem(
+        sys.modules,
+        "homeassistant.helpers.network",
+        FakeNetworkModule("homeassistant.helpers.network"),
+    )
+    hass = FakeHass(
+        entries=[],
+        states={"camera.front_door": FakeState({"access_token": "stream-token"})},
+    )
+
+    command = asyncio.run(
+        _async_show_camera_command(
+            hass,
+            _request_from_call(
+                FakeCall(data={ATTR_CAMERA_ENTITY: "camera.front_door"})
+            ),
+            title="Front Door",
+            capabilities=_capabilities(playable_fallback=False),
+        ),
+    )
+
+    assert command.stream_type == "mjpeg"
+    assert command.url == (
+        "http://10.0.0.2:8123/api/camera_proxy_stream/camera.front_door"
+        "?token=stream-token"
+    )
+
+
 def test_show_camera_command_mjpeg_first_falls_back_to_hls(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -2881,7 +2929,7 @@ def test_show_camera_command_auto_uses_snapshot_when_only_snapshot_supported(
     )
 
 
-def test_show_camera_command_auto_omits_playable_fallback_when_unsupported(
+def test_show_camera_command_auto_prefers_mjpeg_when_fallback_unsupported(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     camera_module = FakeCameraModule("/api/hls/front-door")
@@ -2912,7 +2960,7 @@ def test_show_camera_command_auto_omits_playable_fallback_when_unsupported(
         )
     )
 
-    assert command.stream_type == "hls"
+    assert command.stream_type == "mjpeg"
     assert command.fallback_url is None
     assert command.fallback_stream_type is None
 

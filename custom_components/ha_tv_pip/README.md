@@ -113,6 +113,7 @@ Each paired receiver creates:
 - Focused sensors for active display mode, active stream type, last receiver error, receiver app version, and receiver compatibility.
 - Last Camera Compatibility sensor with the latest stream test recommendation.
 - Last Camera Result sensor with the latest redacted camera/snapshot command outcome.
+- Last Command Result sensor with the latest receiver command status, command type, transport, stream choice, and failure reason.
 - Restreaming Provider Status sensor for planned, configured, and active provider visibility.
 - Connected binary sensor based on the local `/status` endpoint.
 - Remote connected binary sensor for outbound remote receiver mode.
@@ -162,7 +163,7 @@ The integration reads receiver `/status` API and capability metadata and compute
 - `legacy`: the receiver does not report capability metadata, so Home Assistant uses best-effort behavior.
 - `incompatible`: the receiver is missing a required API version or display stream support.
 
-Compatibility state, missing features, and warnings are exposed on the status sensor attributes and in config entry diagnostics. Camera and snapshot commands gracefully drop optional title/message footer fields when the receiver cannot render media text, while still sending the media command where possible.
+Compatibility state, missing features, warnings, and update guidance are exposed on the status and Receiver Compatibility sensor attributes and in config entry diagnostics. Camera and snapshot commands gracefully drop optional title/message footer fields when the receiver cannot render media text, while still sending the media command where possible.
 
 ## Receiver Defaults ⚙️
 
@@ -279,7 +280,9 @@ After a compatibility test runs, the receiver device's `Last Camera Compatibilit
 
 The receiver device also exposes a `Camera Restreaming Recommended` binary sensor. It turns on when the latest compatibility result says live video likely needs another TV-safe source, and its attributes include the camera entity, recommended stream type, recommendation reason, restreaming reason, next step, suggested options, current workaround paths, planned provider families, documentation URL, and timestamp.
 
-After a real camera or snapshot action runs, the receiver device's `Last Camera Result` sensor shows whether the latest command was accepted or failed. Its attributes include the requested stream strategy, final stream type, source classification, transport, fallback usage, popup size, and failure reason where available. URLs are not stored.
+After a real camera or snapshot action runs, the receiver device's `Last Camera Result` sensor shows whether the latest camera command was accepted or failed. Its attributes include the requested stream strategy, final stream type, source classification, transport, fallback usage, popup size, and failure reason where available. URLs are not stored.
+
+The receiver device's `Last Command Result` sensor is the broader command audit trail. It records the latest receiver command type, accepted/failed status, transport, final stream type where applicable, failure stage, failure reason, and update time. Use it first when a popup, snapshot, or notification action behaves unexpectedly.
 
 ```yaml
 service: ha_tv_pip.set_camera_defaults
@@ -316,7 +319,7 @@ data:
   position: top_right
 ```
 
-The service defaults to the receiver's preferred stream strategy, or `stream_type: auto` when no receiver default is configured. Automatic mode checks the receiver's reported capabilities, resolves an HLS stream URL through Home Assistant's camera stream API when supported, and sends it to the paired receiver with the stored bearer token. If HLS is not supported or Home Assistant cannot produce an HLS stream in automatic mode, the integration tries Home Assistant's MJPEG camera proxy stream before falling back to a snapshot command. When HLS URL resolution succeeds and the receiver supports playable fallbacks, automatic mode also sends an optional MJPEG fallback URL so the Android overlay can switch streams if the receiver later rejects HLS playback. Advanced users can force `stream_type: hls`, force `stream_type: mjpeg`, prefer MJPEG with fallback using `stream_type: mjpeg_first`, or force `stream_type: snapshot`.
+The service defaults to the receiver's preferred stream strategy, or `stream_type: auto` when no receiver default is configured. Automatic mode checks the receiver's reported capabilities. If the receiver supports playable fallback, automatic mode resolves HLS first and also sends an optional MJPEG fallback URL when Home Assistant can create one, so the Android overlay can switch streams if the receiver later rejects HLS playback. If the receiver does not support playable fallback, automatic mode prefers MJPEG first when available to reduce decoder risk, then falls back through HLS and snapshot resolution. Advanced users can force `stream_type: hls`, force `stream_type: mjpeg`, prefer MJPEG with fallback using `stream_type: mjpeg_first`, or force `stream_type: snapshot`.
 `stream_type: mjpeg` uses Home Assistant's camera proxy stream endpoint and the receiver's overlay renderer. It is useful when a camera exposes an MJPEG stream that is more reliable on Android TV than its HLS profile. Use `stream_type: mjpeg_first` when MJPEG usually works best but HLS should still be tried before falling back to a snapshot.
 `stream_camera_entity` is optional and defaults to `camera_entity`; set it when a lower-resolution, H.264, or MJPEG camera entity is more reliable for live playback on Android TV. `restream_url` is optional and takes precedence over Home Assistant camera stream resolution for live video; use it for a known TV-safe HLS or MJPEG URL from go2rtc or another local restreaming tool. When `snapshot_fallback` is enabled, the integration also sends a snapshot preview so the receiver can show a still image while the video stream loads. `snapshot_camera_entity` is optional and defaults to `camera_entity`; set it when a separate camera entity provides a better still image or substream preview.
 `title`, `message`, and the styling fields are optional; when either `title` or `message` is present, the receiver renders the text below the camera or snapshot inside the same rounded glass popup. Width and height can be used by themselves to resize the media popup without showing a text footer.

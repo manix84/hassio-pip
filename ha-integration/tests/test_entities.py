@@ -29,6 +29,9 @@ from custom_components.ha_tv_pip.const import (
 from custom_components.ha_tv_pip.services import (
     CAMERA_COMPATIBILITY_KEY,
     CAMERA_LAST_RESULT_KEY,
+    LAST_COMMAND_RESULT_KEY,
+    LAST_COMMAND_RESULT_LISTENERS_KEY,
+    store_last_command_result,
 )
 
 
@@ -60,6 +63,11 @@ def _entry_with_remote_options() -> FakeEntry:
         CONF_REMOTE_ACCESS_TOKEN: "remote-token",
     }
     return entry
+
+
+class FakeHass:
+    def __init__(self) -> None:
+        self.data: dict[str, Any] = {}
 
 
 def _status() -> ReceiverStatus:
@@ -132,6 +140,7 @@ def test_sensor_setup_adds_status_sensor() -> None:
         "device-1_last_error",
         "device-1_receiver_version",
         "device-1_receiver_compatibility",
+        "device-1_last_command_result",
         "device-1_last_camera_compatibility",
         "device-1_last_camera_result",
         "device-1_restreaming_provider_status",
@@ -143,6 +152,7 @@ def test_sensor_setup_adds_status_sensor() -> None:
         "last_error",
         "receiver_version",
         "receiver_compatibility",
+        "last_command_result",
         "last_camera_compatibility",
         "last_camera_result",
         "restreaming_provider_status",
@@ -343,6 +353,73 @@ def test_last_camera_result_sensor_reads_stored_result() -> None:
     }
 
 
+def test_last_command_result_sensor_reads_stored_result() -> None:
+    class FakeResultHass:
+        data = {
+            DOMAIN: {
+                LAST_COMMAND_RESULT_KEY: {
+                    "entry-1": {
+                        "command_type": "show_camera",
+                        "final_stream_type": "mjpeg",
+                        "status": "accepted",
+                        "transport": "local",
+                    }
+                }
+            }
+        }
+
+    entity = sensor.ReceiverLastCommandResultSensor(FakeResultHass(), _entry())
+
+    asyncio.run(entity.async_update())
+
+    assert entity._attr_native_value == "show_camera:accepted"
+    assert entity._attr_extra_state_attributes == {
+        "command_type": "show_camera",
+        "final_stream_type": "mjpeg",
+        "status": "accepted",
+        "transport": "local",
+    }
+
+
+def test_last_command_result_sensor_refreshes_from_signal() -> None:
+    class FakeResultHass:
+        def __init__(self) -> None:
+            self.data: dict[str, Any] = {
+                DOMAIN: {LAST_COMMAND_RESULT_KEY: {"entry-1": {}}}
+            }
+
+    class TestableLastCommandResultSensor(sensor.ReceiverLastCommandResultSensor):
+        def __init__(self, hass: Any, entry: Any) -> None:
+            super().__init__(hass, entry)
+            self.writes: list[str] = []
+
+        def async_write_ha_state(self) -> None:
+            self.writes.append(str(self._attr_native_value))
+
+    hass = FakeResultHass()
+    entity = TestableLastCommandResultSensor(hass, _entry())
+
+    asyncio.run(entity.async_added_to_hass())
+    assert (
+        hass.data[DOMAIN][LAST_COMMAND_RESULT_LISTENERS_KEY]["entry-1"]
+        == [entity._handle_command_result]
+    )
+    store_last_command_result(
+        hass,
+        "entry-1",
+        {
+            "command_type": "show_notification",
+            "final_stream_type": "notification",
+            "status": "accepted",
+            "transport": "local",
+        },
+    )
+
+    assert entity._attr_native_value == "show_notification:accepted"
+    assert entity.writes == ["show_notification:accepted"]
+    assert entity._attr_extra_state_attributes["final_stream_type"] == "notification"
+
+
 def test_last_camera_compatibility_sensor_reads_latest_result() -> None:
     class FakeHass:
         data = {
@@ -483,6 +560,7 @@ def test_remote_connected_sensor_updates_from_receiver(monkeypatch) -> None:  # 
 
 def test_test_button_sends_public_test_stream(monkeypatch) -> None:  # type: ignore[no-untyped-def]
     captured: dict[str, Any] = {}
+    hass = FakeHass()
 
     async def fake_show(host: str, port: int, *, token: str, command: Any) -> None:
         captured.update(
@@ -497,7 +575,7 @@ def test_test_button_sends_public_test_stream(monkeypatch) -> None:  # type: ign
 
     monkeypatch.setattr(button, "async_show_camera", fake_show)
 
-    asyncio.run(button.ReceiverTestButton(_entry()).async_press())
+    asyncio.run(button.ReceiverTestButton(hass, _entry()).async_press())
 
     assert captured == {
         "host": "10.0.0.236",
@@ -506,10 +584,15 @@ def test_test_button_sends_public_test_stream(monkeypatch) -> None:  # type: ign
         "title": "HA TV PiP Test",
         "stream_type": "hls",
     }
+    result = hass.data[DOMAIN][LAST_COMMAND_RESULT_KEY]["entry-1"]
+    assert result["command_type"] == "test_pip"
+    assert result["status"] == "accepted"
+    assert result["final_stream_type"] == "hls"
 
 
 def test_refresh_status_button_fetches_receiver_status(monkeypatch) -> None:  # type: ignore[no-untyped-def]
     captured: dict[str, Any] = {}
+    hass = FakeHass()
 
     async def fake_status(host: str, port: int) -> ReceiverStatus:
         captured.update({"host": host, "port": port})
@@ -517,9 +600,12 @@ def test_refresh_status_button_fetches_receiver_status(monkeypatch) -> None:  # 
 
     monkeypatch.setattr(button, "async_get_receiver_status", fake_status)
 
-    asyncio.run(button.ReceiverRefreshStatusButton(_entry()).async_press())
+    asyncio.run(button.ReceiverRefreshStatusButton(hass, _entry()).async_press())
 
     assert captured == {"host": "10.0.0.236", "port": 8765}
+    result = hass.data[DOMAIN][LAST_COMMAND_RESULT_KEY]["entry-1"]
+    assert result["command_type"] == "refresh_status"
+    assert result["status"] == "accepted"
 
 
 def test_refresh_status_button_reports_receiver_errors(monkeypatch) -> None:  # type: ignore[no-untyped-def]
@@ -527,7 +613,8 @@ def test_refresh_status_button_reports_receiver_errors(monkeypatch) -> None:  # 
         raise ReceiverClientError("cannot_connect")
 
     monkeypatch.setattr(button, "async_get_receiver_status", fake_status)
-    entity = button.ReceiverRefreshStatusButton(_entry())
+    hass = FakeHass()
+    entity = button.ReceiverRefreshStatusButton(hass, _entry())
 
     try:
         asyncio.run(entity.async_press())
@@ -535,10 +622,14 @@ def test_refresh_status_button_reports_receiver_errors(monkeypatch) -> None:  # 
         assert "Could not refresh receiver status" in str(error)
     else:
         raise AssertionError("Expected HomeAssistantError")
+    result = hass.data[DOMAIN][LAST_COMMAND_RESULT_KEY]["entry-1"]
+    assert result["command_type"] == "refresh_status"
+    assert result["status"] == "failed"
 
 
 def test_open_button_opens_receiver_management(monkeypatch) -> None:  # type: ignore[no-untyped-def]
     captured: dict[str, Any] = {}
+    hass = FakeHass()
 
     async def fake_open(host: str, port: int, *, token: str) -> bool:
         captured.update({"host": host, "port": port, "token": token})
@@ -546,18 +637,21 @@ def test_open_button_opens_receiver_management(monkeypatch) -> None:  # type: ig
 
     monkeypatch.setattr(button, "async_open_receiver", fake_open)
 
-    asyncio.run(button.ReceiverOpenButton(_entry()).async_press())
+    asyncio.run(button.ReceiverOpenButton(hass, _entry()).async_press())
 
     assert captured == {
         "host": "10.0.0.236",
         "port": 8765,
         "token": "secret-token",
     }
+    result = hass.data[DOMAIN][LAST_COMMAND_RESULT_KEY]["entry-1"]
+    assert result["command_type"] == "open_launcher"
+    assert result["status"] == "accepted"
 
 
 def test_sync_remote_button_pushes_remote_config(monkeypatch) -> None:  # type: ignore[no-untyped-def]
     captured: dict[str, Any] = {}
-    hass = object()
+    hass = FakeHass()
     entry = _entry_with_remote_options()
 
     async def fake_sync(received_hass: Any, received_entry: Any) -> bool:
@@ -569,10 +663,14 @@ def test_sync_remote_button_pushes_remote_config(monkeypatch) -> None:  # type: 
     asyncio.run(button.ReceiverSyncRemoteButton(hass, entry).async_press())
 
     assert captured == {"hass": hass, "entry": entry}
+    result = hass.data[DOMAIN][LAST_COMMAND_RESULT_KEY]["entry-1"]
+    assert result["command_type"] == "sync_remote_config"
+    assert result["status"] == "accepted"
 
 
 def test_sync_remote_button_fails_without_remote_options() -> None:
-    entity = button.ReceiverSyncRemoteButton(object(), _entry())
+    hass = FakeHass()
+    entity = button.ReceiverSyncRemoteButton(hass, _entry())
 
     try:
         asyncio.run(entity.async_press())
@@ -580,6 +678,10 @@ def test_sync_remote_button_fails_without_remote_options() -> None:
         assert "Configure remote receiver settings" in str(error)
     else:
         raise AssertionError("Expected HomeAssistantError")
+    result = hass.data[DOMAIN][LAST_COMMAND_RESULT_KEY]["entry-1"]
+    assert result["command_type"] == "sync_remote_config"
+    assert result["status"] == "failed"
+    assert result["reason"] == "remote_config_missing"
 
 
 def test_sync_remote_button_fails_when_push_fails(monkeypatch) -> None:  # type: ignore[no-untyped-def]
@@ -587,7 +689,8 @@ def test_sync_remote_button_fails_when_push_fails(monkeypatch) -> None:  # type:
         return False
 
     monkeypatch.setattr(button, "async_sync_remote_setup", fake_sync)
-    entity = button.ReceiverSyncRemoteButton(object(), _entry_with_remote_options())
+    hass = FakeHass()
+    entity = button.ReceiverSyncRemoteButton(hass, _entry_with_remote_options())
 
     try:
         asyncio.run(entity.async_press())
@@ -595,10 +698,15 @@ def test_sync_remote_button_fails_when_push_fails(monkeypatch) -> None:  # type:
         assert "Could not send remote receiver settings" in str(error)
     else:
         raise AssertionError("Expected HomeAssistantError")
+    result = hass.data[DOMAIN][LAST_COMMAND_RESULT_KEY]["entry-1"]
+    assert result["command_type"] == "sync_remote_config"
+    assert result["status"] == "failed"
+    assert result["reason"] == "receiver_command_failed"
 
 
 def test_close_button_sends_close_command(monkeypatch) -> None:  # type: ignore[no-untyped-def]
     captured: dict[str, Any] = {}
+    hass = FakeHass()
 
     async def fake_close(host: str, port: int, *, token: str) -> bool:
         captured.update({"host": host, "port": port, "token": token})
@@ -606,13 +714,16 @@ def test_close_button_sends_close_command(monkeypatch) -> None:  # type: ignore[
 
     monkeypatch.setattr(button, "async_close_receiver", fake_close)
 
-    asyncio.run(button.ReceiverCloseButton(_entry()).async_press())
+    asyncio.run(button.ReceiverCloseButton(hass, _entry()).async_press())
 
     assert captured == {
         "host": "10.0.0.236",
         "port": 8765,
         "token": "secret-token",
     }
+    result = hass.data[DOMAIN][LAST_COMMAND_RESULT_KEY]["entry-1"]
+    assert result["command_type"] == "close_pip"
+    assert result["status"] == "accepted"
 
 
 def test_launcher_switch_updates_from_receiver(monkeypatch) -> None:  # type: ignore[no-untyped-def]
@@ -696,6 +807,9 @@ def test_diagnostics_redacts_token_and_url(monkeypatch) -> None:  # type: ignore
             "height": 405,
         }
     }
+    assert result["camera_compatibility"] == {}
+    assert result["camera_last_result"] == {}
+    assert result["last_command_result"] == {}
     assert result["restreaming_providers"] == {
         "enabled": False,
         "status": "planned",

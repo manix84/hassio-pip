@@ -94,6 +94,9 @@ ATTR_TITLE_SIZE = "title_size"
 ATTR_WIDTH = "width"
 CAMERA_COMPATIBILITY_KEY = "camera_compatibility"
 CAMERA_LAST_RESULT_KEY = "camera_last_result"
+LAST_COMMAND_RESULT_KEY = "last_command_result"
+LAST_COMMAND_RESULT_LISTENERS_KEY = "last_command_result_listeners"
+LAST_COMMAND_RESULT_SIGNAL = f"{DOMAIN}_last_command_result"
 CAMERA_DOMAIN = "camera"
 COLOR_PATTERN = re.compile(r"^#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$")
 DEFAULT_NOTIFICATION_BACKGROUND_COLOR = "#B30F0E0E"
@@ -511,6 +514,7 @@ async def async_handle_show_camera(hass: Any, call: Any) -> None:
                 request,
                 receiver=receiver,
                 status="failed",
+                command_type=SERVICE_SHOW_CAMERA,
                 stage="capability_check",
                 reason=error.code,
                 detail=error.detail,
@@ -534,6 +538,7 @@ async def async_handle_show_camera(hass: Any, call: Any) -> None:
                 request,
                 receiver=receiver,
                 status="failed",
+                command_type=SERVICE_SHOW_CAMERA,
                 stage="command_resolution",
                 reason=error.code,
                 detail=error.detail,
@@ -558,6 +563,7 @@ async def async_handle_show_camera(hass: Any, call: Any) -> None:
                     request,
                     receiver=receiver,
                     status="accepted",
+                    command_type=SERVICE_SHOW_CAMERA,
                     stage="receiver_command",
                     transport="remote",
                     command=command,
@@ -577,6 +583,7 @@ async def async_handle_show_camera(hass: Any, call: Any) -> None:
                 request,
                 receiver=receiver,
                 status="accepted",
+                command_type=SERVICE_SHOW_CAMERA,
                 stage="receiver_command",
                 transport="local",
                 command=command,
@@ -590,6 +597,7 @@ async def async_handle_show_camera(hass: Any, call: Any) -> None:
                 request,
                 receiver=receiver,
                 status="failed",
+                command_type=SERVICE_SHOW_CAMERA,
                 stage="receiver_command",
                 reason="receiver_command_failed",
                 detail=str(error),
@@ -622,6 +630,7 @@ async def async_handle_show_snapshot(hass: Any, call: Any) -> None:
                 request,
                 receiver=receiver,
                 status="failed",
+                command_type=SERVICE_SHOW_SNAPSHOT,
                 stage="capability_check",
                 reason=error.code,
                 detail=error.detail,
@@ -643,6 +652,7 @@ async def async_handle_show_snapshot(hass: Any, call: Any) -> None:
                 request,
                 receiver=receiver,
                 status="failed",
+                command_type=SERVICE_SHOW_SNAPSHOT,
                 stage="command_resolution",
                 reason=error.code,
                 detail=error.detail,
@@ -675,6 +685,7 @@ async def async_handle_show_snapshot(hass: Any, call: Any) -> None:
                     request,
                     receiver=receiver,
                     status="accepted",
+                    command_type=SERVICE_SHOW_SNAPSHOT,
                     stage="receiver_command",
                     transport="remote",
                     command=command,
@@ -694,6 +705,7 @@ async def async_handle_show_snapshot(hass: Any, call: Any) -> None:
                 request,
                 receiver=receiver,
                 status="accepted",
+                command_type=SERVICE_SHOW_SNAPSHOT,
                 stage="receiver_command",
                 transport="local",
                 command=command,
@@ -707,6 +719,7 @@ async def async_handle_show_snapshot(hass: Any, call: Any) -> None:
                 request,
                 receiver=receiver,
                 status="failed",
+                command_type=SERVICE_SHOW_SNAPSHOT,
                 stage="receiver_command",
                 reason="receiver_command_failed",
                 detail=str(error),
@@ -727,7 +740,23 @@ async def async_handle_show_notification(hass: Any, call: Any) -> None:
     remote = remote_registry(hass)
     prefer_external = remote.is_connected(receiver.device_id)
     capabilities = await _async_receiver_capabilities(receiver)
-    _validate_notification_capabilities(capabilities)
+    try:
+        _validate_notification_capabilities(capabilities)
+    except ServiceValidationError as error:
+        _store_command_result(
+            hass,
+            receiver,
+            _notification_action_result(
+                request,
+                receiver=receiver,
+                status="failed",
+                stage="capability_check",
+                transport="remote" if prefer_external else "local",
+                reason=error.code,
+                detail=error.detail,
+            ),
+        )
+        raise
     _LOGGER.info(
         "Sending notification to receiver %s using %s transport",
         receiver.name,
@@ -753,6 +782,18 @@ async def async_handle_show_notification(hass: Any, call: Any) -> None:
             height=request.height,
         )
         if await remote.async_send_show(device_id=receiver.device_id, command=command):
+            _store_command_result(
+                hass,
+                receiver,
+                _notification_action_result(
+                    request,
+                    receiver=receiver,
+                    status="accepted",
+                    stage="receiver_command",
+                    transport="remote",
+                    command=command,
+                ),
+            )
             return
         await async_show_camera(
             receiver.host,
@@ -760,7 +801,33 @@ async def async_handle_show_notification(hass: Any, call: Any) -> None:
             token=receiver.token,
             command=command,
         )
+        _store_command_result(
+            hass,
+            receiver,
+            _notification_action_result(
+                request,
+                receiver=receiver,
+                status="accepted",
+                stage="receiver_command",
+                transport="local",
+                command=command,
+            ),
+        )
     except ReceiverClientError as error:
+        _store_command_result(
+            hass,
+            receiver,
+            _notification_action_result(
+                request,
+                receiver=receiver,
+                status="failed",
+                stage="receiver_command",
+                transport="remote" if prefer_external else "local",
+                command=command,
+                reason="receiver_command_failed",
+                detail=str(error),
+            ),
+        )
         _LOGGER.error("Unable to send notification to %s: %s", receiver.name, error)
         raise ServiceValidationError("receiver_command_failed", str(error)) from error
 
@@ -1575,6 +1642,7 @@ def _camera_action_result(
     *,
     receiver: ReceiverEntry,
     status: str,
+    command_type: str,
     stage: str,
     transport: str,
     command: ShowCameraCommand | None = None,
@@ -1584,6 +1652,7 @@ def _camera_action_result(
     """Build a redacted last camera action result for entity state/diagnostics."""
 
     result: dict[str, Any] = {
+        "command_type": command_type,
         "camera_entity": request.camera_entity,
         "stream_camera_entity": request.stream_camera_entity or request.camera_entity,
         "snapshot_camera_entity": request.snapshot_camera_entity
@@ -1597,6 +1666,7 @@ def _camera_action_result(
         "status": status,
         "stage": stage,
         "transport": transport,
+        "updated_at": datetime.now(UTC).isoformat(timespec="seconds"),
     }
     if request.restream_url is not None:
         result["has_restream_url"] = True
@@ -1642,6 +1712,88 @@ def _store_camera_action_result(
     data = hass.data.setdefault(DOMAIN, {})
     action_results = data.setdefault(CAMERA_LAST_RESULT_KEY, {})
     action_results[receiver.entry_id] = result
+    _store_command_result(hass, receiver, result)
+
+
+def _notification_action_result(
+    request: ShowNotificationRequest,
+    *,
+    receiver: ReceiverEntry,
+    status: str,
+    stage: str,
+    transport: str,
+    command: ShowCameraCommand | None = None,
+    reason: str | None = None,
+    detail: str | None = None,
+) -> dict[str, Any]:
+    result: dict[str, Any] = {
+        "command_type": SERVICE_SHOW_NOTIFICATION,
+        "receiver": receiver.name,
+        "receiver_device_id": receiver.device_id,
+        "status": status,
+        "stage": stage,
+        "transport": transport,
+        "title": request.title,
+        "has_message": request.message is not None,
+        "position": request.position,
+        "width": request.width,
+        "height": request.height,
+        "updated_at": datetime.now(UTC).isoformat(timespec="seconds"),
+    }
+    if command is not None:
+        result.update(
+            {
+                "final_stream_type": command.stream_type,
+                "has_notification_text": (
+                    command.show_notification or command.message is not None
+                ),
+            }
+        )
+    if reason is not None:
+        result["reason"] = reason
+    if detail is not None:
+        result["detail"] = detail
+    return {key: value for key, value in result.items() if value is not None}
+
+
+def _store_command_result(
+    hass: Any,
+    receiver: ReceiverEntry,
+    result: dict[str, Any],
+) -> None:
+    store_last_command_result(hass, receiver.entry_id, result)
+
+
+def store_last_command_result(
+    hass: Any,
+    entry_id: str,
+    result: dict[str, Any],
+) -> None:
+    """Store the latest receiver command result and notify interested entities."""
+
+    data = hass.data.setdefault(DOMAIN, {})
+    command_results = data.setdefault(LAST_COMMAND_RESULT_KEY, {})
+    command_results[entry_id] = result
+    listeners = data.get(LAST_COMMAND_RESULT_LISTENERS_KEY, {}).get(entry_id, [])
+    for listener in list(listeners):
+        listener()
+    _send_last_command_result_signal(hass, entry_id)
+
+
+def last_command_result_signal(entry_id: str) -> str:
+    return f"{LAST_COMMAND_RESULT_SIGNAL}_{entry_id}"
+
+
+def _send_last_command_result_signal(hass: Any, entry_id: str) -> None:
+    try:
+        dispatcher = __import__(
+            "homeassistant.helpers.dispatcher",
+            fromlist=["async_dispatcher_send"],
+        )
+    except ModuleNotFoundError:
+        return
+
+    dispatcher.async_dispatcher_send(hass, last_command_result_signal(entry_id))
 
 
 def _service_response_kwargs() -> dict[str, Any]:
@@ -1771,6 +1923,35 @@ async def _async_show_camera_command(
                 raise
             _LOGGER.warning(
                 "Falling back to HLS for %s because MJPEG stream resolution failed: %s",
+                stream_entity,
+                error,
+            )
+
+    if (
+        request.stream_type == STREAM_TYPE_AUTO
+        and supports_mjpeg
+        and not _supports_playable_fallback(capabilities)
+    ):
+        try:
+            _LOGGER.info(
+                "Using MJPEG first for %s because receiver does not support "
+                "playable fallback",
+                stream_entity,
+            )
+            return _mjpeg_show_camera_command(
+                hass,
+                request,
+                title=title,
+                stream_entity=stream_entity,
+                preview_url=preview_url,
+                prefer_external=prefer_external,
+            )
+        except ServiceValidationError as error:
+            if error.code != "camera_mjpeg_unavailable":
+                raise
+            _LOGGER.warning(
+                "Falling back to HLS for %s because automatic MJPEG "
+                "resolution failed: %s",
                 stream_entity,
                 error,
             )

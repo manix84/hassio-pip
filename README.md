@@ -64,8 +64,8 @@ The latest receiver/integration flow includes:
 - `recommended_defaults` previews so users can inspect exactly what would be saved before applying defaults.
 - Optional `restream_url` and `restream_provider` per-camera defaults for users who already expose a TV-safe go2rtc or similar HLS/MJPEG stream.
 - `restreaming_recommended`, `restreaming_reason`, `restreaming_next_step`, and `restreaming_options` fields when a camera likely needs a TV-safe restreamed source.
-- `Last Camera Compatibility`, `Camera Restreaming Recommended`, and `Last Camera Result` entities on the receiver device.
-- Receiver/integration compatibility checks for current, degraded, legacy, and incompatible receiver states, exposed through a dedicated Receiver Compatibility sensor and status attributes.
+- `Last Camera Compatibility`, `Camera Restreaming Recommended`, `Last Camera Result`, and `Last Command Result` entities on the receiver device.
+- Receiver/integration compatibility checks for current, degraded, legacy, and incompatible receiver states, exposed through a dedicated Receiver Compatibility sensor, update guidance, and status attributes.
 - Redacted diagnostics for camera results, per-camera defaults, receiver status, compatibility, and planned restreaming provider support.
 - Restreaming provider metadata that points users toward today's TV-safe stream workarounds before future go2rtc, WebRTC, or transcoding support exists.
 

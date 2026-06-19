@@ -1,5 +1,12 @@
 # What's New ✨
 
+## 1.27.11 - Compatibility Diagnostics And Stream Strategy 🩺
+
+- Added a Last Command Result sensor so the Home Assistant receiver device shows the latest command type, accepted/failed status, transport, final stream type, failure stage, failure reason, and update time 🧭
+- Added redacted last-command diagnostics alongside camera-specific diagnostics 🔎
+- Improved receiver compatibility guidance for degraded, legacy, and incompatible receivers so users know when to update the Android app 📺
+- Updated automatic camera stream selection so receivers without playable fallback prefer MJPEG first when available, reducing decoder risk without extra automation YAML 🎥
+
 ## 1.27.10 - HACS Support And Compatibility Polish 🧰
 
 - Added a Receiver Compatibility sensor so the Home Assistant device shows compatible, degraded, legacy, or incompatible receiver states directly 🩺

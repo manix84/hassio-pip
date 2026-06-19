@@ -125,6 +125,7 @@ These future providers should be optional. The local-first HLS, MJPEG, and snaps
 
 - Check the receiver device's `Last Camera Compatibility` sensor after running a compatibility test.
 - Check the `Camera Restreaming Recommended` binary sensor when live video falls back to snapshots. Its attributes include current workaround paths, planned provider families, and a documentation URL.
-- Check the `Last Camera Result` sensor after a real popup command. `stream_source` shows whether the command used the main camera entity, alternate stream entity, snapshot entity, or manual restream URL.
+- Check the `Last Command Result` sensor after any popup command for command type, accepted/failed status, transport, final stream type, failure stage, and failure reason.
+- Check the `Last Camera Result` sensor after a real camera or snapshot command. `stream_source` shows whether the command used the main camera entity, alternate stream entity, snapshot entity, or manual restream URL.
 - Download diagnostics from the Home Assistant integration entry when opening an issue. URLs and tokens are redacted.
 - If remote receiver mode is used, confirm the TV can reach the configured Home Assistant external URL.

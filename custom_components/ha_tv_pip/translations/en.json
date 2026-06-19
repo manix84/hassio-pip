@@ -102,6 +102,9 @@
       "last_camera_result": {
         "name": "Last Camera Result"
       },
+      "last_command_result": {
+        "name": "Last Command Result"
+      },
       "receiver_version": {
         "name": "Receiver Version"
       },
