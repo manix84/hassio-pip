@@ -1,6 +1,6 @@
 # What's New ✨
 
-## 1.28.0 - Receiver Service Health Diagnostics 🩺
+## 1.28.1 - Receiver Service Health Diagnostics 🩺
 
 - Added Android receiver service runtime diagnostics for foreground state, start count, last start reason, and boot/package-replaced receiver activity 🔄
 - Exposed the new service-health block through the local `/status` endpoint and Home Assistant status attributes 🔎
