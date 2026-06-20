@@ -851,6 +851,7 @@ Completed:
 - ✅ Remote Close PiP support over the outbound WebSocket receiver connection.
 - ✅ Remote Refresh Status support over the outbound WebSocket receiver connection.
 - ✅ Remote-aware receiver status polling for status, display mode, stream type, compatibility, connected, remote connected, and launcher visibility entities.
+- ✅ Discovery repair for DHCP address changes, using the stable receiver id from Zeroconf to update the stored host, port, version, pairing, and API metadata.
 
 Still future:
 
@@ -858,7 +859,6 @@ Still future:
 - Restreaming or transcoding for broad camera codec support.
 - Automatic camera-platform helpers such as go2rtc or Frigate-specific setup shortcuts.
 - Hide or collapse advanced receiver options by default so normal day-to-day setup stays compact while troubleshooting and expert controls remain available.
-- Network repair flow for DHCP address changes, using the stable receiver id from discovery to update the stored host/port instead of requiring users to delete and re-add the receiver.
 
 ## Additional TV Platforms
 

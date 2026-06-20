@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.31.2 - Discovery Address Repair 🛠️
+
+- Made the existing Zeroconf unique-id update path explicit so rediscovered receivers can repair stored host, port, version, pairing, and API metadata after DHCP address changes 📡
+- Added regression coverage for the discovery repair update payload 🧪
+- Documented the expected DHCP repair behavior and troubleshooting path for receivers that move to a new IP address 📝
+
 ## 1.31.1 - Remote-Aware Status Polling 🩺
 
 - Updated receiver status, display mode, stream type, version, compatibility, connected, remote connected, and launcher visibility polling to use the configured local/remote transport order 🌍

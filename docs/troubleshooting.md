@@ -23,6 +23,18 @@ For HACS installs, use `v1.27.9` or newer. Earlier public beta builds can instal
 - Check the receiver dashboard for discovery status.
 - Use manual setup only as a fallback when discovery is blocked but the TV IP address is reachable.
 
+## Receiver IP Address Changed 📡
+
+HA TV PiP uses the receiver's stable discovery id as the Home Assistant unique id. When Zeroconf rediscovers an already configured receiver at a new host or port, Home Assistant updates the stored receiver address instead of creating a duplicate device.
+
+If a receiver moved because of DHCP and Home Assistant still shows it unavailable:
+
+1. Confirm the Android receiver app is running and discovery is active.
+2. Confirm mDNS / Zeroconf can cross the relevant LAN or VLAN boundary.
+3. Wait for Home Assistant to rediscover the receiver, or restart Home Assistant to force a fresh discovery pass.
+4. Check the receiver Status sensor attributes after rediscovery; `transport` and `last_request` should reflect the current control path.
+5. Use manual setup only if discovery is blocked on the network.
+
 ## Pairing Problems 🔐
 
 - Pairing is intentionally TV-visible. Home Assistant starts pairing, and the six-digit code appears on the TV.

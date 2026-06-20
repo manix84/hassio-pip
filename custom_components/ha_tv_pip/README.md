@@ -118,7 +118,7 @@ Each paired receiver creates:
 - Last Camera Result sensor with the latest redacted camera/snapshot command outcome.
 - Last Command Result sensor with the latest receiver command status, command type, transport, stream choice, and failure reason.
 - Restreaming Provider Status sensor for planned, configured, and active provider visibility.
-- Connected binary sensor based on the local `/status` endpoint.
+- Connected binary sensor based on the configured local/remote status transport path.
 - Remote connected binary sensor for outbound remote receiver mode.
 
 PiP controls:

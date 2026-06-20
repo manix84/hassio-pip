@@ -357,6 +357,8 @@ IP addresses should be treated as dynamic.
 
 The integration should identify receivers using a stable device identifier.
 
+When Zeroconf rediscovers an already configured receiver, the config flow updates mutable connection metadata by stable device id. This repairs DHCP host/port changes without creating duplicate devices or requiring delete/re-add recovery.
+
 ---
 
 # Pairing Architecture

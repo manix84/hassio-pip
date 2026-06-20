@@ -1181,7 +1181,7 @@ Check the `discovery` object in the response. A healthy Android-side advertiseme
 
 The Android TV main screen also reports whether discovery is advertising.
 
-The Home Assistant integration declares a Zeroconf matcher for `_ha-tv-pip._tcp.local.`, includes discovery setup, starts pairing, and stores the returned token after the user enters the TV-visible code. Local Python tests cover discovery metadata parsing, config-flow helpers, and receiver client error handling.
+The Home Assistant integration declares a Zeroconf matcher for `_ha-tv-pip._tcp.local.`, includes discovery setup, starts pairing, and stores the returned token after the user enters the TV-visible code. When an existing receiver is rediscovered, the config flow refreshes host, port, version, pairing, and API metadata by stable receiver id so DHCP address changes repair automatically. Local Python tests cover discovery metadata parsing, config-flow helpers, discovery repair metadata, and receiver client error handling.
 
 Stage 7 Home Assistant stream type testing:
 

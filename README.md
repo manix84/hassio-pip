@@ -228,6 +228,7 @@ Available now:
 - Restreaming guidance when a camera needs a TV-safe source 🧵
 - Manual restream URL defaults for go2rtc or similar TV-safe HLS/MJPEG sources 🎬
 - Zeroconf discovery and TV-visible pairing 🔎
+- Discovery repair for DHCP address changes using the receiver's stable discovery id 📡
 - Receiver status, PiP controls, launcher controls, and diagnostics 🧰
 - Restreaming provider status visibility for planned go2rtc, WebRTC, and transcoding support 🩺
 - Restreaming provider metadata in compatibility responses so dashboards and support notes can show current workaround paths 🔎

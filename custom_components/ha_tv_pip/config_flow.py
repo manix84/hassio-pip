@@ -131,14 +131,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call
 
         await self.async_set_unique_id(receiver.device_id)
         self._abort_if_unique_id_configured(
-            updates={
-                CONF_HOST: receiver.host,
-                CONF_PORT: receiver.port,
-                CONF_NAME: receiver.name,
-                CONF_VERSION: receiver.version,
-                CONF_PAIRING: receiver.pairing,
-                CONF_API_VERSION: receiver.api_version,
-            }
+            updates=_receiver_discovery_updates(receiver)
         )
 
         self._discovered_receiver = receiver
@@ -512,6 +505,24 @@ def _create_receiver_entry(
         title=receiver.name,
         data=data,
     )
+
+
+def _receiver_discovery_updates(receiver: ReceiverDiscovery) -> dict[str, Any]:
+    """Return mutable config-entry fields refreshed by Zeroconf discovery.
+
+    Home Assistant calls `_abort_if_unique_id_configured` for already configured
+    receivers. Passing these updates repairs DHCP address changes by stable
+    receiver id without requiring the user to delete and re-add the device.
+    """
+
+    return {
+        CONF_HOST: receiver.host,
+        CONF_PORT: receiver.port,
+        CONF_NAME: receiver.name,
+        CONF_VERSION: receiver.version,
+        CONF_PAIRING: receiver.pairing,
+        CONF_API_VERSION: receiver.api_version,
+    }
 
 
 def _receiver_from_zeroconf(discovery_info: ZeroconfDiscoveryInfo) -> ReceiverDiscovery:

@@ -42,15 +42,21 @@ sys.modules.setdefault("homeassistant.config_entries", config_entries)
 sys.modules.setdefault("voluptuous", voluptuous)
 
 from custom_components.ha_tv_pip.const import (  # noqa: E402
+    CONF_API_VERSION,
     CONF_DEFAULT_DURATION_SECONDS,
     CONF_DEFAULT_HEIGHT,
     CONF_DEFAULT_POSITION,
     CONF_DEFAULT_SNAPSHOT_FALLBACK,
     CONF_DEFAULT_STREAM_TYPE,
     CONF_DEFAULT_WIDTH,
+    CONF_HOST,
+    CONF_NAME,
+    CONF_PAIRING,
+    CONF_PORT,
     CONF_PREFER_REMOTE_TRANSPORT,
     CONF_REMOTE_ACCESS_TOKEN,
     CONF_REMOTE_HOME_ASSISTANT_URL,
+    CONF_VERSION,
 )
 from custom_components.ha_tv_pip.config_flow import (  # noqa: E402
     ConfigFlow,
@@ -58,6 +64,7 @@ from custom_components.ha_tv_pip.config_flow import (  # noqa: E402
     _create_receiver_entry,
     _confirmed_receiver_name,
     _manual_port,
+    _receiver_discovery_updates,
     _receiver_from_user_input,
     _receiver_from_zeroconf,
     _select_dropdown,
@@ -155,6 +162,29 @@ def test_create_receiver_entry_stores_pairing_token_when_present() -> None:
     assert entry["title"] == "Nursery TV"
     assert entry["data"]["pairing"] == "paired"
     assert entry["data"]["token"] == "secret-token"
+
+
+def test_receiver_discovery_updates_repair_dhcp_address_changes() -> None:
+    updates = _receiver_discovery_updates(
+        ReceiverDiscovery(
+            device_id="receiver-id",
+            name="Nursery TV",
+            host="10.0.0.240",
+            port=8766,
+            version="1.32.0",
+            pairing="paired",
+            api_version=1,
+        )
+    )
+
+    assert updates == {
+        CONF_API_VERSION: 1,
+        CONF_HOST: "10.0.0.240",
+        CONF_NAME: "Nursery TV",
+        CONF_PAIRING: "paired",
+        CONF_PORT: 8766,
+        CONF_VERSION: "1.32.0",
+    }
 
 
 def test_options_flow_factory_is_exposed_at_module_and_class_level() -> None:
