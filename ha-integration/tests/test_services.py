@@ -2223,6 +2223,21 @@ def test_calibrate_camera_can_save_recommendation_with_summary(
         "restreaming_options": [],
         "saved": True,
         "next_step": "use_show_camera_without_repeating_defaults",
+        "primary_action": "use_saved_defaults",
+        "primary_action_label": "Use show_camera without repeating defaults",
+    }
+    assert result["action_plan"] == {
+        "primary_action": "use_saved_defaults",
+        "primary_action_label": "Use show_camera without repeating defaults",
+        "service": "show_camera",
+        "data": {ATTR_CAMERA_ENTITY: "camera.front_door"},
+        "notes": [
+            "Per-camera defaults are saved for this receiver.",
+            (
+                "Future automations only need the camera entity unless "
+                "overriding defaults."
+            ),
+        ],
     }
     assert "restreaming_provider" not in result
     assert result["saved_as_defaults"] is True
@@ -2340,6 +2355,26 @@ def test_camera_stream_test_recommends_restreaming_for_snapshot_only(
         ),
     }
     assert result["recommended_defaults"] == {ATTR_STREAM_TYPE: "snapshot"}
+    assert result["action_plan"] == {
+        "primary_action": "use_snapshot_or_configure_live_source",
+        "primary_action_label": (
+            "Use snapshot alerts now, or configure a TV-safe live source"
+        ),
+        "service": "set_camera_defaults",
+        "data": {
+            ATTR_CAMERA_ENTITY: "camera.front_door",
+            ATTR_STREAM_TYPE: "snapshot",
+        },
+        "fields_to_try": [
+            ATTR_STREAM_CAMERA_ENTITY,
+            ATTR_RESTREAM_URL,
+            ATTR_RESTREAM_PROVIDER,
+        ],
+        "notes": [
+            "Snapshot is available, but live HLS/MJPEG was not available.",
+            "Try a lower-resolution camera entity or a TV-safe HLS/MJPEG restream.",
+        ],
+    }
 
 
 def test_calibrate_camera_flags_restreaming_when_no_paths_work(
@@ -2418,6 +2453,34 @@ def test_calibrate_camera_flags_restreaming_when_no_paths_work(
         ),
         "saved": False,
         "next_step": "try_different_camera_entity_or_stream_source",
+        "primary_action": "check_camera_access_or_configure_live_source",
+        "primary_action_label": (
+            "Check camera access or configure a TV-safe stream source"
+        ),
+    }
+    assert result["action_plan"] == {
+        "primary_action": "check_camera_access_or_configure_live_source",
+        "primary_action_label": (
+            "Check camera access or configure a TV-safe stream source"
+        ),
+        "service": "calibrate_camera",
+        "data": {ATTR_CAMERA_ENTITY: "camera.front_door"},
+        "fields_to_try": [
+            ATTR_STREAM_CAMERA_ENTITY,
+            ATTR_SNAPSHOT_CAMERA_ENTITY,
+            ATTR_RESTREAM_URL,
+            ATTR_RESTREAM_PROVIDER,
+        ],
+        "notes": [
+            (
+                "Home Assistant could not resolve a supported HLS, MJPEG, "
+                "or snapshot path."
+            ),
+            (
+                "Check camera permissions, try another camera entity, or "
+                "configure a restream."
+            ),
+        ],
     }
     assert result["restreaming_recommended"] is True
     assert result["restreaming_provider"] == {

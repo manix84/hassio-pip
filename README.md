@@ -225,6 +225,7 @@ Available now:
 - Home Assistant service: `ha_tv_pip.show_notification` 🔔
 - Home Assistant HLS stream resolution with snapshot fallback 🎬
 - Camera compatibility testing and per-camera stream defaults 🧭
+- Camera calibration action plans that suggest the next service call and safe payload 🧰
 - Restreaming guidance when a camera needs a TV-safe source 🧵
 - Manual restream URL defaults for go2rtc or similar TV-safe HLS/MJPEG sources 🎬
 - Zeroconf discovery and TV-visible pairing 🔎

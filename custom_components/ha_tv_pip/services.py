@@ -858,6 +858,10 @@ async def _async_handle_camera_compatibility_workflow(
             **result,
             "saved_as_defaults": False,
         }
+    result = {
+        **result,
+        "action_plan": _camera_compatibility_action_plan(request, result),
+    }
     if include_summary:
         result = {
             **result,
@@ -1468,6 +1472,10 @@ def _camera_calibration_summary(result: dict[str, Any]) -> dict[str, Any]:
         "saved": saved,
         "next_step": _camera_calibration_next_step(compatible, saved),
     }
+    action_plan = result.get("action_plan")
+    if isinstance(action_plan, dict):
+        summary["primary_action"] = action_plan.get("primary_action")
+        summary["primary_action_label"] = action_plan.get("primary_action_label")
     if bool(result.get("has_restream_url", False)):
         summary["has_restream_url"] = True
     if result.get("restream_provider") is not None:
@@ -1486,6 +1494,110 @@ def _camera_calibration_next_step(compatible: bool, saved: bool) -> str:
     if saved:
         return "use_show_camera_without_repeating_defaults"
     return "review_recommended_defaults_or_run_again_with_save"
+
+
+def _camera_compatibility_action_plan(
+    request: ShowCameraRequest,
+    result: dict[str, Any],
+) -> dict[str, Any]:
+    """Return concrete next actions for a camera compatibility result."""
+
+    recommended = result.get("recommended_stream_type")
+    saved = bool(result.get("saved_as_defaults", False))
+    recommended_defaults = dict(result.get("recommended_defaults", {}) or {})
+    camera_data = {ATTR_CAMERA_ENTITY: request.camera_entity}
+
+    if saved:
+        return {
+            "primary_action": "use_saved_defaults",
+            "primary_action_label": "Use show_camera without repeating defaults",
+            "service": SERVICE_SHOW_CAMERA,
+            "data": camera_data,
+            "notes": [
+                "Per-camera defaults are saved for this receiver.",
+                (
+                    "Future automations only need the camera entity unless "
+                    "overriding defaults."
+                ),
+            ],
+        }
+
+    if result.get("restreaming_reason") == (
+        "snapshot_only_live_stream_restreaming_recommended"
+    ):
+        return {
+            "primary_action": "use_snapshot_or_configure_live_source",
+            "primary_action_label": (
+                "Use snapshot alerts now, or configure a TV-safe live source"
+            ),
+            "service": SERVICE_SET_CAMERA_DEFAULTS,
+            "data": {
+                ATTR_CAMERA_ENTITY: request.camera_entity,
+                ATTR_STREAM_TYPE: STREAM_TYPE_SNAPSHOT,
+            },
+            "fields_to_try": [
+                ATTR_STREAM_CAMERA_ENTITY,
+                ATTR_RESTREAM_URL,
+                ATTR_RESTREAM_PROVIDER,
+            ],
+            "notes": [
+                "Snapshot is available, but live HLS/MJPEG was not available.",
+                "Try a lower-resolution camera entity or a TV-safe HLS/MJPEG restream.",
+            ],
+        }
+
+    if recommended in STREAM_TYPES and recommended_defaults:
+        service_data = {
+            ATTR_CAMERA_ENTITY: request.camera_entity,
+            **_action_plan_safe_defaults(recommended_defaults),
+        }
+        return {
+            "primary_action": "save_recommended_defaults",
+            "primary_action_label": "Save the recommended per-camera defaults",
+            "service": SERVICE_SET_CAMERA_DEFAULTS,
+            "data": service_data,
+            "notes": [
+                "Review recommended_defaults before saving.",
+                (
+                    "After saving, call show_camera with only camera_entity "
+                    "for normal use."
+                ),
+            ],
+        }
+
+    return {
+        "primary_action": "check_camera_access_or_configure_live_source",
+        "primary_action_label": (
+            "Check camera access or configure a TV-safe stream source"
+        ),
+        "service": SERVICE_CALIBRATE_CAMERA,
+        "data": camera_data,
+        "fields_to_try": [
+            ATTR_STREAM_CAMERA_ENTITY,
+            ATTR_SNAPSHOT_CAMERA_ENTITY,
+            ATTR_RESTREAM_URL,
+            ATTR_RESTREAM_PROVIDER,
+        ],
+        "notes": [
+            (
+                "Home Assistant could not resolve a supported HLS, MJPEG, "
+                "or snapshot path."
+            ),
+            (
+                "Check camera permissions, try another camera entity, or "
+                "configure a restream."
+            ),
+        ],
+    }
+
+
+def _action_plan_safe_defaults(defaults: dict[str, Any]) -> dict[str, Any]:
+    """Return recommended defaults without duplicating sensitive direct URLs."""
+
+    safe_defaults = dict(defaults)
+    if ATTR_RESTREAM_URL in safe_defaults:
+        safe_defaults[ATTR_RESTREAM_URL] = "<see recommended_defaults.restream_url>"
+    return safe_defaults
 
 
 async def _async_camera_compatibility_report(

@@ -53,7 +53,16 @@ data:
   save: false
 ```
 
-Review the returned `summary`, `recommended_stream_type`, `recommended_defaults`, `restreaming_recommended`, `restreaming_next_step`, `restreaming_options`, and `restreaming_provider`.
+Review the returned `summary`, `action_plan`, `recommended_stream_type`, `recommended_defaults`, `restreaming_recommended`, `restreaming_next_step`, `restreaming_options`, and `restreaming_provider`.
+
+The `action_plan` block is the fastest path for normal users. It includes:
+
+- `primary_action`: stable key for dashboards or support tools.
+- `primary_action_label`: human-readable next step.
+- `service`: the next HA TV PiP service to call.
+- `data`: a safe payload for that service. Direct restream URLs are not duplicated here; review `recommended_defaults` when a restream URL is involved.
+- `fields_to_try`: optional fields to adjust when live video needs another source.
+- `notes`: short guidance explaining why that action was recommended.
 
 When the recommendation looks right, run the same action with `save: true`. The saved per-camera defaults can include stream type, stream camera entity, snapshot camera entity, snapshot fallback, duration, position, width, and height.
 

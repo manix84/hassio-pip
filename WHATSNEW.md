@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.31.4 - Camera Calibration Action Plans 🧭
+
+- Added an `action_plan` block to camera calibration and compatibility results so users can see the next service to call and the data to use 🧰
+- Added `primary_action` and `primary_action_label` to calibration summaries for faster interpretation in Home Assistant action responses 🔎
+- Made snapshot-only compatibility results point users toward either saved snapshot alerts or a TV-safe live source instead of leaving restreaming guidance as raw fields 🧵
+
 ## 1.31.3 - Compact Receiver Options 🧰
 
 - Split the Home Assistant receiver options flow into an everyday defaults screen and an advanced setup screen for popup sizing, position, and remote receiver credentials 🧭

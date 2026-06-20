@@ -213,7 +213,7 @@ data:
   save: false
 ```
 
-Inspect `summary`, `recommendation_reason`, `restreaming_recommended`, `restreaming_reason`, `restreaming_next_step`, `restreaming_options`, and `recommended_defaults` in the action response.
+Inspect `summary`, `action_plan`, `recommendation_reason`, `restreaming_recommended`, `restreaming_reason`, `restreaming_next_step`, `restreaming_options`, and `recommended_defaults` in the action response. `action_plan` includes the suggested next HA TV PiP service and safe payload to use.
 
 Save the recommendation when it looks right:
 
@@ -256,7 +256,7 @@ data:
   save: true
 ```
 
-Calibration tests HLS, MJPEG, and snapshot availability, returns a summary with the recommended stream strategy and next step, and can save the recommendation as per-camera defaults.
+Calibration tests HLS, MJPEG, and snapshot availability, returns a summary with the recommended stream strategy and next step, includes an `action_plan` with the next service call to try, and can save the recommendation as per-camera defaults.
 
 If live HLS/MJPEG paths are unavailable, the response includes `restreaming_recommended: true`, `restreaming_reason`, `restreaming_next_step`, and `restreaming_options`. This means the current camera entity is likely snapshot-only for HA TV PiP, or needs a TV-safe source such as another camera entity, a lower-resolution profile, go2rtc, WebRTC, or future transcoding support.
 
@@ -290,9 +290,11 @@ Restreaming provider support is planned, not active. Until go2rtc, WebRTC, or tr
 
 The response includes `recommended_defaults`, which previews the exact per-camera defaults that would be stored. Inspect that payload first if you want to verify the recommendation before saving it.
 
+The response also includes `action_plan`. For compatible cameras, this points to saving recommended defaults or using `show_camera` after defaults have been saved. For snapshot-only cameras, it points to either saving snapshot alerts now or configuring a TV-safe live source with fields such as `stream_camera_entity`, `restream_url`, and `restream_provider`. For cameras where no path works, it points to checking camera access or trying another stream source.
+
 Set `save_recommendation: true` to save the recommended stream strategy as per-camera defaults. Any explicit test fields, such as width, height, duration, position, snapshot fallback, stream camera entity, or snapshot camera entity, are saved with it. If no compatible stream is found, no defaults are saved.
 
-After a compatibility test runs, the receiver device's `Last Camera Compatibility` sensor shows the latest recommended stream type. Its attributes include the tested camera, recommendation reason, stream availability results, source classification, and timestamp.
+After a compatibility test runs, the receiver device's `Last Camera Compatibility` sensor shows the latest recommended stream type. Its attributes include the tested camera, recommendation reason, action plan, stream availability results, source classification, and timestamp.
 
 The receiver device also exposes a `Camera Restreaming Recommended` binary sensor. It turns on when the latest compatibility result says live video likely needs another TV-safe source, and its attributes include the camera entity, recommended stream type, recommendation reason, restreaming reason, next step, suggested options, current workaround paths, planned provider families, documentation URL, and timestamp.
 
