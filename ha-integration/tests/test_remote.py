@@ -13,6 +13,7 @@ from custom_components.ha_tv_pip.const import CONF_DEVICE_ID, CONF_TOKEN, DOMAIN
 from custom_components.ha_tv_pip.remote import (
     EVENT_RECEIVER_COMMAND,
     WS_TYPE_REGISTER,
+    WS_TYPE_STATUS_RESPONSE,
     RemoteReceiverRegistry,
     async_setup_remote_api,
     remote_registry,
@@ -150,17 +151,80 @@ def test_remote_registry_returns_false_for_close_when_receiver_not_connected() -
     assert accepted is False
 
 
+def test_remote_registry_sends_status_command_and_resolves_response() -> None:
+    async def run_test() -> None:
+        registry = RemoteReceiverRegistry()
+        connection = FakeConnection()
+        registry.register(
+            device_id="device-1",
+            connection=connection,
+            connection_id="connection-1",
+            receiver_name="Travel TV",
+        )
+
+        task = asyncio.create_task(registry.async_get_status(device_id="device-1"))
+        await asyncio.sleep(0)
+
+        assert connection.messages == [
+            {
+                "id": 1,
+                "type": "event",
+                "event": {
+                    "event_type": EVENT_RECEIVER_COMMAND,
+                    "data": {
+                        "command": "status",
+                        "requestId": 1,
+                    },
+                },
+            }
+        ]
+        accepted = registry.handle_status_response(
+            device_id="device-1",
+            request_id=1,
+            status={
+                "app": "HA TV PiP Receiver",
+                "version": "1.30.0",
+                "deviceId": "device-1",
+                "deviceName": "Travel TV",
+                "controlRunning": True,
+                "playbackState": "idle",
+                "displayMode": "idle",
+            },
+        )
+
+        status = await task
+
+        assert accepted is True
+        assert status is not None
+        assert status.version == "1.30.0"
+        assert status.device_id == "device-1"
+        assert status.playback_state == "idle"
+
+    asyncio.run(run_test())
+
+
+def test_remote_registry_returns_none_for_status_when_receiver_not_connected() -> None:
+    registry = RemoteReceiverRegistry()
+
+    status = asyncio.run(registry.async_get_status(device_id="missing"))
+
+    assert status is None
+
+
 def test_remote_websocket_registers_authenticated_receiver(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     registered: dict[str, Any] = {}
+    handlers: dict[str, Any] = {}
     websocket_api = types.ModuleType("homeassistant.components.websocket_api")
     _install_fake_voluptuous(monkeypatch)
 
     def websocket_command(schema: dict[Any, Any]) -> Any:
         registered["schema"] = schema
+        websocket_type = str(schema["type"])
 
         def decorator(handler: Any) -> Any:
+            handlers[websocket_type] = handler
             return handler
 
         return decorator
@@ -169,7 +233,7 @@ def test_remote_websocket_registers_authenticated_receiver(
         return handler
 
     def async_register_command(hass: Any, handler: Any) -> None:
-        registered["handler"] = handler
+        registered.setdefault("registered_handlers", []).append(handler)
 
     websocket_api.websocket_command = websocket_command  # type: ignore[attr-defined]
     websocket_api.async_response = async_response  # type: ignore[attr-defined]
@@ -194,7 +258,7 @@ def test_remote_websocket_registers_authenticated_receiver(
 
     asyncio.run(async_setup_remote_api(hass))
     asyncio.run(
-        registered["handler"](
+        handlers[WS_TYPE_REGISTER](
             hass,
             connection,
             {
@@ -218,18 +282,27 @@ def test_remote_websocket_registers_authenticated_receiver(
         }
     ]
     assert remote_registry(hass).is_connected("device-1") is True
+    assert WS_TYPE_STATUS_RESPONSE in handlers
 
 
 def test_remote_websocket_rejects_unpaired_receiver(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     registered: dict[str, Any] = {}
+    handlers: dict[str, Any] = {}
     websocket_api = types.ModuleType("homeassistant.components.websocket_api")
     _install_fake_voluptuous(monkeypatch)
 
-    websocket_api.websocket_command = lambda schema: (  # type: ignore[attr-defined]
-        lambda handler: handler
-    )
+    def websocket_command(schema: dict[Any, Any]) -> Any:
+        websocket_type = str(schema["type"])
+
+        def decorator(handler: Any) -> Any:
+            handlers[websocket_type] = handler
+            return handler
+
+        return decorator
+
+    websocket_api.websocket_command = websocket_command  # type: ignore[attr-defined]
     websocket_api.async_response = lambda handler: handler  # type: ignore[attr-defined]
     websocket_api.async_register_command = (  # type: ignore[attr-defined]
         lambda hass, handler: registered.update({"handler": handler})
@@ -245,7 +318,7 @@ def test_remote_websocket_rejects_unpaired_receiver(
 
     asyncio.run(async_setup_remote_api(hass))
     asyncio.run(
-        registered["handler"](
+        handlers[WS_TYPE_REGISTER](
             hass,
             connection,
             {

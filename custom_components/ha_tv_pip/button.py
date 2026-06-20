@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, Any
 from .client import (
     ReceiverClientError,
     ShowCameraCommand,
-    async_get_receiver_status,
     async_open_receiver,
 )
 from .const import CONF_DEVICE_ID, CONF_NAME, CONF_TOKEN
@@ -17,6 +16,7 @@ from .remote import remote_registry
 from .remote_setup import async_sync_remote_setup, has_remote_setup_options
 from .services import (
     _async_close_receiver_command,
+    _async_get_receiver_status_command,
     _async_send_receiver_command,
     _prefer_remote_transport,
     _resolve_receiver_from_entry,
@@ -165,8 +165,15 @@ class ReceiverRefreshStatusButton(ReceiverEntity, ButtonEntity):
     async def async_press(self) -> None:
         """Fetch receiver status once and fail visibly when unreachable."""
 
+        receiver = _resolve_receiver_from_entry(self.entry)
+        remote = remote_registry(self.hass)
+        prefer_remote = _prefer_remote_transport(receiver, remote)
         try:
-            await async_get_receiver_status(self.host, self.port)
+            _, transport = await _async_get_receiver_status_command(
+                receiver,
+                remote,
+                prefer_remote=prefer_remote,
+            )
         except ReceiverClientError as error:
             _store_button_result(
                 self.hass,
@@ -184,6 +191,7 @@ class ReceiverRefreshStatusButton(ReceiverEntity, ButtonEntity):
             self.entry,
             command_type="refresh_status",
             status="accepted",
+            transport=transport,
         )
 
 

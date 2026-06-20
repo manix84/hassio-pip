@@ -748,25 +748,98 @@ def test_refresh_status_button_fetches_receiver_status(monkeypatch) -> None:  # 
     captured: dict[str, Any] = {}
     hass = FakeHass()
 
-    async def fake_status(host: str, port: int) -> ReceiverStatus:
-        captured.update({"host": host, "port": port})
-        return _status()
+    class FakeRemoteRegistry:
+        def is_connected(self, device_id: str) -> bool:
+            return False
 
-    monkeypatch.setattr(button, "async_get_receiver_status", fake_status)
+    async def fake_status(
+        receiver: Any,
+        remote: Any,
+        *,
+        prefer_remote: bool,
+    ) -> tuple[ReceiverStatus, str]:
+        captured.update(
+            {
+                "host": receiver.host,
+                "port": receiver.port,
+                "prefer_remote": prefer_remote,
+            }
+        )
+        return _status(), "local"
+
+    monkeypatch.setattr(button, "remote_registry", lambda hass: FakeRemoteRegistry())
+    monkeypatch.setattr(button, "_async_get_receiver_status_command", fake_status)
 
     asyncio.run(button.ReceiverRefreshStatusButton(hass, _entry()).async_press())
 
-    assert captured == {"host": "10.0.0.236", "port": 8765}
+    assert captured == {
+        "host": "10.0.0.236",
+        "port": 8765,
+        "prefer_remote": False,
+    }
     result = hass.data[DOMAIN][LAST_COMMAND_RESULT_KEY]["entry-1"]
     assert result["command_type"] == "refresh_status"
     assert result["status"] == "accepted"
+    assert result["transport"] == "local"
+
+
+def test_refresh_status_button_prefers_remote_transport_when_enabled(
+    monkeypatch: Any,
+) -> None:
+    captured: dict[str, Any] = {}
+    hass = FakeHass()
+
+    class FakeRemoteRegistry:
+        def is_connected(self, device_id: str) -> bool:
+            return device_id == "device-1"
+
+    async def fake_status(
+        receiver: Any,
+        remote: Any,
+        *,
+        prefer_remote: bool,
+    ) -> tuple[ReceiverStatus, str]:
+        captured.update(
+            {
+                "device_id": receiver.device_id,
+                "prefer_remote": prefer_remote,
+            }
+        )
+        return _status(), "remote"
+
+    entry = _entry()
+    entry.options = {CONF_PREFER_REMOTE_TRANSPORT: True}
+
+    monkeypatch.setattr(button, "remote_registry", lambda hass: FakeRemoteRegistry())
+    monkeypatch.setattr(button, "_async_get_receiver_status_command", fake_status)
+
+    asyncio.run(button.ReceiverRefreshStatusButton(hass, entry).async_press())
+
+    assert captured == {
+        "device_id": "device-1",
+        "prefer_remote": True,
+    }
+    result = hass.data[DOMAIN][LAST_COMMAND_RESULT_KEY]["entry-1"]
+    assert result["command_type"] == "refresh_status"
+    assert result["status"] == "accepted"
+    assert result["transport"] == "remote"
 
 
 def test_refresh_status_button_reports_receiver_errors(monkeypatch) -> None:  # type: ignore[no-untyped-def]
-    async def fake_status(host: str, port: int) -> ReceiverStatus:
+    class FakeRemoteRegistry:
+        def is_connected(self, device_id: str) -> bool:
+            return False
+
+    async def fake_status(
+        receiver: Any,
+        remote: Any,
+        *,
+        prefer_remote: bool,
+    ) -> tuple[ReceiverStatus, str]:
         raise ReceiverClientError("cannot_connect")
 
-    monkeypatch.setattr(button, "async_get_receiver_status", fake_status)
+    monkeypatch.setattr(button, "remote_registry", lambda hass: FakeRemoteRegistry())
+    monkeypatch.setattr(button, "_async_get_receiver_status_command", fake_status)
     hass = FakeHass()
     entity = button.ReceiverRefreshStatusButton(hass, _entry())
 

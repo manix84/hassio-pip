@@ -140,7 +140,25 @@ class RemoteReceiverClient(
                 RemoteConnectionRuntimeState.markMessage()
                 onClose()
             }
+            "status" -> {
+                RemoteConnectionRuntimeState.markMessage()
+                sendStatusResponse(data)
+            }
         }
+    }
+
+    private fun sendStatusResponse(data: JSONObject) {
+        val requestId = data.optInt("requestId", 0)
+        if (requestId <= 0) return
+        webSocket?.send(
+            JSONObject()
+                .put("id", nextMessageId++)
+                .put("type", WS_TYPE_STATUS_RESPONSE)
+                .put("device_id", ReceiverDeviceInfo.stableDeviceId(context))
+                .put("request_id", requestId)
+                .put("status", ReceiverStatusPayload.build(context))
+                .toString()
+        )
     }
 
     private inner class Listener(
@@ -168,6 +186,7 @@ class RemoteReceiverClient(
     companion object {
         const val EVENT_RECEIVER_COMMAND = "ha_tv_pip/receiver_command"
         const val WS_TYPE_REGISTER = "ha_tv_pip/receiver/register"
+        const val WS_TYPE_STATUS_RESPONSE = "ha_tv_pip/receiver/status_response"
         private const val NORMAL_CLOSE_CODE = 1000
 
         fun homeAssistantWebSocketUrl(homeAssistantUrl: String): String {

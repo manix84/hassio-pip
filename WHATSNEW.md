@@ -1,6 +1,12 @@
 # What's New ✨
 
-## 1.29.3 - Remote Close PiP 🚪
+## 1.31.0 - Remote Status Refresh 🔄
+
+- Added a remote WebSocket request/response path so Refresh Status can query connected remote receivers without local LAN access 🌍
+- Reused the same Android status payload for local `/status` and remote status responses to keep diagnostics consistent 🩺
+- Updated Refresh Status to follow receiver transport preference and record whether `local` or `remote` handled the refresh 🧭
+
+## 1.30.0 - Remote Close PiP 🚪
 
 - Added remote WebSocket support for Close PiP so remote receivers can close active popups without local HTTP access 🌍
 - Updated the Android remote receiver client to handle remote close commands and increment remote message diagnostics 📺

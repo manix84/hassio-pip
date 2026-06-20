@@ -262,6 +262,12 @@ async def async_get_receiver_status(host: str, port: int) -> ReceiverStatus:
     """Fetch receiver status from the local API."""
 
     response = await asyncio.to_thread(_get_json, host, port, "/status")
+    return receiver_status_from_payload(response)
+
+
+def receiver_status_from_payload(response: dict[str, Any]) -> ReceiverStatus:
+    """Parse a receiver status payload."""
+
     pairing = response.get("pairing")
     management = response.get("management")
     remote = response.get("remote")

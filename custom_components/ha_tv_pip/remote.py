@@ -8,13 +8,19 @@ already-authenticated connection.
 
 from __future__ import annotations
 
+import asyncio
 import itertools
 import logging
 from dataclasses import dataclass
 from hmac import compare_digest
 from typing import Any
 
-from .client import ShowCameraCommand, show_camera_payload
+from .client import (
+    ReceiverStatus,
+    ShowCameraCommand,
+    receiver_status_from_payload,
+    show_camera_payload,
+)
 from .const import CONF_DEVICE_ID, CONF_TOKEN, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
@@ -22,6 +28,7 @@ _LOGGER = logging.getLogger(__name__)
 DATA_REMOTE_REGISTRY = "remote_registry"
 DATA_REMOTE_API_REGISTERED = "remote_api_registered"
 WS_TYPE_REGISTER = f"{DOMAIN}/receiver/register"
+WS_TYPE_STATUS_RESPONSE = f"{DOMAIN}/receiver/status_response"
 EVENT_RECEIVER_COMMAND = f"{DOMAIN}/receiver_command"
 
 
@@ -41,6 +48,7 @@ class RemoteReceiverRegistry:
     def __init__(self) -> None:
         self._connections: dict[str, RemoteReceiverConnection] = {}
         self._message_ids = itertools.count(1)
+        self._pending_status: dict[int, tuple[str, asyncio.Future[ReceiverStatus]]] = {}
 
     def is_connected(self, device_id: str) -> bool:
         """Return whether a remote receiver is currently connected."""
@@ -111,14 +119,68 @@ class RemoteReceiverRegistry:
             data={"command": "close"},
         )
 
-    def _send_command_event(self, *, device_id: str, data: dict[str, Any]) -> bool:
+    async def async_get_status(
+        self,
+        *,
+        device_id: str,
+        timeout_seconds: float = 5.0,
+    ) -> ReceiverStatus | None:
+        """Request receiver status over the connected remote transport."""
+
+        request_id = next(self._message_ids)
+        loop = asyncio.get_running_loop()
+        future: asyncio.Future[ReceiverStatus] = loop.create_future()
+        self._pending_status[request_id] = (device_id, future)
+        accepted = self._send_command_event(
+            device_id=device_id,
+            data={
+                "command": "status",
+                "requestId": request_id,
+            },
+            message_id=request_id,
+        )
+        if not accepted:
+            self._pending_status.pop(request_id, None)
+            return None
+        try:
+            return await asyncio.wait_for(future, timeout=timeout_seconds)
+        except TimeoutError:
+            return None
+        finally:
+            self._pending_status.pop(request_id, None)
+
+    def handle_status_response(
+        self,
+        *,
+        device_id: str,
+        request_id: int,
+        status: dict[str, Any],
+    ) -> bool:
+        """Resolve a pending remote status request."""
+
+        pending = self._pending_status.get(request_id)
+        if pending is None:
+            return False
+        expected_device_id, future = pending
+        if expected_device_id != device_id or future.done():
+            return False
+        future.set_result(receiver_status_from_payload(status))
+        return True
+
+    def _send_command_event(
+        self,
+        *,
+        device_id: str,
+        data: dict[str, Any],
+        message_id: int | None = None,
+    ) -> bool:
         remote = self._connections.get(device_id)
         if remote is None:
             return False
 
         remote.connection.send_message(
             {
-                "id": next(self._message_ids),
+                "id": message_id or next(self._message_ids),
                 "type": "event",
                 "event": {
                     "event_type": EVENT_RECEIVER_COMMAND,
@@ -188,6 +250,35 @@ async def async_setup_remote_api(hass: Any) -> None:
             },
         )
 
+    async def receive_status_response(
+        hass: Any,
+        connection: Any,
+        msg: dict[str, Any],
+    ) -> None:
+        device_id = str(msg.get("device_id", "")).strip()
+        request_id = int(msg.get("request_id", 0))
+        status = msg.get("status")
+        if not device_id or request_id <= 0 or not isinstance(status, dict):
+            connection.send_error(
+                msg["id"],
+                "invalid_status_response",
+                "Invalid receiver status response",
+            )
+            return
+        accepted = remote_registry(hass).handle_status_response(
+            device_id=device_id,
+            request_id=request_id,
+            status=status,
+        )
+        connection.send_result(
+            msg["id"],
+            {
+                "accepted": accepted,
+                "device_id": device_id,
+                "request_id": request_id,
+            },
+        )
+
     register_receiver = websocket_api.websocket_command(
         {
             vol.Required("type"): WS_TYPE_REGISTER,
@@ -198,6 +289,17 @@ async def async_setup_remote_api(hass: Any) -> None:
     )(register_receiver)
     register_receiver = websocket_api.async_response(register_receiver)
     websocket_api.async_register_command(hass, register_receiver)
+
+    receive_status_response = websocket_api.websocket_command(
+        {
+            vol.Required("type"): WS_TYPE_STATUS_RESPONSE,
+            vol.Required("device_id"): str,
+            vol.Required("request_id"): int,
+            vol.Required("status"): dict,
+        }
+    )(receive_status_response)
+    receive_status_response = websocket_api.async_response(receive_status_response)
+    websocket_api.async_register_command(hass, receive_status_response)
     data[DATA_REMOTE_API_REGISTERED] = True
 
 

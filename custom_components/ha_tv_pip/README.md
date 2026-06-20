@@ -386,7 +386,7 @@ The service sends a styled text notification to the paired receiver as `streamTy
 
 Phase 9 adds optional remote receiver transport for external TVs.
 
-The integration registers a Home Assistant WebSocket command that a paired Android TV receiver can use after authenticating to the user's own Home Assistant instance. `ha_tv_pip.show_camera`, `ha_tv_pip.show_snapshot`, `ha_tv_pip.show_notification`, Test PiP, and Close PiP use local HTTP first by default. Prefer Remote Transport can be enabled per receiver for WebSocket-first behavior, and the non-preferred path remains available as fallback when possible.
+The integration registers a Home Assistant WebSocket command that a paired Android TV receiver can use after authenticating to the user's own Home Assistant instance. `ha_tv_pip.show_camera`, `ha_tv_pip.show_snapshot`, `ha_tv_pip.show_notification`, Test PiP, Close PiP, and Refresh Status use local HTTP first by default. Prefer Remote Transport can be enabled per receiver for WebSocket-first behavior, and the non-preferred path remains available as fallback when possible.
 
 Remote mode is not a HA TV PiP cloud service. It uses the user's Home Assistant external URL, including Nabu Casa URLs where available, and the integration remains `local_push`.
 

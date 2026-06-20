@@ -12,6 +12,7 @@ from urllib.parse import quote, urlencode, urljoin, urlparse
 from .client import (
     ReceiverCapabilities,
     ReceiverClientError,
+    ReceiverStatus,
     ShowCameraCommand,
     async_close_receiver,
     async_get_receiver_status,
@@ -1142,6 +1143,33 @@ async def _async_close_receiver_command(
         token=receiver.token,
     )
     return accepted, "local"
+
+
+async def _async_get_receiver_status_command(
+    receiver: ReceiverEntry,
+    remote: Any,
+    *,
+    prefer_remote: bool,
+) -> tuple[ReceiverStatus, str]:
+    """Fetch receiver status with remote/local fallback ordering."""
+
+    if prefer_remote:
+        status = await remote.async_get_status(device_id=receiver.device_id)
+        if status is not None:
+            return status, "remote"
+
+    if not prefer_remote:
+        try:
+            status = await async_get_receiver_status(receiver.host, receiver.port)
+            return status, "local"
+        except ReceiverClientError:
+            status = await remote.async_get_status(device_id=receiver.device_id)
+            if status is not None:
+                return status, "remote"
+            raise
+
+    status = await async_get_receiver_status(receiver.host, receiver.port)
+    return status, "local"
 
 
 def _configured_entries(hass: Any) -> list[Any]:
