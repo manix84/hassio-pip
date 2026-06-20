@@ -483,7 +483,7 @@ Home Assistant integration
 Android TV receiver playback
 ```
 
-Local HTTP control is preferred by default. When a remote receiver is connected and remote transport is preferred for that receiver, Home Assistant should resolve camera streams and snapshots against the external Home Assistant URL and try the WebSocket path first. Test PiP, Close PiP, and Refresh Status use the same transport ordering as camera, snapshot, and notification commands. The non-preferred path remains available as fallback when possible.
+Local HTTP control is preferred by default. When a remote receiver is connected and remote transport is preferred for that receiver, Home Assistant should resolve camera streams and snapshots against the external Home Assistant URL and try the WebSocket path first. Test PiP, Close PiP, Refresh Status, and receiver status polling use the same transport ordering as camera, snapshot, and notification commands. The non-preferred path remains available as fallback when possible.
 
 ---
 

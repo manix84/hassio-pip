@@ -8,12 +8,16 @@ from typing import TYPE_CHECKING, Any
 from .client import ReceiverClientError, ReceiverStatus, async_get_receiver_status
 from .const import DOMAIN
 from .entity import ReceiverEntity
+from .remote import remote_registry
 from .restreaming import RESTREAMING_PROVIDER_STATUS, restreaming_provider_metadata
 from .services import (
     CAMERA_COMPATIBILITY_KEY,
     CAMERA_LAST_RESULT_KEY,
     LAST_COMMAND_RESULT_KEY,
     LAST_COMMAND_RESULT_LISTENERS_KEY,
+    _async_get_receiver_status_command,
+    _prefer_remote_transport,
+    _resolve_receiver_from_entry,
     last_command_result_signal,
 )
 
@@ -37,16 +41,16 @@ async def async_setup_entry(hass: Any, entry: Any, async_add_entities: Any) -> N
 
     async_add_entities(
         [
-            ReceiverStatusSensor(entry),
-            ReceiverDisplayModeSensor(entry),
-            ReceiverStreamTypeSensor(entry),
-            ReceiverLastErrorSensor(entry),
-            ReceiverVersionSensor(entry),
-            ReceiverCompatibilitySensor(entry),
+            ReceiverStatusSensor(entry, hass=hass),
+            ReceiverDisplayModeSensor(entry, hass=hass),
+            ReceiverStreamTypeSensor(entry, hass=hass),
+            ReceiverLastErrorSensor(entry, hass=hass),
+            ReceiverVersionSensor(entry, hass=hass),
+            ReceiverCompatibilitySensor(entry, hass=hass),
             ReceiverLastCommandResultSensor(hass, entry),
             ReceiverLastCameraCompatibilitySensor(hass, entry),
             ReceiverLastCameraResultSensor(hass, entry),
-            ReceiverRestreamingProviderStatusSensor(entry),
+            ReceiverRestreamingProviderStatusSensor(entry, hass=hass),
         ]
     )
 
@@ -56,8 +60,16 @@ class ReceiverPollingSensor(ReceiverEntity, SensorEntity):
 
     unavailable_value = "unavailable"
 
-    def __init__(self, entry: Any, *, key: str, name: str) -> None:
+    def __init__(
+        self,
+        entry: Any,
+        *,
+        key: str,
+        name: str,
+        hass: Any | None = None,
+    ) -> None:
         super().__init__(entry, key=key, name=name)
+        self.hass = hass
         self._attr_native_value: str | None = self.unavailable_value
         self._attr_extra_state_attributes: dict[str, Any] = {}
 
@@ -65,7 +77,12 @@ class ReceiverPollingSensor(ReceiverEntity, SensorEntity):
         """Poll the receiver status endpoint."""
 
         try:
-            status = await async_get_receiver_status(self.host, self.port)
+            status, transport = await _async_status_for_entry(
+                self.hass,
+                self.entry,
+                self.host,
+                self.port,
+            )
         except ReceiverClientError as error:
             self._attr_native_value = "unavailable"
             self._attr_extra_state_attributes = {
@@ -77,6 +94,7 @@ class ReceiverPollingSensor(ReceiverEntity, SensorEntity):
 
         self._attr_native_value = self._native_value(status)
         self._attr_extra_state_attributes = self._extra_attributes(status)
+        self._attr_extra_state_attributes["transport"] = transport
 
     def _native_value(self, status: ReceiverStatus) -> str | None:
         raise NotImplementedError
@@ -88,8 +106,8 @@ class ReceiverPollingSensor(ReceiverEntity, SensorEntity):
 class ReceiverStatusSensor(ReceiverPollingSensor):
     """Receiver playback/status sensor."""
 
-    def __init__(self, entry: Any) -> None:
-        super().__init__(entry, key="status", name="Status")
+    def __init__(self, entry: Any, *, hass: Any | None = None) -> None:
+        super().__init__(entry, key="status", name="Status", hass=hass)
 
     def _native_value(self, status: ReceiverStatus) -> str:
         return status.playback_state
@@ -98,8 +116,13 @@ class ReceiverStatusSensor(ReceiverPollingSensor):
 class ReceiverDisplayModeSensor(ReceiverPollingSensor):
     """Receiver display mode sensor."""
 
-    def __init__(self, entry: Any) -> None:
-        super().__init__(entry, key="display_mode", name="Active Display Mode")
+    def __init__(self, entry: Any, *, hass: Any | None = None) -> None:
+        super().__init__(
+            entry,
+            key="display_mode",
+            name="Active Display Mode",
+            hass=hass,
+        )
 
     def _native_value(self, status: ReceiverStatus) -> str:
         return status.display_mode
@@ -110,8 +133,8 @@ class ReceiverStreamTypeSensor(ReceiverPollingSensor):
 
     unavailable_value = "unknown"
 
-    def __init__(self, entry: Any) -> None:
-        super().__init__(entry, key="stream_type", name="Active Stream Type")
+    def __init__(self, entry: Any, *, hass: Any | None = None) -> None:
+        super().__init__(entry, key="stream_type", name="Active Stream Type", hass=hass)
 
     def _native_value(self, status: ReceiverStatus) -> str:
         return status.stream_type or "unknown"
@@ -120,8 +143,8 @@ class ReceiverStreamTypeSensor(ReceiverPollingSensor):
 class ReceiverLastErrorSensor(ReceiverPollingSensor):
     """Receiver last error sensor."""
 
-    def __init__(self, entry: Any) -> None:
-        super().__init__(entry, key="last_error", name="Last Receiver Error")
+    def __init__(self, entry: Any, *, hass: Any | None = None) -> None:
+        super().__init__(entry, key="last_error", name="Last Receiver Error", hass=hass)
 
     def _native_value(self, status: ReceiverStatus) -> str:
         return status.error or "none"
@@ -130,8 +153,13 @@ class ReceiverLastErrorSensor(ReceiverPollingSensor):
 class ReceiverVersionSensor(ReceiverPollingSensor):
     """Receiver app version sensor."""
 
-    def __init__(self, entry: Any) -> None:
-        super().__init__(entry, key="receiver_version", name="Receiver Version")
+    def __init__(self, entry: Any, *, hass: Any | None = None) -> None:
+        super().__init__(
+            entry,
+            key="receiver_version",
+            name="Receiver Version",
+            hass=hass,
+        )
 
     def _native_value(self, status: ReceiverStatus) -> str:
         return status.version or "unknown"
@@ -140,11 +168,12 @@ class ReceiverVersionSensor(ReceiverPollingSensor):
 class ReceiverCompatibilitySensor(ReceiverPollingSensor):
     """Receiver compatibility summary sensor."""
 
-    def __init__(self, entry: Any) -> None:
+    def __init__(self, entry: Any, *, hass: Any | None = None) -> None:
         super().__init__(
             entry,
             key="receiver_compatibility",
             name="Receiver Compatibility",
+            hass=hass,
         )
 
     def _native_value(self, status: ReceiverStatus) -> str:
@@ -292,7 +321,7 @@ class ReceiverLastCameraCompatibilitySensor(ReceiverEntity, SensorEntity):
 class ReceiverRestreamingProviderStatusSensor(ReceiverEntity, SensorEntity):
     """Current restreaming provider availability for this integration."""
 
-    def __init__(self, entry: Any) -> None:
+    def __init__(self, entry: Any, *, hass: Any | None = None) -> None:
         super().__init__(
             entry,
             key="restreaming_provider_status",
@@ -300,6 +329,24 @@ class ReceiverRestreamingProviderStatusSensor(ReceiverEntity, SensorEntity):
         )
         self._attr_native_value = RESTREAMING_PROVIDER_STATUS
         self._attr_extra_state_attributes = restreaming_provider_metadata()
+
+
+async def _async_status_for_entry(
+    hass: Any | None,
+    entry: Any,
+    host: str,
+    port: int,
+) -> tuple[ReceiverStatus, str]:
+    if hass is None:
+        return await async_get_receiver_status(host, port), "local"
+
+    receiver = _resolve_receiver_from_entry(entry)
+    remote = remote_registry(hass)
+    return await _async_get_receiver_status_command(
+        receiver,
+        remote,
+        prefer_remote=_prefer_remote_transport(receiver, remote),
+    )
 
 
 def _latest_camera_compatibility_result(

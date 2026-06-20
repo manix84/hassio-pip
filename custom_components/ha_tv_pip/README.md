@@ -145,6 +145,7 @@ Remote receiver mode:
 - Uses your own Home Assistant external URL and long-lived access token.
 - The TV connects outbound to Home Assistant, so you do not need to forward ports to the TV.
 - Local HTTP is used first by default. Prefer Remote Transport can be enabled when connected remote receivers should receive commands over the Home Assistant WebSocket path first.
+- Receiver status entities add a `transport` attribute so you can see whether local HTTP or remote WebSocket supplied the latest poll.
 - This is not a HA TV PiP cloud service.
 
 Launcher visibility:
@@ -386,7 +387,7 @@ The service sends a styled text notification to the paired receiver as `streamTy
 
 Phase 9 adds optional remote receiver transport for external TVs.
 
-The integration registers a Home Assistant WebSocket command that a paired Android TV receiver can use after authenticating to the user's own Home Assistant instance. `ha_tv_pip.show_camera`, `ha_tv_pip.show_snapshot`, `ha_tv_pip.show_notification`, Test PiP, Close PiP, and Refresh Status use local HTTP first by default. Prefer Remote Transport can be enabled per receiver for WebSocket-first behavior, and the non-preferred path remains available as fallback when possible.
+The integration registers a Home Assistant WebSocket command that a paired Android TV receiver can use after authenticating to the user's own Home Assistant instance. `ha_tv_pip.show_camera`, `ha_tv_pip.show_snapshot`, `ha_tv_pip.show_notification`, Test PiP, Close PiP, Refresh Status, and receiver status polling use local HTTP first by default. Prefer Remote Transport can be enabled per receiver for WebSocket-first behavior, and the non-preferred path remains available as fallback when possible.
 
 Remote mode is not a HA TV PiP cloud service. It uses the user's Home Assistant external URL, including Nabu Casa URLs where available, and the integration remains `local_push`.
 

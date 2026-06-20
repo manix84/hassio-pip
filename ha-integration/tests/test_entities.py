@@ -372,6 +372,48 @@ def test_restreaming_provider_status_sensor_reports_planned_state() -> None:
     }
 
 
+def test_status_sensor_prefers_remote_transport_when_enabled(
+    monkeypatch: Any,
+) -> None:
+    captured: dict[str, Any] = {}
+    hass = FakeHass()
+
+    class FakeRemoteRegistry:
+        def is_connected(self, device_id: str) -> bool:
+            return device_id == "device-1"
+
+    async def fake_status(
+        receiver: Any,
+        remote: Any,
+        *,
+        prefer_remote: bool,
+    ) -> tuple[ReceiverStatus, str]:
+        captured.update(
+            {
+                "device_id": receiver.device_id,
+                "prefer_remote": prefer_remote,
+            }
+        )
+        return _status(), "remote"
+
+    entry = _entry()
+    entry.options = {CONF_PREFER_REMOTE_TRANSPORT: True}
+
+    monkeypatch.setattr(sensor, "remote_registry", lambda hass: FakeRemoteRegistry())
+    monkeypatch.setattr(sensor, "_async_get_receiver_status_command", fake_status)
+
+    entity = sensor.ReceiverStatusSensor(entry, hass=hass)
+
+    asyncio.run(entity.async_update())
+
+    assert captured == {
+        "device_id": "device-1",
+        "prefer_remote": True,
+    }
+    assert entity._attr_native_value == "playing"
+    assert entity._attr_extra_state_attributes["transport"] == "remote"
+
+
 def test_focused_status_sensors_update_from_receiver(monkeypatch) -> None:  # type: ignore[no-untyped-def]
     async def fake_status(host: str, port: int) -> ReceiverStatus:
         return _status()
@@ -653,6 +695,56 @@ def test_remote_connected_sensor_updates_from_receiver(monkeypatch) -> None:  # 
         entity._attr_extra_state_attributes["remote_last_disconnect_reason"]
         == "receiver reconnect"
     )
+
+
+def test_remote_connected_sensor_prefers_remote_transport_when_enabled(
+    monkeypatch: Any,
+) -> None:
+    captured: dict[str, Any] = {}
+    hass = FakeHass()
+
+    class FakeRemoteRegistry:
+        def is_connected(self, device_id: str) -> bool:
+            return device_id == "device-1"
+
+    async def fake_status(
+        receiver: Any,
+        remote: Any,
+        *,
+        prefer_remote: bool,
+    ) -> tuple[ReceiverStatus, str]:
+        captured.update(
+            {
+                "device_id": receiver.device_id,
+                "prefer_remote": prefer_remote,
+            }
+        )
+        return _status(), "remote"
+
+    entry = _entry()
+    entry.options = {CONF_PREFER_REMOTE_TRANSPORT: True}
+
+    monkeypatch.setattr(
+        binary_sensor,
+        "remote_registry",
+        lambda hass: FakeRemoteRegistry(),
+    )
+    monkeypatch.setattr(
+        binary_sensor,
+        "_async_get_receiver_status_command",
+        fake_status,
+    )
+
+    entity = binary_sensor.ReceiverRemoteConnectedBinarySensor(entry, hass=hass)
+
+    asyncio.run(entity.async_update())
+
+    assert captured == {
+        "device_id": "device-1",
+        "prefer_remote": True,
+    }
+    assert entity._attr_is_on is True
+    assert entity._attr_extra_state_attributes["transport"] == "remote"
 
 
 def test_test_button_sends_public_test_stream(monkeypatch) -> None:  # type: ignore[no-untyped-def]
@@ -1022,6 +1114,48 @@ def test_launcher_switch_updates_from_receiver(monkeypatch) -> None:  # type: ig
     asyncio.run(entity.async_update())
 
     assert entity._attr_is_on is False
+
+
+def test_launcher_switch_prefers_remote_transport_when_enabled(
+    monkeypatch: Any,
+) -> None:
+    captured: dict[str, Any] = {}
+    hass = FakeHass()
+
+    class FakeRemoteRegistry:
+        def is_connected(self, device_id: str) -> bool:
+            return device_id == "device-1"
+
+    async def fake_status(
+        receiver: Any,
+        remote: Any,
+        *,
+        prefer_remote: bool,
+    ) -> tuple[ReceiverStatus, str]:
+        captured.update(
+            {
+                "device_id": receiver.device_id,
+                "prefer_remote": prefer_remote,
+            }
+        )
+        return _status(), "remote"
+
+    entry = _entry()
+    entry.options = {CONF_PREFER_REMOTE_TRANSPORT: True}
+
+    monkeypatch.setattr(switch, "remote_registry", lambda hass: FakeRemoteRegistry())
+    monkeypatch.setattr(switch, "_async_get_receiver_status_command", fake_status)
+
+    entity = switch.ReceiverLauncherSwitch(entry, hass=hass)
+
+    asyncio.run(entity.async_update())
+
+    assert captured == {
+        "device_id": "device-1",
+        "prefer_remote": True,
+    }
+    assert entity._attr_is_on is False
+    assert entity._attr_extra_state_attributes["transport"] == "remote"
 
 
 def test_launcher_switch_hides_launcher(monkeypatch) -> None:  # type: ignore[no-untyped-def]

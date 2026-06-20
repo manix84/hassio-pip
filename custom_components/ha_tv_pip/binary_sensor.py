@@ -4,11 +4,17 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from .client import ReceiverClientError, async_get_receiver_status
+from .client import ReceiverClientError, ReceiverStatus, async_get_receiver_status
 from .const import DOMAIN
 from .entity import ReceiverEntity
+from .remote import remote_registry
 from .restreaming import restreaming_provider_metadata
-from .services import CAMERA_COMPATIBILITY_KEY
+from .services import (
+    CAMERA_COMPATIBILITY_KEY,
+    _async_get_receiver_status_command,
+    _prefer_remote_transport,
+    _resolve_receiver_from_entry,
+)
 
 if TYPE_CHECKING:
 
@@ -30,8 +36,8 @@ async def async_setup_entry(hass: Any, entry: Any, async_add_entities: Any) -> N
 
     async_add_entities(
         [
-            ReceiverConnectedBinarySensor(entry),
-            ReceiverRemoteConnectedBinarySensor(entry),
+            ReceiverConnectedBinarySensor(entry, hass=hass),
+            ReceiverRemoteConnectedBinarySensor(entry, hass=hass),
             ReceiverCameraRestreamingRecommendedBinarySensor(hass, entry),
         ]
     )
@@ -40,8 +46,16 @@ async def async_setup_entry(hass: Any, entry: Any, async_add_entities: Any) -> N
 class ReceiverPollingBinarySensor(ReceiverEntity, BinarySensorEntity):
     """Base binary sensor that polls the receiver status endpoint."""
 
-    def __init__(self, entry: Any, *, key: str, name: str) -> None:
+    def __init__(
+        self,
+        entry: Any,
+        *,
+        key: str,
+        name: str,
+        hass: Any | None = None,
+    ) -> None:
         super().__init__(entry, key=key, name=name)
+        self.hass = hass
         self._attr_is_on = False
         self._attr_extra_state_attributes: dict[str, Any] = {}
 
@@ -49,7 +63,12 @@ class ReceiverPollingBinarySensor(ReceiverEntity, BinarySensorEntity):
         """Poll the receiver status endpoint."""
 
         try:
-            status = await async_get_receiver_status(self.host, self.port)
+            status, transport = await _async_status_for_entry(
+                self.hass,
+                self.entry,
+                self.host,
+                self.port,
+            )
         except ReceiverClientError as error:
             self._attr_is_on = False
             self._attr_extra_state_attributes = {"last_error": str(error)}
@@ -57,6 +76,7 @@ class ReceiverPollingBinarySensor(ReceiverEntity, BinarySensorEntity):
 
         self._attr_is_on = self._is_on_from_status(status)
         self._attr_extra_state_attributes = self._extra_attributes(status)
+        self._attr_extra_state_attributes["transport"] = transport
 
     def _is_on_from_status(self, status: Any) -> bool:
         raise NotImplementedError
@@ -72,8 +92,8 @@ class ReceiverPollingBinarySensor(ReceiverEntity, BinarySensorEntity):
 class ReceiverConnectedBinarySensor(ReceiverPollingBinarySensor):
     """Reports whether the receiver status endpoint is reachable."""
 
-    def __init__(self, entry: Any) -> None:
-        super().__init__(entry, key="connected", name="Connected")
+    def __init__(self, entry: Any, *, hass: Any | None = None) -> None:
+        super().__init__(entry, key="connected", name="Connected", hass=hass)
 
     def _is_on_from_status(self, status: Any) -> bool:
         return True
@@ -82,8 +102,13 @@ class ReceiverConnectedBinarySensor(ReceiverPollingBinarySensor):
 class ReceiverRemoteConnectedBinarySensor(ReceiverPollingBinarySensor):
     """Reports whether the receiver is connected through remote receiver mode."""
 
-    def __init__(self, entry: Any) -> None:
-        super().__init__(entry, key="remote_connected", name="Remote Connected")
+    def __init__(self, entry: Any, *, hass: Any | None = None) -> None:
+        super().__init__(
+            entry,
+            key="remote_connected",
+            name="Remote Connected",
+            hass=hass,
+        )
 
     def _is_on_from_status(self, status: Any) -> bool:
         return bool(status.remote_status == "connected")
@@ -172,6 +197,24 @@ class ReceiverCameraRestreamingRecommendedBinarySensor(
             }.items()
             if value is not None
         }
+
+
+async def _async_status_for_entry(
+    hass: Any | None,
+    entry: Any,
+    host: str,
+    port: int,
+) -> tuple[ReceiverStatus, str]:
+    if hass is None:
+        return await async_get_receiver_status(host, port), "local"
+
+    receiver = _resolve_receiver_from_entry(entry)
+    remote = remote_registry(hass)
+    return await _async_get_receiver_status_command(
+        receiver,
+        remote,
+        prefer_remote=_prefer_remote_transport(receiver, remote),
+    )
 
 
 def _latest_camera_compatibility_result(

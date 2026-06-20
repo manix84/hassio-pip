@@ -165,7 +165,7 @@ Phase 9 adds optional outbound remote connectivity for travel TVs and external r
 - Local LAN control is preferred by default.
 - Prefer Remote Transport can be enabled per receiver when the WebSocket path should be tried first.
 - The non-preferred path remains available as the fallback path when possible.
-- Test PiP, Close PiP, and Refresh Status follow the same transport preference, so remote receiver mode can be tested without relying on camera entities.
+- Test PiP, Close PiP, Refresh Status, and receiver status polling follow the same transport preference, so remote receiver mode can be tested and monitored without relying on camera entities.
 
 Remote mode is for sending notifications to an external TV. It does not make HA TV PiP a cloud service and does not require port forwarding to the TV.
 

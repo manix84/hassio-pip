@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.31.1 - Remote-Aware Status Polling 🩺
+
+- Updated receiver status, display mode, stream type, version, compatibility, connected, remote connected, and launcher visibility polling to use the configured local/remote transport order 🌍
+- Added `transport` attributes to polled receiver entities so users can see whether local HTTP or remote WebSocket supplied the latest status 🧭
+- Kept launcher hide/show actions local-only while making their status read path remote-aware, because launcher management still requires the TV-local control endpoint 📺
+
 ## 1.31.0 - Remote Status Refresh 🔄
 
 - Added a remote WebSocket request/response path so Refresh Status can query connected remote receivers without local LAN access 🌍

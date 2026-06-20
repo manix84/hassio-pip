@@ -850,6 +850,7 @@ Completed:
 - ✅ Receiver option for preferring remote WebSocket transport while keeping local HTTP first by default.
 - ✅ Remote Close PiP support over the outbound WebSocket receiver connection.
 - ✅ Remote Refresh Status support over the outbound WebSocket receiver connection.
+- ✅ Remote-aware receiver status polling for status, display mode, stream type, compatibility, connected, remote connected, and launcher visibility entities.
 
 Still future:
 
