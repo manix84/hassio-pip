@@ -140,6 +140,13 @@ show_camera:
       name: Background color
       description: Hex or alpha-hex color for the optional text overlay background.
       example: "#B30F0E0E"
+    text_overlay:
+      default: false
+      selector:
+        boolean:
+      name: Text over media
+      description: Put the optional title/message over the camera media instead of below it.
+      example: false
     width:
       required: false
       selector:
@@ -258,6 +265,13 @@ show_snapshot:
       name: Background color
       description: Hex or alpha-hex color for the optional text overlay background.
       example: "#B30F0E0E"
+    text_overlay:
+      default: false
+      selector:
+        boolean:
+      name: Text over media
+      description: Put the optional title/message over the snapshot instead of below it.
+      example: false
     width:
       required: false
       selector:

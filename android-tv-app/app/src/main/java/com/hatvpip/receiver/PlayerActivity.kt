@@ -41,6 +41,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 
 class PlayerActivity : ComponentActivity() {
@@ -275,6 +276,7 @@ class PlayerActivity : ComponentActivity() {
                     .putExtra(EXTRA_MESSAGE_COLOR, command.style.messageColor)
                     .putExtra(EXTRA_MESSAGE_SIZE, command.style.messageSize)
                     .putExtra(EXTRA_BACKGROUND_COLOR, command.style.backgroundColor)
+                    .putExtra(EXTRA_TEXT_OVERLAY, command.style.textOverlay)
                     .apply {
                         command.style.width?.let { putExtra(EXTRA_WIDTH, it) }
                         command.style.height?.let { putExtra(EXTRA_HEIGHT, it) }
@@ -357,6 +359,7 @@ class PlayerActivity : ComponentActivity() {
         const val EXTRA_MESSAGE_COLOR = "com.hatvpip.receiver.extra.MESSAGE_COLOR"
         const val EXTRA_MESSAGE_SIZE = "com.hatvpip.receiver.extra.MESSAGE_SIZE"
         const val EXTRA_BACKGROUND_COLOR = "com.hatvpip.receiver.extra.BACKGROUND_COLOR"
+        const val EXTRA_TEXT_OVERLAY = "com.hatvpip.receiver.extra.TEXT_OVERLAY"
         const val EXTRA_WIDTH = "com.hatvpip.receiver.extra.WIDTH"
         const val EXTRA_HEIGHT = "com.hatvpip.receiver.extra.HEIGHT"
         const val EXTRA_DURATION_SECONDS = "com.hatvpip.receiver.extra.DURATION_SECONDS"
@@ -380,6 +383,7 @@ class PlayerActivity : ComponentActivity() {
                 putExtra(EXTRA_MESSAGE_COLOR, command.style.messageColor)
                 putExtra(EXTRA_MESSAGE_SIZE, command.style.messageSize)
                 putExtra(EXTRA_BACKGROUND_COLOR, command.style.backgroundColor)
+                putExtra(EXTRA_TEXT_OVERLAY, command.style.textOverlay)
                 command.style.width?.let { putExtra(EXTRA_WIDTH, it) }
                 command.style.height?.let { putExtra(EXTRA_HEIGHT, it) }
                 command.durationSeconds?.let { putExtra(EXTRA_DURATION_SECONDS, it) }
@@ -417,6 +421,7 @@ private fun Intent.toShowCommand(): ShowCommand =
             messageColor = getStringExtra(PlayerActivity.EXTRA_MESSAGE_COLOR) ?: "#fbf5f5",
             messageSize = getIntExtra(PlayerActivity.EXTRA_MESSAGE_SIZE, 18).coerceIn(10, 40),
             backgroundColor = getStringExtra(PlayerActivity.EXTRA_BACKGROUND_COLOR) ?: "#B30F0E0E",
+            textOverlay = getBooleanExtra(PlayerActivity.EXTRA_TEXT_OVERLAY, false),
             width = if (hasExtra(PlayerActivity.EXTRA_WIDTH)) {
                 getIntExtra(PlayerActivity.EXTRA_WIDTH, 0).takeIf { it > 0 }
             } else {
@@ -473,6 +478,7 @@ private fun PlayerScreen(
                         // Android TV D-pad focus can be trapped by Media3's built-in controller.
                         // Phase 1 keeps playback in Media3 and exposes TV-friendly controls in Compose.
                         useController = false
+                        resizeMode = AspectRatioFrameLayout.RESIZE_MODE_ZOOM
                         isFocusable = false
                         isFocusableInTouchMode = false
                         descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS

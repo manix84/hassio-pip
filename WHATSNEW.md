@@ -1,5 +1,12 @@
 # What's New ✨
 
+## 1.31.6 - Popup Visual Polish 🪟
+
+- Added Android window background blur for translucent overlay popup backgrounds on supported Android TV devices 🧊
+- Cropped HLS, MJPEG, snapshot, and full-screen test video rendering to fill the available container and reduce black bars 📺
+- Added an opt-in `text_overlay` media option so camera/snapshot title and message text can sit over the video or image instead of below it 📝
+- Kept the blur conditional so fully opaque popup backgrounds avoid unnecessary processing work ⚡
+
 ## 1.31.5 - Manual Restream Helper Workflow 🧵
 
 - Added manual go2rtc helper metadata to restreaming provider diagnostics and camera calibration action plans 🧰

@@ -91,6 +91,7 @@ ATTR_RESTREAM_PROVIDER = "restream_provider"
 ATTR_RESTREAM_URL = "restream_url"
 ATTR_STREAM_CAMERA_ENTITY = "stream_camera_entity"
 ATTR_STREAM_TYPE = "stream_type"
+ATTR_TEXT_OVERLAY = "text_overlay"
 ATTR_TITLE = "title"
 ATTR_TITLE_COLOR = "title_color"
 ATTR_TITLE_SIZE = "title_size"
@@ -195,6 +196,7 @@ class ShowCameraRequest:
     message_color: str
     message_size: int
     background_color: str
+    text_overlay: bool
     width: int | None
     height: int | None
     snapshot_camera_entity: str | None
@@ -292,6 +294,7 @@ async def async_register_services(hass: Any) -> None:
             ATTR_BACKGROUND_COLOR,
             default=DEFAULT_NOTIFICATION_BACKGROUND_COLOR,
         ): str,
+        vol.Optional(ATTR_TEXT_OVERLAY, default=False): bool,
         vol.Optional(ATTR_WIDTH): vol.All(
             vol.Coerce(int),
             vol.Range(min=240, max=1600),
@@ -959,6 +962,7 @@ def _request_from_call(call: Any) -> ShowCameraRequest:
             data.get(ATTR_BACKGROUND_COLOR),
             DEFAULT_NOTIFICATION_BACKGROUND_COLOR,
         ),
+        text_overlay=bool(data.get(ATTR_TEXT_OVERLAY, False)),
         width=_optional_overlay_dimension(data.get(ATTR_WIDTH), 240, 1600),
         height=_optional_overlay_dimension(data.get(ATTR_HEIGHT), 120, 900),
         title=_optional_text(data.get(ATTR_TITLE)),
@@ -2623,6 +2627,7 @@ def _presentation_payload(request: ShowCameraRequest) -> dict[str, Any]:
                 "position": request.position,
                 "title_color": request.title_color,
                 "title_size": request.title_size,
+                "text_overlay": request.text_overlay,
                 "message_color": request.message_color,
                 "message_size": request.message_size,
                 "background_color": request.background_color,

@@ -201,6 +201,9 @@
         },
         "height": {
           "name": "Height"
+        },
+        "text_overlay": {
+          "name": "Text over media"
         }
       }
     },
@@ -246,6 +249,9 @@
         },
         "height": {
           "name": "Height"
+        },
+        "text_overlay": {
+          "name": "Text over media"
         }
       }
     },

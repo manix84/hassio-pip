@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.drawable.GradientDrawable
+import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -83,6 +84,7 @@ class OverlayPlayerService : Service() {
                     messageColor = intent?.getStringExtra(PlayerActivity.EXTRA_MESSAGE_COLOR) ?: "#fbf5f5",
                     messageSize = intent?.getIntExtra(PlayerActivity.EXTRA_MESSAGE_SIZE, 18)?.coerceIn(10, 40) ?: 18,
                     backgroundColor = intent?.getStringExtra(PlayerActivity.EXTRA_BACKGROUND_COLOR) ?: DEFAULT_BACKGROUND_COLOR,
+                    textOverlay = intent?.getBooleanExtra(PlayerActivity.EXTRA_TEXT_OVERLAY, false) ?: false,
                     width = intent?.takeIf {
                         it.hasExtra(PlayerActivity.EXTRA_WIDTH)
                     }?.getIntExtra(PlayerActivity.EXTRA_WIDTH, 0)?.takeIf { it > 0 },
@@ -140,11 +142,15 @@ class OverlayPlayerService : Service() {
                 addPlayerView(mediaContainer)
             }
 
+            if (showNotification && style.textOverlay) {
+                addNotificationOverlay(mediaContainer)
+            }
             errorTextView = buildErrorTextView()
             mediaContainer.addView(errorTextView)
+
             root.addView(mediaContainer)
 
-            if (showNotification) {
+            if (showNotification && !style.textOverlay) {
                 addNotificationContent(root, fillHeight = false)
             }
         }
@@ -162,6 +168,7 @@ class OverlayPlayerService : Service() {
             x = OVERLAY_MARGIN_PX
             y = OVERLAY_MARGIN_PX
         }
+        applyBackgroundBlur(params)
 
         runCatching {
             windowManager.addView(root, params)
@@ -187,6 +194,21 @@ class OverlayPlayerService : Service() {
             cornerRadius = NOTIFICATION_CORNER_RADIUS_PX
         }
 
+    private fun applyBackgroundBlur(params: WindowManager.LayoutParams) {
+        val backgroundColor = parseColorOrDefault(
+            style.backgroundColor,
+            DEFAULT_BACKGROUND_COLOR_INT
+        )
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S || Color.alpha(backgroundColor) == 255) {
+            return
+        }
+
+        // Android applies this at the window level, so opaque video/image pixels are not
+        // needlessly blurred. The effect is only visible through the translucent glass areas.
+        params.flags = params.flags or WindowManager.LayoutParams.FLAG_BLUR_BEHIND
+        params.blurBehindRadius = OVERLAY_BACKGROUND_BLUR_RADIUS_PX
+    }
+
     private fun buildErrorTextView(): TextView =
         TextView(this).apply {
             setTextColor(Color.WHITE)
@@ -203,7 +225,48 @@ class OverlayPlayerService : Service() {
         }
 
     private fun addNotificationContent(root: LinearLayout, fillHeight: Boolean) {
-        val content = LinearLayout(this).apply {
+        root.addView(
+            buildNotificationContent(fillHeight).apply {
+                background = glassTextBackground()
+            }
+        )
+    }
+
+    private fun addNotificationOverlay(root: FrameLayout) {
+        val content = buildNotificationContent(fillHeight = false).apply {
+            setBackgroundColor(parseColorOrDefault(style.backgroundColor, DEFAULT_BACKGROUND_COLOR_INT))
+            layoutParams = FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                Gravity.BOTTOM
+            )
+        }
+        root.addView(content)
+    }
+
+    private fun glassTextBackground(): GradientDrawable {
+        val baseColor = parseColorOrDefault(
+            style.backgroundColor,
+            DEFAULT_BACKGROUND_COLOR_INT
+        )
+        return GradientDrawable().apply {
+            setColor(baseColor)
+            cornerRadii = floatArrayOf(
+                0f,
+                0f,
+                0f,
+                0f,
+                NOTIFICATION_CORNER_RADIUS_PX,
+                NOTIFICATION_CORNER_RADIUS_PX,
+                NOTIFICATION_CORNER_RADIUS_PX,
+                NOTIFICATION_CORNER_RADIUS_PX
+            )
+            setStroke(TEXT_GLASS_STROKE_PX, TEXT_GLASS_STROKE_COLOR)
+        }
+    }
+
+    private fun buildNotificationContent(fillHeight: Boolean): LinearLayout =
+        LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(24, 20, 24, 20)
             layoutParams = LinearLayout.LayoutParams(
@@ -214,27 +277,26 @@ class OverlayPlayerService : Service() {
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 }
             )
-        }
-        TextView(this).apply {
-            text = title.ifBlank { getString(R.string.notification_default_title) }
-            setTextColor(parseColorOrDefault(style.titleColor, Color.rgb(80, 191, 242)))
-            textSize = style.titleSize.toFloat()
-            typeface = android.graphics.Typeface.DEFAULT_BOLD
-            includeFontPadding = false
-            content.addView(this)
-        }
-        message?.takeIf { it.isNotBlank() }?.let { body ->
+        }.also { content ->
             TextView(this).apply {
-                text = body
-                setTextColor(parseColorOrDefault(style.messageColor, Color.rgb(251, 245, 245)))
-                textSize = style.messageSize.toFloat()
-                setPadding(0, 10, 0, 0)
+                text = title.ifBlank { getString(R.string.notification_default_title) }
+                setTextColor(parseColorOrDefault(style.titleColor, Color.rgb(80, 191, 242)))
+                textSize = style.titleSize.toFloat()
+                typeface = android.graphics.Typeface.DEFAULT_BOLD
                 includeFontPadding = false
                 content.addView(this)
             }
+            message?.takeIf { it.isNotBlank() }?.let { body ->
+                TextView(this).apply {
+                    text = body
+                    setTextColor(parseColorOrDefault(style.messageColor, Color.rgb(251, 245, 245)))
+                    textSize = style.messageSize.toFloat()
+                    setPadding(0, 10, 0, 0)
+                    includeFontPadding = false
+                    content.addView(this)
+                }
+            }
         }
-        root.addView(content)
-    }
 
     private fun addPlayerView(root: FrameLayout) {
         val previewImageView = previewUrl?.let { imageUrl ->
@@ -353,7 +415,7 @@ class OverlayPlayerService : Service() {
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
             adjustViewBounds = true
-            scaleType = ImageView.ScaleType.FIT_CENTER
+            scaleType = ImageView.ScaleType.CENTER_CROP
             setBackgroundColor(Color.BLACK)
             alpha = if (previewImageView == null) 1f else 0.01f
         }
@@ -464,7 +526,7 @@ class OverlayPlayerService : Service() {
                 ViewGroup.LayoutParams.MATCH_PARENT
             )
             adjustViewBounds = true
-            scaleType = ImageView.ScaleType.FIT_CENTER
+            scaleType = ImageView.ScaleType.CENTER_CROP
             setBackgroundColor(android.graphics.Color.BLACK)
         }
         root.addView(imageView)
@@ -596,6 +658,9 @@ class OverlayPlayerService : Service() {
         private const val OVERLAY_HEIGHT_PX = 360
         private const val NOTIFICATION_WIDTH_PX = 512
         private const val NOTIFICATION_CORNER_RADIUS_PX = 18f
+        private const val OVERLAY_BACKGROUND_BLUR_RADIUS_PX = 28
+        private const val TEXT_GLASS_STROKE_PX = 1
+        private const val TEXT_GLASS_STROKE_COLOR = 0x44FFFFFF
         private const val OVERLAY_MARGIN_PX = 48
         private const val DEFAULT_BACKGROUND_COLOR = "#B30F0E0E"
         private const val MJPEG_CONNECT_TIMEOUT_MS = 5_000

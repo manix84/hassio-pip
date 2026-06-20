@@ -122,6 +122,7 @@ class LocalControlService : Service() {
                     .putExtra(PlayerActivity.EXTRA_MESSAGE_COLOR, command.style.messageColor)
                     .putExtra(PlayerActivity.EXTRA_MESSAGE_SIZE, command.style.messageSize)
                     .putExtra(PlayerActivity.EXTRA_BACKGROUND_COLOR, command.style.backgroundColor)
+                    .putExtra(PlayerActivity.EXTRA_TEXT_OVERLAY, command.style.textOverlay)
                     .apply {
                         command.style.width?.let { putExtra(PlayerActivity.EXTRA_WIDTH, it) }
                         command.style.height?.let { putExtra(PlayerActivity.EXTRA_HEIGHT, it) }

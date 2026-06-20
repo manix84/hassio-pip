@@ -140,6 +140,7 @@ class ShowCommandTest {
               "titleColor": "#50BFF2",
               "messageColor": "#fbf5f5",
               "backgroundColor": "#B30F0E0E",
+              "textOverlay": true,
               "width": 720,
               "height": 360
             }
@@ -153,6 +154,7 @@ class ShowCommandTest {
         assertEquals("#50BFF2", command.style.titleColor)
         assertEquals("#fbf5f5", command.style.messageColor)
         assertEquals("#B30F0E0E", command.style.backgroundColor)
+        assertEquals(true, command.style.textOverlay)
         assertEquals(720, command.style.width)
         assertEquals(360, command.style.height)
     }

@@ -47,6 +47,7 @@ from custom_components.ha_tv_pip.services import (
     ATTR_SNAPSHOT_FALLBACK,
     ATTR_STREAM_CAMERA_ENTITY,
     ATTR_STREAM_TYPE,
+    ATTR_TEXT_OVERLAY,
     ATTR_TITLE,
     ATTR_TITLE_COLOR,
     ATTR_TITLE_SIZE,
@@ -349,6 +350,7 @@ def test_request_from_call_accepts_overlay_message_style() -> None:
                 ATTR_MESSAGE_COLOR: "#fbf5f5",
                 ATTR_MESSAGE_SIZE: 20,
                 ATTR_BACKGROUND_COLOR: "#B30F0E0E",
+                ATTR_TEXT_OVERLAY: True,
                 ATTR_WIDTH: 720,
                 ATTR_HEIGHT: 360,
             }
@@ -362,6 +364,7 @@ def test_request_from_call_accepts_overlay_message_style() -> None:
     assert request.message_color == "#fbf5f5"
     assert request.message_size == 20
     assert request.background_color == "#B30F0E0E"
+    assert request.text_overlay is True
     assert request.width == 720
     assert request.height == 360
 

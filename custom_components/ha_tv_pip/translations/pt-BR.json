@@ -199,6 +199,9 @@
         },
         "height": {
           "name": "Height"
+        },
+        "text_overlay": {
+          "name": "Texto sobre mídia"
         }
       }
     },
@@ -244,6 +247,9 @@
         },
         "height": {
           "name": "Height"
+        },
+        "text_overlay": {
+          "name": "Texto sobre mídia"
         }
       }
     },

@@ -46,6 +46,7 @@ class ShowCameraCommand:
     show_notification: bool = False
     message: str | None = None
     position: str | None = None
+    text_overlay: bool = False
     title_color: str | None = None
     title_size: int | None = None
     message_color: str | None = None
@@ -78,6 +79,8 @@ def show_camera_payload(command: ShowCameraCommand) -> dict[str, Any]:
         payload["message"] = command.message
     if command.position is not None:
         payload["position"] = command.position
+    if command.text_overlay:
+        payload["textOverlay"] = True
     if command.title_color is not None:
         payload["titleColor"] = command.title_color
     if command.title_size is not None:
