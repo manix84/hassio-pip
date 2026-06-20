@@ -852,13 +852,13 @@ Completed:
 - ✅ Remote Refresh Status support over the outbound WebSocket receiver connection.
 - ✅ Remote-aware receiver status polling for status, display mode, stream type, compatibility, connected, remote connected, and launcher visibility entities.
 - ✅ Discovery repair for DHCP address changes, using the stable receiver id from Zeroconf to update the stored host, port, version, pairing, and API metadata.
+- ✅ Compact Home Assistant receiver options screen with advanced popup size, position, and remote receiver credential fields hidden behind an explicit advanced-settings step.
 
 Still future:
 
 - WebRTC low-latency mode.
 - Restreaming or transcoding for broad camera codec support.
 - Automatic camera-platform helpers such as go2rtc or Frigate-specific setup shortcuts.
-- Hide or collapse advanced receiver options by default so normal day-to-day setup stays compact while troubleshooting and expert controls remain available.
 
 ## Additional TV Platforms
 

@@ -142,6 +142,7 @@ If the launcher icon is hidden, use the Open Launcher button or Android Settings
 Remote receiver mode:
 
 - Configure from the integration options flow.
+- The first options screen keeps everyday defaults compact; use Show advanced settings for popup position, width, height, and remote URL/token fields.
 - Uses your own Home Assistant external URL and long-lived access token.
 - The TV connects outbound to Home Assistant, so you do not need to forward ports to the TV.
 - Local HTTP is used first by default. Prefer Remote Transport can be enabled when connected remote receivers should receive commands over the Home Assistant WebSocket path first.

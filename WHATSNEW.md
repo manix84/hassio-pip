@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.31.3 - Compact Receiver Options 🧰
+
+- Split the Home Assistant receiver options flow into an everyday defaults screen and an advanced setup screen for popup sizing, position, and remote receiver credentials 🧭
+- Preserved existing advanced settings when users save the compact options screen, so normal edits do not accidentally clear remote setup or popup layout defaults 🛡️
+- Updated Tier 1 Home Assistant translation files for the new advanced-settings toggle and screen labels 🌍
+
 ## 1.31.2 - Discovery Address Repair 🛠️
 
 - Made the existing Zeroconf unique-id update path explicit so rediscovered receivers can repair stored host, port, version, pairing, and API metadata after DHCP address changes 📡

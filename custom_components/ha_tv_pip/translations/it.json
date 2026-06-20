@@ -49,18 +49,25 @@
     "step": {
       "init": {
         "data": {
-          "remote_access_token": "Token di accesso a lunga durata di Home Assistant",
-          "remote_home_assistant_url": "URL esterno di Home Assistant",
           "default_duration_seconds": "Default duration",
-          "default_height": "Default height",
-          "default_position": "Default position",
           "default_snapshot_fallback": "Snapshot fallback by default",
           "default_stream_type": "Preferred stream strategy",
-          "default_width": "Default width",
-          "prefer_remote_transport": "Preferisci trasporto remoto"
+          "prefer_remote_transport": "Preferisci trasporto remoto",
+          "show_advanced_options": "Mostra impostazioni avanzate"
         },
-        "description": "Set receiver defaults used when an action does not provide its own value. Use 0 for duration, width, or height to keep the built-in service default. Remote receiver settings are sent to the paired TV over the local connection. Suggested external URL: {suggested_url}",
-        "title": "Receiver defaults and remote setup"
+        "description": "Set everyday receiver defaults. Advanced popup size, position, and remote receiver credentials are hidden unless needed.",
+        "title": "Receiver defaults"
+      },
+      "advanced": {
+        "data": {
+          "default_height": "Default height",
+          "default_position": "Default position",
+          "default_width": "Default width",
+          "remote_access_token": "Token di accesso a lunga durata di Home Assistant",
+          "remote_home_assistant_url": "URL esterno di Home Assistant"
+        },
+        "description": "Set advanced popup defaults and optional remote receiver settings. Use 0 for width or height to keep the built-in service default. Remote receiver settings are sent to the paired TV over the local connection. Suggested external URL: {suggested_url}",
+        "title": "Advanced receiver setup"
       }
     }
   },

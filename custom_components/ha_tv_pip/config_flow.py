@@ -27,6 +27,7 @@ from .const import (
     CONF_PREFER_REMOTE_TRANSPORT,
     CONF_REMOTE_ACCESS_TOKEN,
     CONF_REMOTE_HOME_ASSISTANT_URL,
+    CONF_SHOW_ADVANCED_OPTIONS,
     CONF_TOKEN,
     CONF_VERSION,
     DEFAULT_PORT,
@@ -240,6 +241,7 @@ class ReceiverOptionsFlow(config_entries.OptionsFlow):  # type: ignore[misc]
         """
 
         self._config_entry = config_entry
+        self._pending_basic_options: dict[str, Any] | None = None
 
     @property
     def _entry(self) -> Any:
@@ -251,52 +253,20 @@ class ReceiverOptionsFlow(config_entries.OptionsFlow):  # type: ignore[misc]
             return self._config_entry
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> Any:
-        """Configure receiver defaults and remote provisioning from Home Assistant."""
+        """Configure everyday receiver defaults from Home Assistant."""
 
         errors: dict[str, str] = {}
         entry = self._entry
-        hass = getattr(self, "hass", None)
-        suggested_url = suggested_remote_home_assistant_url(hass)
-        current_url = str(
-            entry.options.get(
-                CONF_REMOTE_HOME_ASSISTANT_URL,
-                suggested_url,
-            )
-        ).strip()
-        current_token = str(
-            entry.options.get(CONF_REMOTE_ACCESS_TOKEN, "")
-        ).strip()
         current_stream_type = str(
             entry.options.get(CONF_DEFAULT_STREAM_TYPE, STREAM_TYPE_AUTO)
         ).strip()
         if current_stream_type not in STREAM_TYPES:
             current_stream_type = STREAM_TYPE_AUTO
-        current_position = str(
-            entry.options.get(CONF_DEFAULT_POSITION, "top_right")
-        ).strip()
-        if current_position not in NOTIFICATION_POSITIONS:
-            current_position = "top_right"
         current_duration = (
             _optional_default_int(
                 entry.options.get(CONF_DEFAULT_DURATION_SECONDS),
                 minimum=0,
                 maximum=3600,
-            )
-            or 0
-        )
-        current_width = (
-            _optional_default_int(
-                entry.options.get(CONF_DEFAULT_WIDTH),
-                minimum=0,
-                maximum=1600,
-            )
-            or 0
-        )
-        current_height = (
-            _optional_default_int(
-                entry.options.get(CONF_DEFAULT_HEIGHT),
-                minimum=0,
-                maximum=900,
             )
             or 0
         )
@@ -306,33 +276,16 @@ class ReceiverOptionsFlow(config_entries.OptionsFlow):  # type: ignore[misc]
         current_prefer_remote_transport = bool(
             entry.options.get(CONF_PREFER_REMOTE_TRANSPORT, False)
         )
+        show_advanced_options = False
 
         if user_input is not None:
-            raw_remote_url = str(
-                user_input.get(CONF_REMOTE_HOME_ASSISTANT_URL, "")
-            ).strip()
-            remote_token = str(user_input.get(CONF_REMOTE_ACCESS_TOKEN, "")).strip()
-            remote_url = (raw_remote_url or suggested_url) if remote_token else ""
             default_stream_type = str(
                 user_input.get(CONF_DEFAULT_STREAM_TYPE, STREAM_TYPE_AUTO)
-            ).strip()
-            default_position = str(
-                user_input.get(CONF_DEFAULT_POSITION, "top_right")
             ).strip()
             default_duration = _optional_default_int(
                 user_input.get(CONF_DEFAULT_DURATION_SECONDS),
                 minimum=0,
                 maximum=3600,
-            )
-            default_width = _optional_default_int(
-                user_input.get(CONF_DEFAULT_WIDTH),
-                minimum=0,
-                maximum=1600,
-            )
-            default_height = _optional_default_int(
-                user_input.get(CONF_DEFAULT_HEIGHT),
-                minimum=0,
-                maximum=900,
             )
             default_snapshot_fallback = bool(
                 user_input.get(CONF_DEFAULT_SNAPSHOT_FALLBACK, True)
@@ -340,64 +293,34 @@ class ReceiverOptionsFlow(config_entries.OptionsFlow):  # type: ignore[misc]
             prefer_remote_transport = bool(
                 user_input.get(CONF_PREFER_REMOTE_TRANSPORT, False)
             )
+            show_advanced_options = bool(
+                user_input.get(CONF_SHOW_ADVANCED_OPTIONS, False)
+            )
 
-            if bool(remote_url) != bool(remote_token):
-                errors["base"] = "remote_fields_required"
-            elif default_stream_type not in STREAM_TYPES:
+            if default_stream_type not in STREAM_TYPES:
                 errors[CONF_DEFAULT_STREAM_TYPE] = "invalid_default_stream_type"
-            elif default_position not in NOTIFICATION_POSITIONS:
-                errors[CONF_DEFAULT_POSITION] = "invalid_default_position"
             elif default_duration is None:
                 errors[CONF_DEFAULT_DURATION_SECONDS] = "invalid_default_duration"
-            elif default_width is None:
-                errors[CONF_DEFAULT_WIDTH] = "invalid_default_overlay_size"
-            elif default_height is None:
-                errors[CONF_DEFAULT_HEIGHT] = "invalid_default_overlay_size"
             else:
-                options: dict[str, Any] = {
-                    CONF_DEFAULT_STREAM_TYPE: default_stream_type,
-                    CONF_DEFAULT_POSITION: default_position,
-                    CONF_DEFAULT_SNAPSHOT_FALLBACK: default_snapshot_fallback,
-                    CONF_PREFER_REMOTE_TRANSPORT: prefer_remote_transport,
-                }
-                if default_duration > 0:
-                    options[CONF_DEFAULT_DURATION_SECONDS] = default_duration
-                if default_width > 0:
-                    options[CONF_DEFAULT_WIDTH] = default_width
-                if default_height > 0:
-                    options[CONF_DEFAULT_HEIGHT] = default_height
-                if CONF_CAMERA_DEFAULTS in entry.options:
-                    options[CONF_CAMERA_DEFAULTS] = dict(
-                        entry.options[CONF_CAMERA_DEFAULTS]
-                    )
-                if remote_url and remote_token:
-                    options[CONF_REMOTE_HOME_ASSISTANT_URL] = remote_url
-                    options[CONF_REMOTE_ACCESS_TOKEN] = remote_token
+                basic_options = _basic_options(
+                    default_stream_type=default_stream_type,
+                    default_duration=default_duration,
+                    default_snapshot_fallback=default_snapshot_fallback,
+                    prefer_remote_transport=prefer_remote_transport,
+                )
+                if show_advanced_options:
+                    self._pending_basic_options = basic_options
+                    return await self.async_step_advanced()
 
-                if not await async_sync_remote_setup_values(
-                    hass,
-                    entry,
-                    remote_url,
-                    remote_token,
-                ):
-                    errors["base"] = "cannot_connect"
-                    current_url = raw_remote_url or suggested_url
-                    current_token = remote_token
-                else:
-                    return self.async_create_entry(title="", data=options)
+                return self.async_create_entry(
+                    title="",
+                    data=_options_with_preserved_advanced(entry, basic_options),
+                )
 
-            current_url = raw_remote_url or suggested_url
-            current_token = remote_token
             if default_stream_type in STREAM_TYPES:
                 current_stream_type = default_stream_type
-            if default_position in NOTIFICATION_POSITIONS:
-                current_position = default_position
             if default_duration is not None:
                 current_duration = default_duration
-            if default_width is not None:
-                current_width = default_width
-            if default_height is not None:
-                current_height = default_height
             current_snapshot_fallback = default_snapshot_fallback
             current_prefer_remote_transport = prefer_remote_transport
 
@@ -414,13 +337,131 @@ class ReceiverOptionsFlow(config_entries.OptionsFlow):  # type: ignore[misc]
                         default=current_duration,
                     ): int,
                     vol.Optional(
-                        CONF_DEFAULT_POSITION,
-                        default=current_position,
-                    ): _select_dropdown(NOTIFICATION_POSITIONS),
-                    vol.Optional(
                         CONF_DEFAULT_SNAPSHOT_FALLBACK,
                         default=current_snapshot_fallback,
                     ): bool,
+                    vol.Optional(
+                        CONF_PREFER_REMOTE_TRANSPORT,
+                        default=current_prefer_remote_transport,
+                    ): bool,
+                    vol.Optional(
+                        CONF_SHOW_ADVANCED_OPTIONS,
+                        default=show_advanced_options,
+                    ): bool,
+                }
+            ),
+            errors=errors,
+        )
+
+    async def async_step_advanced(
+        self,
+        user_input: dict[str, Any] | None = None,
+    ) -> Any:
+        """Configure advanced receiver defaults and remote receiver provisioning."""
+
+        errors: dict[str, str] = {}
+        entry = self._entry
+        hass = getattr(self, "hass", None)
+        suggested_url = suggested_remote_home_assistant_url(hass)
+        current_url = str(
+            entry.options.get(
+                CONF_REMOTE_HOME_ASSISTANT_URL,
+                suggested_url,
+            )
+        ).strip()
+        current_token = str(
+            entry.options.get(CONF_REMOTE_ACCESS_TOKEN, "")
+        ).strip()
+        current_position = str(
+            entry.options.get(CONF_DEFAULT_POSITION, "top_right")
+        ).strip()
+        if current_position not in NOTIFICATION_POSITIONS:
+            current_position = "top_right"
+        current_width = (
+            _optional_default_int(
+                entry.options.get(CONF_DEFAULT_WIDTH),
+                minimum=0,
+                maximum=1600,
+            )
+            or 0
+        )
+        current_height = (
+            _optional_default_int(
+                entry.options.get(CONF_DEFAULT_HEIGHT),
+                minimum=0,
+                maximum=900,
+            )
+            or 0
+        )
+
+        if user_input is not None:
+            raw_remote_url = str(
+                user_input.get(CONF_REMOTE_HOME_ASSISTANT_URL, "")
+            ).strip()
+            remote_token = str(user_input.get(CONF_REMOTE_ACCESS_TOKEN, "")).strip()
+            remote_url = (raw_remote_url or suggested_url) if remote_token else ""
+            default_position = str(
+                user_input.get(CONF_DEFAULT_POSITION, "top_right")
+            ).strip()
+            default_width = _optional_default_int(
+                user_input.get(CONF_DEFAULT_WIDTH),
+                minimum=0,
+                maximum=1600,
+            )
+            default_height = _optional_default_int(
+                user_input.get(CONF_DEFAULT_HEIGHT),
+                minimum=0,
+                maximum=900,
+            )
+
+            if bool(remote_url) != bool(remote_token):
+                errors["base"] = "remote_fields_required"
+            elif default_position not in NOTIFICATION_POSITIONS:
+                errors[CONF_DEFAULT_POSITION] = "invalid_default_position"
+            elif default_width is None:
+                errors[CONF_DEFAULT_WIDTH] = "invalid_default_overlay_size"
+            elif default_height is None:
+                errors[CONF_DEFAULT_HEIGHT] = "invalid_default_overlay_size"
+            else:
+                options = _options_with_advanced(
+                    entry,
+                    self._pending_basic_options or _current_basic_options(entry),
+                    default_position=default_position,
+                    default_width=default_width,
+                    default_height=default_height,
+                    remote_url=remote_url,
+                    remote_token=remote_token,
+                )
+                if not await async_sync_remote_setup_values(
+                    hass,
+                    entry,
+                    remote_url,
+                    remote_token,
+                ):
+                    errors["base"] = "cannot_connect"
+                    current_url = raw_remote_url or suggested_url
+                    current_token = remote_token
+                else:
+                    self._pending_basic_options = None
+                    return self.async_create_entry(title="", data=options)
+
+            current_url = raw_remote_url or suggested_url
+            current_token = remote_token
+            if default_position in NOTIFICATION_POSITIONS:
+                current_position = default_position
+            if default_width is not None:
+                current_width = default_width
+            if default_height is not None:
+                current_height = default_height
+
+        return self.async_show_form(
+            step_id="advanced",
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(
+                        CONF_DEFAULT_POSITION,
+                        default=current_position,
+                    ): _select_dropdown(NOTIFICATION_POSITIONS),
                     vol.Optional(
                         CONF_DEFAULT_WIDTH,
                         default=current_width,
@@ -429,10 +470,6 @@ class ReceiverOptionsFlow(config_entries.OptionsFlow):  # type: ignore[misc]
                         CONF_DEFAULT_HEIGHT,
                         default=current_height,
                     ): int,
-                    vol.Optional(
-                        CONF_PREFER_REMOTE_TRANSPORT,
-                        default=current_prefer_remote_transport,
-                    ): bool,
                     vol.Optional(
                         CONF_REMOTE_HOME_ASSISTANT_URL,
                         default=current_url,
@@ -478,6 +515,115 @@ def _optional_default_int(
     if not minimum <= parsed_value <= maximum:
         return None
     return parsed_value
+
+
+def _current_basic_options(entry: Any) -> dict[str, Any]:
+    stream_type = str(
+        entry.options.get(CONF_DEFAULT_STREAM_TYPE, STREAM_TYPE_AUTO)
+    ).strip()
+    if stream_type not in STREAM_TYPES:
+        stream_type = STREAM_TYPE_AUTO
+    duration = (
+        _optional_default_int(
+            entry.options.get(CONF_DEFAULT_DURATION_SECONDS),
+            minimum=0,
+            maximum=3600,
+        )
+        or 0
+    )
+    return _basic_options(
+        default_stream_type=stream_type,
+        default_duration=duration,
+        default_snapshot_fallback=bool(
+            entry.options.get(CONF_DEFAULT_SNAPSHOT_FALLBACK, True)
+        ),
+        prefer_remote_transport=bool(
+            entry.options.get(CONF_PREFER_REMOTE_TRANSPORT, False)
+        ),
+    )
+
+
+def _basic_options(
+    *,
+    default_stream_type: str,
+    default_duration: int,
+    default_snapshot_fallback: bool,
+    prefer_remote_transport: bool,
+) -> dict[str, Any]:
+    options: dict[str, Any] = {
+        CONF_DEFAULT_STREAM_TYPE: default_stream_type,
+        CONF_DEFAULT_SNAPSHOT_FALLBACK: default_snapshot_fallback,
+        CONF_PREFER_REMOTE_TRANSPORT: prefer_remote_transport,
+    }
+    if default_duration > 0:
+        options[CONF_DEFAULT_DURATION_SECONDS] = default_duration
+    return options
+
+
+def _options_with_preserved_advanced(
+    entry: Any,
+    basic_options: dict[str, Any],
+) -> dict[str, Any]:
+    options = dict(basic_options)
+    _preserve_camera_defaults(entry, options)
+    _preserve_advanced_options(entry, options)
+    return options
+
+
+def _options_with_advanced(
+    entry: Any,
+    basic_options: dict[str, Any],
+    *,
+    default_position: str,
+    default_width: int,
+    default_height: int,
+    remote_url: str,
+    remote_token: str,
+) -> dict[str, Any]:
+    options = dict(basic_options)
+    options[CONF_DEFAULT_POSITION] = default_position
+    if default_width > 0:
+        options[CONF_DEFAULT_WIDTH] = default_width
+    if default_height > 0:
+        options[CONF_DEFAULT_HEIGHT] = default_height
+    if remote_url and remote_token:
+        options[CONF_REMOTE_HOME_ASSISTANT_URL] = remote_url
+        options[CONF_REMOTE_ACCESS_TOKEN] = remote_token
+    _preserve_camera_defaults(entry, options)
+    return options
+
+
+def _preserve_camera_defaults(entry: Any, options: dict[str, Any]) -> None:
+    if CONF_CAMERA_DEFAULTS in entry.options:
+        options[CONF_CAMERA_DEFAULTS] = dict(entry.options[CONF_CAMERA_DEFAULTS])
+
+
+def _preserve_advanced_options(entry: Any, options: dict[str, Any]) -> None:
+    position = str(entry.options.get(CONF_DEFAULT_POSITION, "top_right")).strip()
+    if position in NOTIFICATION_POSITIONS:
+        options[CONF_DEFAULT_POSITION] = position
+
+    width = _optional_default_int(
+        entry.options.get(CONF_DEFAULT_WIDTH),
+        minimum=0,
+        maximum=1600,
+    )
+    if width is not None and width > 0:
+        options[CONF_DEFAULT_WIDTH] = width
+
+    height = _optional_default_int(
+        entry.options.get(CONF_DEFAULT_HEIGHT),
+        minimum=0,
+        maximum=900,
+    )
+    if height is not None and height > 0:
+        options[CONF_DEFAULT_HEIGHT] = height
+
+    remote_url = str(entry.options.get(CONF_REMOTE_HOME_ASSISTANT_URL, "")).strip()
+    remote_token = str(entry.options.get(CONF_REMOTE_ACCESS_TOKEN, "")).strip()
+    if remote_url and remote_token:
+        options[CONF_REMOTE_HOME_ASSISTANT_URL] = remote_url
+        options[CONF_REMOTE_ACCESS_TOKEN] = remote_token
 
 
 def _create_receiver_entry(
