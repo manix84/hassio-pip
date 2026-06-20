@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.31.5 - Manual Restream Helper Workflow 🧵
+
+- Added manual go2rtc helper metadata to restreaming provider diagnostics and camera calibration action plans 🧰
+- Included example TV-safe HLS/MJPEG URL patterns and the `set_camera_defaults` fields needed to save a working manual restream URL 📺
+- Updated camera compatibility docs, roadmap, packaged integration README, and website wording for the larger go2rtc/WebRTC/transcoding compatibility track 📝
+
 ## 1.31.4 - Camera Calibration Action Plans 🧭
 
 - Added an `action_plan` block to camera calibration and compatibility results so users can see the next service to call and the data to use 🧰

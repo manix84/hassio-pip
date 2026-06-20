@@ -29,6 +29,7 @@ from custom_components.ha_tv_pip.const import (
     CONF_TOKEN,
     DOMAIN,
 )
+from custom_components.ha_tv_pip.restreaming import restreaming_provider_metadata
 from custom_components.ha_tv_pip.services import (
     CAMERA_COMPATIBILITY_KEY,
     CAMERA_LAST_RESULT_KEY,
@@ -349,27 +350,7 @@ def test_restreaming_provider_status_sensor_reports_planned_state() -> None:
     entity = sensor.ReceiverRestreamingProviderStatusSensor(_entry())
 
     assert entity._attr_native_value == "planned"
-    assert entity._attr_extra_state_attributes == {
-        "enabled": False,
-        "status": "planned",
-        "configured_provider": None,
-        "active_provider": None,
-        "supported_providers": [],
-        "planned_providers": ["go2rtc", "webrtc", "transcoding"],
-        "recommended_current_paths": [
-            "use_stream_camera_entity",
-            "use_mjpeg_first",
-            "use_snapshot_fallback",
-            "use_camera_substream",
-            "use_restream_url",
-            "save_per_camera_defaults",
-        ],
-        "next_step": "configure_tv_safe_live_stream_source",
-        "documentation_url": (
-            "https://github.com/manix84/ha-tv-pip/blob/main/"
-            "docs/camera-compatibility.md"
-        ),
-    }
+    assert entity._attr_extra_state_attributes == restreaming_provider_metadata()
 
 
 def test_status_sensor_prefers_remote_transport_when_enabled(
@@ -1230,27 +1211,7 @@ def test_diagnostics_redacts_token_and_url(monkeypatch) -> None:  # type: ignore
     assert result["camera_compatibility"] == {}
     assert result["camera_last_result"] == {}
     assert result["last_command_result"] == {}
-    assert result["restreaming_providers"] == {
-        "enabled": False,
-        "status": "planned",
-        "configured_provider": None,
-        "active_provider": None,
-        "supported_providers": [],
-        "planned_providers": ["go2rtc", "webrtc", "transcoding"],
-        "recommended_current_paths": [
-            "use_stream_camera_entity",
-            "use_mjpeg_first",
-            "use_snapshot_fallback",
-            "use_camera_substream",
-            "use_restream_url",
-            "save_per_camera_defaults",
-        ],
-        "next_step": "configure_tv_safe_live_stream_source",
-        "documentation_url": (
-            "https://github.com/manix84/ha-tv-pip/blob/main/"
-            "docs/camera-compatibility.md"
-        ),
-    }
+    assert result["restreaming_providers"] == restreaming_provider_metadata()
     assert result["receiver_status"]["url"] == diagnostics.REDACTED
     assert result["receiver_status"]["fallbackUrl"] == diagnostics.REDACTED
     assert result["receiver_status"]["playback"]["url"] == diagnostics.REDACTED

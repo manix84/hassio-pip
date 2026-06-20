@@ -854,12 +854,13 @@ Completed:
 - ✅ Discovery repair for DHCP address changes, using the stable receiver id from Zeroconf to update the stored host, port, version, pairing, and API metadata.
 - ✅ Compact Home Assistant receiver options screen with advanced popup size, position, and remote receiver credential fields hidden behind an explicit advanced-settings step.
 - ✅ Camera calibration and compatibility action plans so users can see the recommended next service call, safe data payload, and restreaming/source fields to try.
+- ✅ Manual go2rtc helper workflow metadata in restreaming provider diagnostics and calibration action plans, including URL patterns and fields to save a working TV-safe restream URL.
 
 Still future:
 
 - WebRTC low-latency mode.
 - Restreaming or transcoding for broad camera codec support.
-- Automatic camera-platform helpers such as go2rtc or Frigate-specific setup shortcuts.
+- Guided camera-platform helpers such as go2rtc or Frigate-specific setup shortcuts.
 
 ## Additional TV Platforms
 

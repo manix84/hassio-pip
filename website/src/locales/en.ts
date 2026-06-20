@@ -11,7 +11,7 @@ export const en = {
     currentStatus: {
       body: [
         "HA TV PiP now supports discovery, TV-visible pairing, authenticated receiver control, camera stream popups, snapshots, styled notifications, receiver management, remote receiver transport, and per-camera receiver defaults.",
-        "Post-1.0 compatibility work is underway. The Home Assistant integration can calibrate a camera against a receiver, preview and save recommended defaults, use manual TV-safe restream URLs, flag when a restreamed source is likely needed, expose receiver service health, show suggested next steps on the receiver device, and report whether the installed receiver is current, degraded, legacy, or incompatible. Automatic restreaming providers remain planned extension points, not active requirements.",
+        "Post-1.0 compatibility work is underway. The Home Assistant integration can calibrate a camera against a receiver, preview and save recommended defaults, use manual TV-safe restream URLs, expose go2rtc helper metadata for manual restream setup, flag when a restreamed source is likely needed, expose receiver service health, show suggested next steps on the receiver device, and report whether the installed receiver is current, degraded, legacy, or incompatible. Automatic restreaming providers remain planned extension points, not active requirements.",
       ],
       eyebrow: "Current status",
       title: "Post-v1.0 compatibility polish",
@@ -72,7 +72,7 @@ export const en = {
       {
         question: "Why do some camera streams show snapshots or errors?",
         answer:
-          "Android TV devices can reject unsupported codecs or very high-resolution streams. HA TV PiP supports snapshot fallbacks, separate stream camera entities, manual restream URLs, automatic MJPEG fallback, MJPEG-first mode, receiver capability checks, and camera compatibility testing. If HLS/MJPEG are unavailable or only snapshots work, calibration results flag that a TV-safe restreamed source is likely needed. Start with a lower-resolution or MJPEG camera entity, or use a go2rtc HLS/MJPEG URL if you already have one. Automatic go2rtc helpers, WebRTC, and transcoding are planned future provider paths.",
+          "Android TV devices can reject unsupported codecs or very high-resolution streams. HA TV PiP supports snapshot fallbacks, separate stream camera entities, manual restream URLs, automatic MJPEG fallback, MJPEG-first mode, receiver capability checks, and camera compatibility testing. If HLS/MJPEG are unavailable or only snapshots work, calibration results flag that a TV-safe restreamed source is likely needed and include manual go2rtc helper metadata. Start with a lower-resolution or MJPEG camera entity, or save a tested go2rtc HLS/MJPEG URL as a per-camera default. Guided go2rtc setup, WebRTC, and transcoding are planned future provider paths.",
       },
       {
         question: "Why does the Home Assistant Configuration screen show a 500 error?",

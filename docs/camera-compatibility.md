@@ -62,6 +62,7 @@ The `action_plan` block is the fastest path for normal users. It includes:
 - `service`: the next HA TV PiP service to call.
 - `data`: a safe payload for that service. Direct restream URLs are not duplicated here; review `recommended_defaults` when a restream URL is involved.
 - `fields_to_try`: optional fields to adjust when live video needs another source.
+- `provider_help`: helper metadata for manual go2rtc URLs today, plus planned WebRTC/transcoding paths for future support.
 - `notes`: short guidance explaining why that action was recommended.
 
 When the recommendation looks right, run the same action with `save: true`. The saved per-camera defaults can include stream type, stream camera entity, snapshot camera entity, snapshot fallback, duration, position, width, and height.
@@ -91,6 +92,31 @@ target:
 data:
   camera_entity: camera.front_door
 ```
+
+## Manual go2rtc Helper Workflow 🧰
+
+Automatic go2rtc setup is not implemented yet, but the calibration response now exposes enough helper metadata to guide a manual setup:
+
+- `restreaming_provider.manual_provider_workflows`: current provider workflows that can be used today.
+- `action_plan.provider_help.manual_provider_workflows`: the same helper data attached to the suggested next action.
+- `example_url_patterns`: example HLS and MJPEG URL shapes for a go2rtc stream name.
+- `service` and `fields`: the HA TV PiP service and fields to use when saving the working URL as per-camera defaults.
+
+The current manual go2rtc path is:
+
+1. Create or identify a TV-safe go2rtc stream name for the camera.
+2. Test the go2rtc HLS or MJPEG URL from a device on the same network as the TV.
+3. Save that URL with `ha_tv_pip.set_camera_defaults`.
+4. Keep `snapshot_fallback: true` so the receiver can show an image while live video loads or if live video fails.
+
+Example URL patterns:
+
+```txt
+http://homeassistant.local:1984/api/stream.m3u8?src=<stream_name>
+http://homeassistant.local:1984/api/stream.mjpeg?src=<stream_name>
+```
+
+Treat these as provider helper patterns, not guaranteed URLs. Your actual host, port, stream name, and go2rtc configuration may differ.
 
 ## When Restreaming Is Recommended 🧵
 
@@ -122,11 +148,11 @@ The provider status metadata also includes today's recommended paths:
 - `use_restream_url`: point the camera default at a known TV-safe HLS or MJPEG restream URL.
 - `save_per_camera_defaults`: store the working values once a camera has been calibrated.
 
-Planned provider families:
+Provider roadmap:
 
-- `go2rtc`: manual `restream_url` support works today; automatic setup helpers remain future work.
-- `webrtc`: future low-latency path where the receiver and platform constraints allow it.
-- `transcoding`: future path for converting unsupported camera formats into receiver-compatible video.
+- `go2rtc`: manual `restream_url` support and helper metadata work today; guided setup helpers remain future work.
+- `WebRTC`: future low-latency path where the receiver and platform constraints allow it.
+- `transcoding`: future optional path for converting unsupported camera formats into receiver-compatible video.
 
 These future providers should be optional. The local-first HLS, MJPEG, and snapshot path should remain the default for users whose cameras already expose TV-safe streams.
 

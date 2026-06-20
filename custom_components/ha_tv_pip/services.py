@@ -1540,6 +1540,7 @@ def _camera_compatibility_action_plan(
                 ATTR_RESTREAM_URL,
                 ATTR_RESTREAM_PROVIDER,
             ],
+            "provider_help": _restreaming_provider_help(result),
             "notes": [
                 "Snapshot is available, but live HLS/MJPEG was not available.",
                 "Try a lower-resolution camera entity or a TV-safe HLS/MJPEG restream.",
@@ -1578,6 +1579,7 @@ def _camera_compatibility_action_plan(
             ATTR_RESTREAM_URL,
             ATTR_RESTREAM_PROVIDER,
         ],
+        "provider_help": _restreaming_provider_help(result),
         "notes": [
             (
                 "Home Assistant could not resolve a supported HLS, MJPEG, "
@@ -1588,6 +1590,31 @@ def _camera_compatibility_action_plan(
                 "configure a restream."
             ),
         ],
+    }
+
+
+def _restreaming_provider_help(result: dict[str, Any]) -> dict[str, Any]:
+    """Return provider helper metadata for camera compatibility action plans."""
+
+    provider_metadata = result.get("restreaming_provider")
+    if not isinstance(provider_metadata, dict):
+        return {}
+
+    provider_help = {
+        "status": provider_metadata.get("status"),
+        "next_step": provider_metadata.get("next_step"),
+        "documentation_url": provider_metadata.get("documentation_url"),
+        "manual_provider_workflows": provider_metadata.get(
+            "manual_provider_workflows", []
+        ),
+        "future_provider_workflows": provider_metadata.get(
+            "future_provider_workflows", []
+        ),
+    }
+    return {
+        key: value
+        for key, value in provider_help.items()
+        if value is not None and value != []
     }
 
 

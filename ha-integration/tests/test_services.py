@@ -27,6 +27,7 @@ from custom_components.ha_tv_pip.const import (
     CONF_PREFER_REMOTE_TRANSPORT,
     CONF_TOKEN,
 )
+from custom_components.ha_tv_pip.restreaming import restreaming_provider_metadata
 from custom_components.ha_tv_pip.services import (
     ATTR_BACKGROUND_COLOR,
     ATTR_CAMERA_ENTITY,
@@ -61,6 +62,17 @@ from custom_components.ha_tv_pip.services import (
     _resolve_receiver,
     _validate_camera_entity,
 )
+
+
+def _expected_restreaming_provider_help() -> dict[str, Any]:
+    metadata = restreaming_provider_metadata()
+    return {
+        "status": metadata["status"],
+        "next_step": metadata["next_step"],
+        "documentation_url": metadata["documentation_url"],
+        "manual_provider_workflows": metadata["manual_provider_workflows"],
+        "future_provider_workflows": metadata["future_provider_workflows"],
+    }
 
 
 @dataclass
@@ -2333,27 +2345,7 @@ def test_camera_stream_test_recommends_restreaming_for_snapshot_only(
         "try_go2rtc_or_webrtc_bridge",
         "wait_for_transcoding_support",
     ]
-    assert result["restreaming_provider"] == {
-        "enabled": False,
-        "status": "planned",
-        "configured_provider": None,
-        "active_provider": None,
-        "supported_providers": [],
-        "planned_providers": ["go2rtc", "webrtc", "transcoding"],
-        "recommended_current_paths": [
-            "use_stream_camera_entity",
-            "use_mjpeg_first",
-            "use_snapshot_fallback",
-            "use_camera_substream",
-            "use_restream_url",
-            "save_per_camera_defaults",
-        ],
-        "next_step": "configure_tv_safe_live_stream_source",
-        "documentation_url": (
-            "https://github.com/manix84/ha-tv-pip/blob/main/"
-            "docs/camera-compatibility.md"
-        ),
-    }
+    assert result["restreaming_provider"] == restreaming_provider_metadata()
     assert result["recommended_defaults"] == {ATTR_STREAM_TYPE: "snapshot"}
     assert result["action_plan"] == {
         "primary_action": "use_snapshot_or_configure_live_source",
@@ -2370,6 +2362,7 @@ def test_camera_stream_test_recommends_restreaming_for_snapshot_only(
             ATTR_RESTREAM_URL,
             ATTR_RESTREAM_PROVIDER,
         ],
+        "provider_help": _expected_restreaming_provider_help(),
         "notes": [
             "Snapshot is available, but live HLS/MJPEG was not available.",
             "Try a lower-resolution camera entity or a TV-safe HLS/MJPEG restream.",
@@ -2471,6 +2464,7 @@ def test_calibrate_camera_flags_restreaming_when_no_paths_work(
             ATTR_RESTREAM_URL,
             ATTR_RESTREAM_PROVIDER,
         ],
+        "provider_help": _expected_restreaming_provider_help(),
         "notes": [
             (
                 "Home Assistant could not resolve a supported HLS, MJPEG, "
@@ -2483,27 +2477,7 @@ def test_calibrate_camera_flags_restreaming_when_no_paths_work(
         ],
     }
     assert result["restreaming_recommended"] is True
-    assert result["restreaming_provider"] == {
-        "enabled": False,
-        "status": "planned",
-        "configured_provider": None,
-        "active_provider": None,
-        "supported_providers": [],
-        "planned_providers": ["go2rtc", "webrtc", "transcoding"],
-        "recommended_current_paths": [
-            "use_stream_camera_entity",
-            "use_mjpeg_first",
-            "use_snapshot_fallback",
-            "use_camera_substream",
-            "use_restream_url",
-            "save_per_camera_defaults",
-        ],
-        "next_step": "configure_tv_safe_live_stream_source",
-        "documentation_url": (
-            "https://github.com/manix84/ha-tv-pip/blob/main/"
-            "docs/camera-compatibility.md"
-        ),
-    }
+    assert result["restreaming_provider"] == restreaming_provider_metadata()
     assert "recommended_defaults" not in result
 
 

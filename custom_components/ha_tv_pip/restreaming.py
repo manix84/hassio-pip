@@ -21,6 +21,51 @@ RESTREAMING_PLANNED_PROVIDER_PATHS = [
     "webrtc",
     "transcoding",
 ]
+RESTREAMING_MANUAL_PROVIDER_WORKFLOWS: list[dict[str, Any]] = [
+    {
+        "provider": "go2rtc",
+        "status": "manual_url_supported",
+        "current_support": (
+            "Save a known TV-safe go2rtc HLS or MJPEG URL as a per-camera "
+            "restream_url."
+        ),
+        "service": "set_camera_defaults",
+        "fields": [
+            "camera_entity",
+            "restream_provider",
+            "restream_url",
+            "stream_type",
+            "snapshot_fallback",
+        ],
+        "example_url_patterns": [
+            "http://homeassistant.local:1984/api/stream.m3u8?src=<stream_name>",
+            "http://homeassistant.local:1984/api/stream.mjpeg?src=<stream_name>",
+        ],
+    },
+]
+RESTREAMING_FUTURE_PROVIDER_WORKFLOWS: list[dict[str, Any]] = [
+    {
+        "provider": "go2rtc",
+        "status": "planned",
+        "planned_support": "Guided setup and stream-source helpers.",
+    },
+    {
+        "provider": "webrtc",
+        "status": "research",
+        "planned_support": (
+            "Low-latency receiver path where Android TV and Home Assistant "
+            "constraints allow it."
+        ),
+    },
+    {
+        "provider": "transcoding",
+        "status": "research",
+        "planned_support": (
+            "Optional conversion of unsupported camera formats into "
+            "receiver-compatible video."
+        ),
+    },
+]
 
 RESTREAMING_PROVIDER_METADATA: dict[str, Any] = {
     "enabled": False,
@@ -29,6 +74,8 @@ RESTREAMING_PROVIDER_METADATA: dict[str, Any] = {
     "active_provider": None,
     "supported_providers": [],
     "planned_providers": RESTREAMING_PLANNED_PROVIDER_PATHS,
+    "manual_provider_workflows": RESTREAMING_MANUAL_PROVIDER_WORKFLOWS,
+    "future_provider_workflows": RESTREAMING_FUTURE_PROVIDER_WORKFLOWS,
     "recommended_current_paths": RESTREAMING_CURRENT_PATHS,
     "next_step": "configure_tv_safe_live_stream_source",
     "documentation_url": RESTREAMING_PROVIDER_DOCS_URL,

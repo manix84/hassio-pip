@@ -1,6 +1,6 @@
 {
   "name": "@ha-tv-pip/android-tv-app",
-  "version": "1.31.4",
+  "version": "1.31.5",
   "private": true,
   "description": "Android TV Kotlin receiver app for HA TV PiP.",
   "license": "MIT",
