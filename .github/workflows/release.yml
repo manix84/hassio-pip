@@ -220,6 +220,14 @@ jobs:
       - release-check
 
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
       - name: Download release artifacts
         uses: actions/download-artifact@v4
         with:
@@ -228,6 +236,30 @@ jobs:
 
       - name: Show release assets
         run: ls -la dist
+
+      - name: Generate release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ needs.setup.outputs.tag }}
+          RELEASE_VERSION: ${{ needs.setup.outputs.version }}
+        run: |
+          PREVIOUS_TAG=$(gh release list \
+            --limit 20 \
+            --json tagName,isDraft \
+            --jq '[.[] | select(.isDraft | not) | select(.tagName != env.RELEASE_TAG)][0].tagName // ""')
+          PREVIOUS_VERSION="${PREVIOUS_TAG#v}"
+
+          if [ -n "$PREVIOUS_VERSION" ]; then
+            node scripts/generate-release-notes.mjs \
+              --version "$RELEASE_VERSION" \
+              --since "$PREVIOUS_VERSION" \
+              --output dist/release-notes.md
+          else
+            node scripts/generate-release-notes.mjs \
+              --version "$RELEASE_VERSION" \
+              --output dist/release-notes.md
+          fi
 
       - name: Create draft GitHub Release with assets
         id: release_assets
@@ -252,6 +284,7 @@ jobs:
               "dist/ha-tv-pip-integration-v$RELEASE_VERSION.zip" \
               "dist/ha-tv-pip-integration.zip" \
               --clobber
+            gh release edit "$RELEASE_TAG" --notes-file dist/release-notes.md
             echo "publish=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -264,7 +297,7 @@ jobs:
             --draft \
             --target "${{ github.sha }}" \
             --title "HA TV PiP v$RELEASE_VERSION" \
-            --notes "Automated release for v$RELEASE_VERSION."
+            --notes-file dist/release-notes.md
           echo "publish=true" >> "$GITHUB_OUTPUT"
 
       - name: Publish GitHub Release
