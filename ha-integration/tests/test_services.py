@@ -31,6 +31,7 @@ from custom_components.ha_tv_pip.restreaming import restreaming_provider_metadat
 from custom_components.ha_tv_pip.services import (
     ATTR_BACKGROUND_COLOR,
     ATTR_CAMERA_ENTITY,
+    ATTR_CHECK_REACHABILITY,
     ATTR_DEVICE_ID,
     ATTR_DURATION_SECONDS,
     ATTR_ENTER_PIP,
@@ -2102,6 +2103,128 @@ def test_suggest_restream_source_uses_custom_base_url() -> None:
         "hls": "http://go2rtc.local:1984/api/stream.m3u8?src=front_door",
         "mjpeg": "http://go2rtc.local:1984/api/stream.mjpeg?src=front_door",
     }
+
+
+def test_test_restream_source_returns_save_action_for_supported_hls(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from custom_components.ha_tv_pip import services
+
+    monkeypatch.setattr(
+        services,
+        "_async_receiver_capabilities",
+        lambda receiver: asyncio.sleep(0, result=_capabilities()),
+    )
+    entry = FakeEntry(
+        entry_id="entry-1",
+        data={
+            CONF_DEVICE_ID: "device-1",
+            CONF_NAME: "Nursery TV",
+            CONF_HOST: "10.0.0.236",
+            CONF_PORT: 8765,
+            CONF_TOKEN: "token",
+        },
+    )
+    hass = FakeHass(
+        entries=[entry],
+        states={"camera.front_door": FakeState({"friendly_name": "Front Door"})},
+    )
+
+    result = asyncio.run(
+        services.async_handle_test_restream_source(
+            hass,
+            FakeCall(
+                data={
+                    ATTR_CAMERA_ENTITY: "camera.front_door",
+                    ATTR_RESTREAM_PROVIDER: "go2rtc",
+                    ATTR_RESTREAM_URL: (
+                        "http://go2rtc.local:1984/api/stream.m3u8?"
+                        "src=front_door"
+                    ),
+                    ATTR_CHECK_REACHABILITY: False,
+                },
+                target={ATTR_DEVICE_ID: "device-1"},
+            ),
+        )
+    )
+
+    assert result == {
+        "accepted": True,
+        "camera_entity": "camera.front_door",
+        "camera_title": "Front Door",
+        "receiver": "Nursery TV",
+        "receiver_device_id": "device-1",
+        "restream_provider": "go2rtc",
+        "restream_url": "http://go2rtc.local:1984/api/stream.m3u8?src=front_door",
+        "stream_type": "hls",
+        "receiver_supports_stream_type": True,
+        "reachability": {"checked": False},
+        "save_recommended": True,
+        "next_step": "save_restream_source",
+        "save_action": {
+            "service": "save_restream_source",
+            "target": {ATTR_DEVICE_ID: "device-1"},
+            "data": {
+                ATTR_CAMERA_ENTITY: "camera.front_door",
+                ATTR_RESTREAM_PROVIDER: "go2rtc",
+                ATTR_RESTREAM_URL: (
+                    "http://go2rtc.local:1984/api/stream.m3u8?src=front_door"
+                ),
+                ATTR_SNAPSHOT_FALLBACK: True,
+            },
+        },
+    }
+
+
+def test_test_restream_source_warns_when_receiver_lacks_stream_support(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from custom_components.ha_tv_pip import services
+
+    monkeypatch.setattr(
+        services,
+        "_async_receiver_capabilities",
+        lambda receiver: asyncio.sleep(
+            0,
+            result=_capabilities(stream_types=("snapshot", "notification")),
+        ),
+    )
+    entry = FakeEntry(
+        entry_id="entry-1",
+        data={
+            CONF_DEVICE_ID: "device-1",
+            CONF_NAME: "Nursery TV",
+            CONF_HOST: "10.0.0.236",
+            CONF_PORT: 8765,
+            CONF_TOKEN: "token",
+        },
+    )
+    hass = FakeHass(
+        entries=[entry],
+        states={"camera.front_door": FakeState({"friendly_name": "Front Door"})},
+    )
+
+    result = asyncio.run(
+        services.async_handle_test_restream_source(
+            hass,
+            FakeCall(
+                data={
+                    ATTR_CAMERA_ENTITY: "camera.front_door",
+                    ATTR_RESTREAM_URL: (
+                        "http://go2rtc.local:1984/api/stream.mjpeg?"
+                        "src=front_door"
+                    ),
+                },
+                target={ATTR_DEVICE_ID: "device-1"},
+            ),
+        )
+    )
+
+    assert result["stream_type"] == "mjpeg"
+    assert result["receiver_supports_stream_type"] is False
+    assert result["save_recommended"] is False
+    assert result["next_step"] == "choose_supported_hls_or_mjpeg_url"
+    assert "save_action" not in result
 
 
 def test_camera_stream_test_stores_non_sensitive_compatibility_report(

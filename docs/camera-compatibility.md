@@ -93,7 +93,22 @@ data:
   restream_base_url: http://homeassistant.local:1984
 ```
 
-The response includes candidate stream names, go2rtc-style HLS/MJPEG URL patterns, provider help, and a `save_action` payload to use after you have tested a working URL. `restream_base_url` is optional; omit it to use the default `http://homeassistant.local:1984` suggestion. This is advisory only; it does not create go2rtc streams or validate the candidate URLs automatically.
+The response includes candidate stream names, go2rtc-style HLS/MJPEG URL patterns, provider help, and a `save_action` payload to use after you have tested a working URL. `restream_base_url` is optional; omit it to use the default `http://homeassistant.local:1984` suggestion. This is advisory only; it does not create go2rtc streams automatically.
+
+Before saving one candidate, validate it with:
+
+```yaml
+service: ha_tv_pip.test_restream_source
+target:
+  device_id: living_room_tv
+data:
+  camera_entity: camera.front_door
+  restream_url: http://homeassistant.local:1984/api/stream.m3u8?src=front_door
+  restream_provider: go2rtc
+  check_reachability: false
+```
+
+This action infers HLS or MJPEG from the URL, checks the selected receiver's capability metadata, optionally checks reachability from Home Assistant, and returns a `save_action` payload when the candidate looks worth saving. Keep `check_reachability: false` for candidate URLs that may only be reachable from the TV network.
 
 When calibration or compatibility testing recommends restreaming, the action response includes the same guidance in `restream_source_suggestion` so you can move directly from a failed or snapshot-only live path to candidate manual restream values.
 
@@ -131,9 +146,10 @@ The current manual go2rtc path is:
 1. Create or identify a TV-safe go2rtc stream name for the camera.
 2. Run `ha_tv_pip.suggest_restream_source` to get candidate stream names and URL patterns.
 3. Test the go2rtc HLS or MJPEG URL from a device on the same network as the TV.
-4. Save that URL with `ha_tv_pip.save_restream_source`.
-5. Keep `snapshot_fallback: true` so the receiver can show an image while live video loads or if live video fails.
-6. Check the receiver device's `Saved Camera Defaults` sensor to confirm the camera has a saved restream source.
+4. Run `ha_tv_pip.test_restream_source` to confirm URL shape and receiver stream support.
+5. Save that URL with `ha_tv_pip.save_restream_source`.
+6. Keep `snapshot_fallback: true` so the receiver can show an image while live video loads or if live video fails.
+7. Check the receiver device's `Saved Camera Defaults` sensor to confirm the camera has a saved restream source.
 
 Example URL patterns:
 

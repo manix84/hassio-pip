@@ -807,3 +807,46 @@ suggest_restream_source:
       name: Restream base URL
       description: Optional base URL for the restream provider.
       example: http://homeassistant.local:1984
+test_restream_source:
+  target:
+    device:
+      integration: ha_tv_pip
+  fields:
+    camera_entity:
+      required: true
+      selector:
+        entity:
+          domain: camera
+      name: Camera entity
+      description: Camera entity this manual restream URL belongs to.
+    restream_url:
+      required: true
+      selector:
+        text:
+      name: Restream URL
+      description: Candidate HLS or MJPEG URL to validate before saving.
+      example: http://homeassistant.local:1984/api/stream.m3u8?src=front_door
+    restream_provider:
+      required: false
+      default: go2rtc
+      selector:
+        text:
+      name: Restream provider
+      description: Label for the restream source.
+      example: go2rtc
+    check_reachability:
+      required: false
+      default: false
+      selector:
+        boolean:
+      name: Check reachability
+      description: Try a lightweight URL reachability check from Home Assistant.
+      example: false
+    snapshot_fallback:
+      required: false
+      default: true
+      selector:
+        boolean:
+      name: Snapshot fallback
+      description: Include snapshot fallback in the returned save action.
+      example: true

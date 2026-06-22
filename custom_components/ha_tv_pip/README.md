@@ -267,6 +267,8 @@ If you already expose a TV-safe stream through go2rtc or another local restreami
 
 Use `ha_tv_pip.suggest_restream_source` when you need help turning a camera entity into manual restream setup values. It returns candidate stream names, go2rtc-style HLS/MJPEG URL patterns, provider help, and the follow-up `save_restream_source` action payload to use after a URL has been tested.
 
+Use `ha_tv_pip.test_restream_source` before saving a manual URL. It infers whether the candidate is HLS or MJPEG, checks that the selected receiver reports support for that stream type, optionally performs a lightweight reachability check from Home Assistant, and returns a safe `save_restream_source` payload when the URL looks worth saving.
+
 For the full setup workflow, see the project camera compatibility guide: <https://github.com/manix84/ha-tv-pip/blob/main/docs/camera-compatibility.md>.
 
 For lower-level troubleshooting, use `ha_tv_pip.test_camera_stream`:
@@ -387,6 +389,21 @@ data:
   camera_entity: camera.front_door
   restream_base_url: http://homeassistant.local:1984
 ```
+
+To validate one candidate before saving it:
+
+```yaml
+service: ha_tv_pip.test_restream_source
+target:
+  device_id: living_room_tv
+data:
+  camera_entity: camera.front_door
+  restream_url: http://homeassistant.local:1984/api/stream.m3u8?src=front_door
+  restream_provider: go2rtc
+  check_reachability: false
+```
+
+The action returns `stream_type`, `receiver_supports_stream_type`, `reachability`, `save_recommended`, `next_step`, and a `save_action` payload when the URL should be saved. Keep `check_reachability: false` if the candidate URL is only reachable from the TV network or you only want to check URL shape and receiver capability support.
 
 This is advisory only. It does not create go2rtc streams or validate the returned URLs automatically.
 

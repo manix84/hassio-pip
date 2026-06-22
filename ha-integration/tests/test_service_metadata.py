@@ -100,6 +100,12 @@ SERVICE_EXAMPLES: dict[str, set[str]] = {
         "restream_base_url",
         "restream_provider",
     },
+    "test_restream_source": {
+        "check_reachability",
+        "restream_provider",
+        "restream_url",
+        "snapshot_fallback",
+    },
 }
 
 NO_EXAMPLE_FIELDS: dict[str, set[str]] = {
@@ -136,6 +142,9 @@ NO_EXAMPLE_FIELDS: dict[str, set[str]] = {
     },
     "clear_all_camera_defaults": set(),
     "suggest_restream_source": {
+        "camera_entity",
+    },
+    "test_restream_source": {
         "camera_entity",
     },
 }

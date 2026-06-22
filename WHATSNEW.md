@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.31.13 - Restream Source Validation 🧪
+
+- Added `ha_tv_pip.test_restream_source` to validate a candidate manual HLS/MJPEG restream URL before saving it 🧰
+- Returned inferred stream type, receiver capability support, optional reachability results, next-step guidance, and a safe `save_restream_source` payload when the candidate looks usable 🔎
+- Updated Home Assistant service metadata, tests, and camera compatibility docs for the validate-before-save restream workflow 📹
+
 ## 1.31.12 - Restream Base URL Suggestions 🧭
 
 - Added optional `restream_base_url` support to `ha_tv_pip.suggest_restream_source` so candidate HLS/MJPEG URLs can use a real go2rtc host instead of the default placeholder 🧰

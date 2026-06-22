@@ -40,6 +40,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
@@ -442,6 +443,7 @@ private fun Intent.toShowCommand(): ShowCommand =
     )
 
 @Composable
+@androidx.annotation.OptIn(UnstableApi::class)
 private fun PlayerScreen(
     player: Player?,
     playbackState: PlayerPlaybackState,

@@ -394,6 +394,27 @@
         }
       }
     },
+    "test_restream_source": {
+      "name": "Test restream source",
+      "description": "Validate a candidate HLS or MJPEG restream URL before saving it as a camera default.",
+      "fields": {
+        "camera_entity": {
+          "name": "Camera entity"
+        },
+        "restream_url": {
+          "name": "Restream URL"
+        },
+        "restream_provider": {
+          "name": "Restream provider"
+        },
+        "check_reachability": {
+          "name": "Check reachability"
+        },
+        "snapshot_fallback": {
+          "name": "Snapshot fallback"
+        }
+      }
+    },
     "calibrate_camera": {
       "name": "Calibrate camera",
       "description": "Test a camera against a paired receiver and optionally save the recommended per-camera defaults.",

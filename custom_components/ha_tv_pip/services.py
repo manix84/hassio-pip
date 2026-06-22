@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import re
 from dataclasses import dataclass, replace
@@ -44,6 +45,7 @@ from .const import (
     SERVICE_SHOW_SNAPSHOT,
     SERVICE_SUGGEST_RESTREAM_SOURCE,
     SERVICE_TEST_CAMERA_STREAM,
+    SERVICE_TEST_RESTREAM_SOURCE,
     STREAM_TYPE_AUTO,
     STREAM_TYPE_HLS,
     STREAM_TYPE_MJPEG,
@@ -74,6 +76,7 @@ _LOGGER = logging.getLogger(__name__)
 
 ATTR_CAMERA_ENTITY = "camera_entity"
 ATTR_AREA_ID = "area_id"
+ATTR_CHECK_REACHABILITY = "check_reachability"
 ATTR_DEVICE_ID = "device_id"
 ATTR_DURATION_SECONDS = "duration_seconds"
 ATTR_ENTER_PIP = "enter_pip"
@@ -468,6 +471,9 @@ async def async_register_services(hass: Any) -> None:
     async def handle_suggest_restream_source(call: Any) -> dict[str, Any]:
         return await async_handle_suggest_restream_source(hass, call)
 
+    async def handle_test_restream_source(call: Any) -> dict[str, Any]:
+        return await async_handle_test_restream_source(hass, call)
+
     if not hass.services.has_service(DOMAIN, SERVICE_SHOW_CAMERA):
         hass.services.async_register(
             DOMAIN,
@@ -564,6 +570,24 @@ async def async_register_services(hass: Any) -> None:
                     vol.Required(ATTR_CAMERA_ENTITY): cv.entity_id,
                     vol.Optional(ATTR_RESTREAM_BASE_URL): str,
                     vol.Optional(ATTR_RESTREAM_PROVIDER, default="go2rtc"): str,
+                }
+            ),
+            **response_kwargs,
+        )
+
+    if not hass.services.has_service(DOMAIN, SERVICE_TEST_RESTREAM_SOURCE):
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_TEST_RESTREAM_SOURCE,
+            handle_test_restream_source,
+            schema=vol.Schema(
+                {
+                    **target_schema,
+                    vol.Required(ATTR_CAMERA_ENTITY): cv.entity_id,
+                    vol.Required(ATTR_RESTREAM_URL): str,
+                    vol.Optional(ATTR_RESTREAM_PROVIDER, default="go2rtc"): str,
+                    vol.Optional(ATTR_CHECK_REACHABILITY, default=False): bool,
+                    vol.Optional(ATTR_SNAPSHOT_FALLBACK, default=True): bool,
                 }
             ),
             **response_kwargs,
@@ -1092,6 +1116,68 @@ async def async_handle_suggest_restream_source(
         provider,
         base_url=base_url,
     )
+
+
+async def async_handle_test_restream_source(
+    hass: Any,
+    call: Any,
+) -> dict[str, Any]:
+    """Validate whether a manual restream URL is worth saving."""
+
+    data = dict(getattr(call, "data", {}))
+    camera_entity = str(data.get(ATTR_CAMERA_ENTITY, "")).strip()
+    if not camera_entity:
+        raise ServiceValidationError("missing_camera_entity")
+    _validate_camera_entity(hass, camera_entity)
+
+    restream_url = _validated_restream_url(data.get(ATTR_RESTREAM_URL))
+    if restream_url is None:
+        raise ServiceValidationError("invalid_restream_url")
+
+    receiver = _resolve_receiver_from_target(hass, call)
+    provider = _optional_text(data.get(ATTR_RESTREAM_PROVIDER)) or "go2rtc"
+    snapshot_fallback = bool(data.get(ATTR_SNAPSHOT_FALLBACK, True))
+    stream_type = _restream_url_stream_type_from_url(restream_url)
+    capabilities = await _async_receiver_capabilities(receiver)
+    receiver_supports_stream_type = _supports_stream(capabilities, stream_type)
+    reachability = {"checked": False}
+    if bool(data.get(ATTR_CHECK_REACHABILITY, False)):
+        reachability = await _async_check_restream_url_reachability(
+            hass,
+            restream_url,
+        )
+
+    url_reachable = reachability.get("reachable")
+    save_recommended = receiver_supports_stream_type and url_reachable is not False
+    result: dict[str, Any] = {
+        "accepted": True,
+        "camera_entity": camera_entity,
+        "camera_title": _camera_title(hass, camera_entity),
+        "receiver": receiver.name,
+        "receiver_device_id": receiver.device_id,
+        "restream_provider": provider,
+        "restream_url": restream_url,
+        "stream_type": stream_type,
+        "receiver_supports_stream_type": receiver_supports_stream_type,
+        "reachability": reachability,
+        "save_recommended": save_recommended,
+        "next_step": _restream_test_next_step(
+            receiver_supports_stream_type,
+            reachability,
+        ),
+    }
+    if save_recommended:
+        result["save_action"] = {
+            "service": SERVICE_SAVE_RESTREAM_SOURCE,
+            "target": {ATTR_DEVICE_ID: receiver.device_id},
+            "data": {
+                ATTR_CAMERA_ENTITY: camera_entity,
+                ATTR_RESTREAM_PROVIDER: provider,
+                ATTR_RESTREAM_URL: restream_url,
+                ATTR_SNAPSHOT_FALLBACK: snapshot_fallback,
+            },
+        }
+    return result
 
 
 def _request_from_call(call: Any) -> ShowCameraRequest:
@@ -2609,10 +2695,62 @@ def _restream_url_stream_type(request: ShowCameraRequest) -> str:
         return STREAM_TYPE_HLS
     if request.restream_url is None:
         return STREAM_TYPE_HLS
-    path = urlparse(request.restream_url).path.lower()
+    return _restream_url_stream_type_from_url(request.restream_url)
+
+
+def _restream_url_stream_type_from_url(restream_url: str) -> str:
+    path = urlparse(restream_url).path.lower()
     if path.endswith(".mjpeg") or path.endswith(".mjpg") or "mjpeg" in path:
         return STREAM_TYPE_MJPEG
     return STREAM_TYPE_HLS
+
+
+def _restream_test_next_step(
+    receiver_supports_stream_type: bool,
+    reachability: dict[str, Any],
+) -> str:
+    if not receiver_supports_stream_type:
+        return "choose_supported_hls_or_mjpeg_url"
+    if reachability.get("reachable") is False:
+        return "fix_url_or_network_access"
+    return "save_restream_source"
+
+
+async def _async_check_restream_url_reachability(
+    hass: Any,
+    restream_url: str,
+) -> dict[str, Any]:
+    try:
+        aiohttp_client = __import__(
+            "homeassistant.helpers.aiohttp_client",
+            fromlist=["async_get_clientsession"],
+        )
+    except ModuleNotFoundError:
+        return {
+            "checked": True,
+            "reachable": None,
+            "reason": "home_assistant_http_client_unavailable",
+        }
+
+    session = aiohttp_client.async_get_clientsession(hass)
+    try:
+        async with asyncio.timeout(5):
+            response = await session.head(restream_url, allow_redirects=True)
+            status_code = int(getattr(response, "status", 0))
+            close = getattr(response, "close", None)
+            if callable(close):
+                close()
+    except Exception as error:  # noqa: BLE001
+        return {
+            "checked": True,
+            "reachable": False,
+            "error": str(error),
+        }
+    return {
+        "checked": True,
+        "reachable": 200 <= status_code < 500,
+        "status_code": status_code,
+    }
 
 
 def _snapshot_preview_url(
