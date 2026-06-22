@@ -97,6 +97,7 @@ SERVICE_EXAMPLES: dict[str, set[str]] = {
     "clear_camera_defaults": set(),
     "clear_all_camera_defaults": set(),
     "suggest_restream_source": {
+        "restream_base_url",
         "restream_provider",
     },
 }

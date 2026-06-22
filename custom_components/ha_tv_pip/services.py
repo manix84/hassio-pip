@@ -91,6 +91,7 @@ ATTR_SNAPSHOT_FALLBACK = "snapshot_fallback"
 ATTR_SAVE = "save"
 ATTR_SAVE_RECOMMENDATION = "save_recommendation"
 ATTR_RESTREAM_PROVIDER = "restream_provider"
+ATTR_RESTREAM_BASE_URL = "restream_base_url"
 ATTR_RESTREAM_URL = "restream_url"
 ATTR_STREAM_CAMERA_ENTITY = "stream_camera_entity"
 ATTR_STREAM_TYPE = "stream_type"
@@ -561,6 +562,7 @@ async def async_register_services(hass: Any) -> None:
                 {
                     **target_schema,
                     vol.Required(ATTR_CAMERA_ENTITY): cv.entity_id,
+                    vol.Optional(ATTR_RESTREAM_BASE_URL): str,
                     vol.Optional(ATTR_RESTREAM_PROVIDER, default="go2rtc"): str,
                 }
             ),
@@ -1081,8 +1083,15 @@ async def async_handle_suggest_restream_source(
     provider = _optional_text(data.get(ATTR_RESTREAM_PROVIDER)) or "go2rtc"
     if provider != "go2rtc":
         provider = "manual"
+    base_url = _validated_restream_base_url(data.get(ATTR_RESTREAM_BASE_URL))
 
-    return _restream_source_suggestion(hass, receiver, camera_entity, provider)
+    return _restream_source_suggestion(
+        hass,
+        receiver,
+        camera_entity,
+        provider,
+        base_url=base_url,
+    )
 
 
 def _request_from_call(call: Any) -> ShowCameraRequest:
@@ -1818,6 +1827,8 @@ def _restream_source_suggestion(
     receiver: ReceiverEntry,
     camera_entity: str,
     provider: str,
+    *,
+    base_url: str | None = None,
 ) -> dict[str, Any]:
     """Return manual restream setup guidance for a selected camera."""
 
@@ -1826,7 +1837,11 @@ def _restream_source_suggestion(
         camera_entity,
         _camera_title(hass, camera_entity),
     )
-    url_patterns = _provider_url_patterns(provider, candidate_stream_names)
+    url_patterns = _provider_url_patterns(
+        provider,
+        candidate_stream_names,
+        base_url=base_url,
+    )
     primary_stream_name = candidate_stream_names[0]
     return {
         "accepted": True,
@@ -1836,6 +1851,7 @@ def _restream_source_suggestion(
         "receiver_device_id": receiver.device_id,
         "provider": provider,
         "provider_status": metadata.get("status"),
+        "restream_base_url": base_url or _default_restream_base_url(provider),
         "candidate_stream_names": candidate_stream_names,
         "candidate_urls": url_patterns,
         "recommended_test_order": [
@@ -1893,6 +1909,8 @@ def _slug_like_name(value: str) -> str:
 def _provider_url_patterns(
     provider: str,
     stream_names: list[str],
+    *,
+    base_url: str | None = None,
 ) -> list[dict[str, str]]:
     if provider != "go2rtc":
         return [
@@ -1908,20 +1926,27 @@ def _provider_url_patterns(
             for stream_name in stream_names
         ]
 
+    restream_base_url = base_url or _default_restream_base_url(provider)
     return [
         {
             "stream_name": stream_name,
             "hls": (
-                "http://homeassistant.local:1984/api/stream.m3u8?"
+                f"{restream_base_url}/api/stream.m3u8?"
                 f"src={quote(stream_name)}"
             ),
             "mjpeg": (
-                "http://homeassistant.local:1984/api/stream.mjpeg?"
+                f"{restream_base_url}/api/stream.mjpeg?"
                 f"src={quote(stream_name)}"
             ),
         }
         for stream_name in stream_names
     ]
+
+
+def _default_restream_base_url(provider: str) -> str:
+    if provider == "go2rtc":
+        return "http://homeassistant.local:1984"
+    return f"<{provider} base URL>"
 
 
 def _action_plan_safe_defaults(defaults: dict[str, Any]) -> dict[str, Any]:
@@ -2891,6 +2916,13 @@ def _validated_restream_url(value: Any) -> str | None:
     if parsed.scheme not in {"http", "https"} or not parsed.netloc:
         raise ServiceValidationError("invalid_restream_url")
     return url
+
+
+def _validated_restream_base_url(value: Any) -> str | None:
+    url = _validated_restream_url(value)
+    if url is None:
+        return None
+    return url.rstrip("/")
 
 
 def _validated_color(value: Any, default: str) -> str:

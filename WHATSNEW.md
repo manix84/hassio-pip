@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.31.12 - Restream Base URL Suggestions 🧭
+
+- Added optional `restream_base_url` support to `ha_tv_pip.suggest_restream_source` so candidate HLS/MJPEG URLs can use a real go2rtc host instead of the default placeholder 🧰
+- Returned the effective restream base URL in suggestion responses for easier troubleshooting 🔎
+- Added Home Assistant service metadata and tests for custom restream base URL suggestions 🧪
+
 ## 1.31.11 - Compatibility Guidance Surfacing 🩺
 
 - Added `restream_source_suggestion` to camera compatibility and calibration results when a TV-safe restream source is recommended 🧭

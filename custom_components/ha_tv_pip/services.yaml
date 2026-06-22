@@ -800,3 +800,10 @@ suggest_restream_source:
       name: Restream provider
       description: Restream provider to plan for.
       example: go2rtc
+    restream_base_url:
+      required: false
+      selector:
+        text:
+      name: Restream base URL
+      description: Optional base URL for the restream provider.
+      example: http://homeassistant.local:1984

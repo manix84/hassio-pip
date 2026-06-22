@@ -860,6 +860,7 @@ Completed:
 - ✅ `ha_tv_pip.clear_all_camera_defaults` helper action for resetting saved camera compatibility choices across one receiver.
 - ✅ `ha_tv_pip.suggest_restream_source` advisory action for candidate go2rtc-style stream names, HLS/MJPEG URL patterns, provider help, and save-action payloads.
 - ✅ Automatic `restream_source_suggestion` payloads in compatibility and calibration results when restreaming is recommended.
+- ✅ Optional `restream_base_url` support for restream source suggestions when go2rtc is not reachable at the default placeholder host.
 - ✅ Diagnostic entity categorization for detailed receiver, compatibility, command-result, connectivity, restreaming, and saved-defaults entities.
 
 Still future:

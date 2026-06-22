@@ -1213,7 +1213,7 @@ Use `ha_tv_pip.clear_all_camera_defaults` to remove every saved per-camera defau
 
 Calibration and compatibility responses also include `restreaming_recommended`, `restreaming_reason`, `restreaming_next_step`, `restreaming_options`, and `restreaming_provider`. These fields are populated when HLS and MJPEG are unavailable, or when the receiver/camera path is snapshot-only. Treat them as a signal to try a different camera entity, a lower-resolution profile, a TV-safe H.264/HLS or MJPEG substream, a manual `restream_url`, or, in the future, automatic go2rtc, WebRTC, or transcoding support.
 
-Use `ha_tv_pip.suggest_restream_source` to generate advisory manual restream setup values for a selected camera and receiver. It returns candidate stream names, go2rtc-style HLS/MJPEG URL patterns, provider help, and a safe follow-up `save_restream_source` payload. It does not create provider streams or validate candidate URLs.
+Use `ha_tv_pip.suggest_restream_source` to generate advisory manual restream setup values for a selected camera and receiver. It returns candidate stream names, go2rtc-style HLS/MJPEG URL patterns, provider help, the effective `restream_base_url`, and a safe follow-up `save_restream_source` payload. It does not create provider streams or validate candidate URLs.
 
 Camera compatibility and calibration responses include `restream_source_suggestion` automatically when `restreaming_recommended` is true. This keeps the manual restream workflow discoverable from the first failing or snapshot-only test result.
 

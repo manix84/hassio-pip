@@ -385,6 +385,7 @@ target:
   device_id: living_room_tv
 data:
   camera_entity: camera.front_door
+  restream_base_url: http://homeassistant.local:1984
 ```
 
 This is advisory only. It does not create go2rtc streams or validate the returned URLs automatically.

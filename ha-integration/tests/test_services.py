@@ -39,6 +39,7 @@ from custom_components.ha_tv_pip.services import (
     ATTR_MESSAGE_COLOR,
     ATTR_MESSAGE_SIZE,
     ATTR_POSITION,
+    ATTR_RESTREAM_BASE_URL,
     ATTR_RESTREAM_PROVIDER,
     ATTR_RESTREAM_URL,
     ATTR_SAVE,
@@ -2033,6 +2034,7 @@ def test_suggest_restream_source_returns_manual_go2rtc_plan() -> None:
     assert result["receiver_device_id"] == "device-1"
     assert result["provider"] == "go2rtc"
     assert result["provider_status"] == "planned"
+    assert result["restream_base_url"] == "http://homeassistant.local:1984"
     assert result["candidate_stream_names"] == [
         "front_door_bell_main",
         "front-door-bell-main",
@@ -2061,6 +2063,45 @@ def test_suggest_restream_source_returns_manual_go2rtc_plan() -> None:
         },
     }
     assert result["provider_help"] == _expected_restreaming_provider_help()
+
+
+def test_suggest_restream_source_uses_custom_base_url() -> None:
+    from custom_components.ha_tv_pip import services
+
+    entry = FakeEntry(
+        entry_id="entry-1",
+        data={
+            CONF_DEVICE_ID: "device-1",
+            CONF_NAME: "Nursery TV",
+            CONF_HOST: "10.0.0.236",
+            CONF_PORT: 8765,
+            CONF_TOKEN: "token",
+        },
+    )
+    hass = FakeHass(
+        entries=[entry],
+        states={"camera.front_door": FakeState({"friendly_name": "Front Door"})},
+    )
+
+    result = asyncio.run(
+        services.async_handle_suggest_restream_source(
+            hass,
+            FakeCall(
+                data={
+                    ATTR_CAMERA_ENTITY: "camera.front_door",
+                    ATTR_RESTREAM_BASE_URL: "http://go2rtc.local:1984/",
+                },
+                target={ATTR_DEVICE_ID: "device-1"},
+            ),
+        )
+    )
+
+    assert result["restream_base_url"] == "http://go2rtc.local:1984"
+    assert result["candidate_urls"][0] == {
+        "stream_name": "front_door",
+        "hls": "http://go2rtc.local:1984/api/stream.m3u8?src=front_door",
+        "mjpeg": "http://go2rtc.local:1984/api/stream.mjpeg?src=front_door",
+    }
 
 
 def test_camera_stream_test_stores_non_sensitive_compatibility_report(

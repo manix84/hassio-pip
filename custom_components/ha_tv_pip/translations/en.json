@@ -388,6 +388,9 @@
         },
         "restream_provider": {
           "name": "Restream provider"
+        },
+        "restream_base_url": {
+          "name": "Restream base URL"
         }
       }
     },

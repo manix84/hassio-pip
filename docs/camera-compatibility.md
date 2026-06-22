@@ -90,9 +90,10 @@ target:
   device_id: living_room_tv
 data:
   camera_entity: camera.front_door
+  restream_base_url: http://homeassistant.local:1984
 ```
 
-The response includes candidate stream names, go2rtc-style HLS/MJPEG URL patterns, provider help, and a `save_action` payload to use after you have tested a working URL. This is advisory only; it does not create go2rtc streams or validate the candidate URLs automatically.
+The response includes candidate stream names, go2rtc-style HLS/MJPEG URL patterns, provider help, and a `save_action` payload to use after you have tested a working URL. `restream_base_url` is optional; omit it to use the default `http://homeassistant.local:1984` suggestion. This is advisory only; it does not create go2rtc streams or validate the candidate URLs automatically.
 
 When calibration or compatibility testing recommends restreaming, the action response includes the same guidance in `restream_source_suggestion` so you can move directly from a failed or snapshot-only live path to candidate manual restream values.
 
