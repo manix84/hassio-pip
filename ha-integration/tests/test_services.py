@@ -1994,6 +1994,75 @@ def test_clear_all_camera_defaults_removes_all_stored_camera_options() -> None:
     assert entry.options == {CONF_DEFAULT_STREAM_TYPE: "mjpeg_first"}
 
 
+def test_suggest_restream_source_returns_manual_go2rtc_plan() -> None:
+    from custom_components.ha_tv_pip import services
+
+    entry = FakeEntry(
+        entry_id="entry-1",
+        data={
+            CONF_DEVICE_ID: "device-1",
+            CONF_NAME: "Nursery TV",
+            CONF_HOST: "10.0.0.236",
+            CONF_PORT: 8765,
+            CONF_TOKEN: "token",
+        },
+    )
+    hass = FakeHass(
+        entries=[entry],
+        states={
+            "camera.front_door_bell_main": FakeState(
+                {"friendly_name": "Front Door Bell Main"}
+            )
+        },
+    )
+
+    result = asyncio.run(
+        services.async_handle_suggest_restream_source(
+            hass,
+            FakeCall(
+                data={ATTR_CAMERA_ENTITY: "camera.front_door_bell_main"},
+                target={ATTR_DEVICE_ID: "device-1"},
+            ),
+        )
+    )
+
+    assert result["accepted"] is True
+    assert result["camera_entity"] == "camera.front_door_bell_main"
+    assert result["camera_title"] == "Front Door Bell Main"
+    assert result["receiver"] == "Nursery TV"
+    assert result["receiver_device_id"] == "device-1"
+    assert result["provider"] == "go2rtc"
+    assert result["provider_status"] == "planned"
+    assert result["candidate_stream_names"] == [
+        "front_door_bell_main",
+        "front-door-bell-main",
+    ]
+    assert result["candidate_urls"][0] == {
+        "stream_name": "front_door_bell_main",
+        "hls": (
+            "http://homeassistant.local:1984/api/stream.m3u8?"
+            "src=front_door_bell_main"
+        ),
+        "mjpeg": (
+            "http://homeassistant.local:1984/api/stream.mjpeg?"
+            "src=front_door_bell_main"
+        ),
+    }
+    assert result["save_action"] == {
+        "service": "save_restream_source",
+        "target": {ATTR_DEVICE_ID: "device-1"},
+        "data": {
+            ATTR_CAMERA_ENTITY: "camera.front_door_bell_main",
+            ATTR_RESTREAM_PROVIDER: "go2rtc",
+            ATTR_RESTREAM_URL: (
+                "<tested go2rtc HLS or MJPEG URL for front_door_bell_main>"
+            ),
+            ATTR_SNAPSHOT_FALLBACK: True,
+        },
+    }
+    assert result["provider_help"] == _expected_restreaming_provider_help()
+
+
 def test_camera_stream_test_stores_non_sensitive_compatibility_report(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

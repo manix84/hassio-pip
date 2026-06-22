@@ -263,6 +263,8 @@ If live HLS/MJPEG paths are unavailable, the response includes `restreaming_reco
 
 If you already expose a TV-safe stream through go2rtc or another local restreaming tool, set `restream_url` and `restream_provider` with `ha_tv_pip.save_restream_source`. The receiver will use that URL for live video while still using `camera_entity` for titles and snapshot previews. Saved restream URLs are redacted from diagnostics and are not exposed by the Saved Camera Defaults sensor.
 
+Use `ha_tv_pip.suggest_restream_source` when you need help turning a camera entity into manual restream setup values. It returns candidate stream names, go2rtc-style HLS/MJPEG URL patterns, provider help, and the follow-up `save_restream_source` action payload to use after a URL has been tested.
+
 For the full setup workflow, see the project camera compatibility guide: <https://github.com/manix84/ha-tv-pip/blob/main/docs/camera-compatibility.md>.
 
 For lower-level troubleshooting, use `ha_tv_pip.test_camera_stream`:
@@ -370,6 +372,18 @@ data:
 ```
 
 The helper saves the URL as the camera's live source, defaults the provider label to `go2rtc`, keeps snapshot fallback enabled unless disabled, and infers `hls` or `mjpeg` from common URL shapes when `stream_type` is omitted. After saving, normal automations can call `ha_tv_pip.show_camera` with only `camera_entity`. Check the receiver device's Saved Camera Defaults sensor to confirm the camera has a saved restream source without exposing the URL.
+
+To get candidate stream names and URL patterns before saving a manual source:
+
+```yaml
+service: ha_tv_pip.suggest_restream_source
+target:
+  device_id: living_room_tv
+data:
+  camera_entity: camera.front_door
+```
+
+This is advisory only. It does not create go2rtc streams or validate the returned URLs automatically.
 
 To reset all saved camera compatibility choices for a receiver:
 

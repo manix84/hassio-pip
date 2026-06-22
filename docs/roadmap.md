@@ -858,6 +858,7 @@ Completed:
 - ✅ `ha_tv_pip.save_restream_source` helper action for saving a tested HLS/MJPEG restream URL as per-camera defaults without using the lower-level defaults service.
 - ✅ Saved Camera Defaults sensor on receiver devices so saved per-camera defaults and restream source state can be confirmed without opening diagnostics.
 - ✅ `ha_tv_pip.clear_all_camera_defaults` helper action for resetting saved camera compatibility choices across one receiver.
+- ✅ `ha_tv_pip.suggest_restream_source` advisory action for candidate go2rtc-style stream names, HLS/MJPEG URL patterns, provider help, and save-action payloads.
 
 Still future:
 

@@ -42,6 +42,7 @@ from .const import (
     SERVICE_SHOW_CAMERA,
     SERVICE_SHOW_NOTIFICATION,
     SERVICE_SHOW_SNAPSHOT,
+    SERVICE_SUGGEST_RESTREAM_SOURCE,
     SERVICE_TEST_CAMERA_STREAM,
     STREAM_TYPE_AUTO,
     STREAM_TYPE_HLS,
@@ -463,6 +464,9 @@ async def async_register_services(hass: Any) -> None:
     async def handle_clear_all_camera_defaults(call: Any) -> dict[str, Any]:
         return await async_handle_clear_all_camera_defaults(hass, call)
 
+    async def handle_suggest_restream_source(call: Any) -> dict[str, Any]:
+        return await async_handle_suggest_restream_source(hass, call)
+
     if not hass.services.has_service(DOMAIN, SERVICE_SHOW_CAMERA):
         hass.services.async_register(
             DOMAIN,
@@ -545,6 +549,21 @@ async def async_register_services(hass: Any) -> None:
             SERVICE_CLEAR_ALL_CAMERA_DEFAULTS,
             handle_clear_all_camera_defaults,
             schema=vol.Schema(target_schema),
+            **response_kwargs,
+        )
+
+    if not hass.services.has_service(DOMAIN, SERVICE_SUGGEST_RESTREAM_SOURCE):
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_SUGGEST_RESTREAM_SOURCE,
+            handle_suggest_restream_source,
+            schema=vol.Schema(
+                {
+                    **target_schema,
+                    vol.Required(ATTR_CAMERA_ENTITY): cv.entity_id,
+                    vol.Optional(ATTR_RESTREAM_PROVIDER, default="go2rtc"): str,
+                }
+            ),
             **response_kwargs,
         )
 
@@ -1034,6 +1053,26 @@ async def async_handle_clear_all_camera_defaults(
         "cleared_camera_count": len(cleared_cameras),
         "cleared_cameras": cleared_cameras,
     }
+
+
+async def async_handle_suggest_restream_source(
+    hass: Any,
+    call: Any,
+) -> dict[str, Any]:
+    """Suggest manual restream setup values for a camera and receiver."""
+
+    data = dict(getattr(call, "data", {}))
+    camera_entity = str(data.get(ATTR_CAMERA_ENTITY, "")).strip()
+    if not camera_entity:
+        raise ServiceValidationError("missing_camera_entity")
+    _validate_camera_entity(hass, camera_entity)
+
+    receiver = _resolve_receiver_from_target(hass, call)
+    provider = _optional_text(data.get(ATTR_RESTREAM_PROVIDER)) or "go2rtc"
+    if provider != "go2rtc":
+        provider = "manual"
+
+    return _restream_source_suggestion(hass, receiver, camera_entity, provider)
 
 
 def _request_from_call(call: Any) -> ShowCameraRequest:
@@ -1762,6 +1801,118 @@ def _restreaming_provider_help(result: dict[str, Any]) -> dict[str, Any]:
         for key, value in provider_help.items()
         if value is not None and value != []
     }
+
+
+def _restream_source_suggestion(
+    hass: Any,
+    receiver: ReceiverEntry,
+    camera_entity: str,
+    provider: str,
+) -> dict[str, Any]:
+    """Return manual restream setup guidance for a selected camera."""
+
+    metadata = restreaming_provider_metadata()
+    candidate_stream_names = _candidate_restream_names(
+        camera_entity,
+        _camera_title(hass, camera_entity),
+    )
+    url_patterns = _provider_url_patterns(provider, candidate_stream_names)
+    primary_stream_name = candidate_stream_names[0]
+    return {
+        "accepted": True,
+        "camera_entity": camera_entity,
+        "camera_title": _camera_title(hass, camera_entity),
+        "receiver": receiver.name,
+        "receiver_device_id": receiver.device_id,
+        "provider": provider,
+        "provider_status": metadata.get("status"),
+        "candidate_stream_names": candidate_stream_names,
+        "candidate_urls": url_patterns,
+        "recommended_test_order": [
+            "Test candidate HLS URLs from a browser on the TV network.",
+            "If HLS fails, test the matching MJPEG URL.",
+            "Save the first TV-safe URL that plays reliably.",
+        ],
+        "save_action": {
+            "service": SERVICE_SAVE_RESTREAM_SOURCE,
+            "target": {ATTR_DEVICE_ID: receiver.device_id},
+            "data": {
+                ATTR_CAMERA_ENTITY: camera_entity,
+                ATTR_RESTREAM_PROVIDER: provider,
+                ATTR_RESTREAM_URL: (
+                    f"<tested {provider} HLS or MJPEG URL for {primary_stream_name}>"
+                ),
+                ATTR_SNAPSHOT_FALLBACK: True,
+            },
+        },
+        "provider_help": {
+            "status": metadata.get("status"),
+            "next_step": metadata.get("next_step"),
+            "documentation_url": metadata.get("documentation_url"),
+            "manual_provider_workflows": metadata.get(
+                "manual_provider_workflows", []
+            ),
+            "future_provider_workflows": metadata.get(
+                "future_provider_workflows", []
+            ),
+        },
+    }
+
+
+def _candidate_restream_names(camera_entity: str, camera_title: str) -> list[str]:
+    object_id = camera_entity.split(".", 1)[-1]
+    candidates = [
+        _slug_like_name(object_id),
+        _slug_like_name(camera_title),
+    ]
+    expanded: list[str] = []
+    for candidate in candidates:
+        if not candidate:
+            continue
+        expanded.append(candidate)
+        if "_" in candidate:
+            expanded.append(candidate.replace("_", "-"))
+    return list(dict.fromkeys(expanded))
+
+
+def _slug_like_name(value: str) -> str:
+    slug = re.sub(r"[^a-zA-Z0-9_]+", "_", value.strip().lower())
+    slug = re.sub(r"_+", "_", slug).strip("_")
+    return slug
+
+
+def _provider_url_patterns(
+    provider: str,
+    stream_names: list[str],
+) -> list[dict[str, str]]:
+    if provider != "go2rtc":
+        return [
+            {
+                "stream_name": stream_name,
+                "hls": (
+                    f"<{provider} HLS URL for stream '{stream_name}'>"
+                ),
+                "mjpeg": (
+                    f"<{provider} MJPEG URL for stream '{stream_name}'>"
+                ),
+            }
+            for stream_name in stream_names
+        ]
+
+    return [
+        {
+            "stream_name": stream_name,
+            "hls": (
+                "http://homeassistant.local:1984/api/stream.m3u8?"
+                f"src={quote(stream_name)}"
+            ),
+            "mjpeg": (
+                "http://homeassistant.local:1984/api/stream.mjpeg?"
+                f"src={quote(stream_name)}"
+            ),
+        }
+        for stream_name in stream_names
+    ]
 
 
 def _action_plan_safe_defaults(defaults: dict[str, Any]) -> dict[str, Any]:

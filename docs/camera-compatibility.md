@@ -82,6 +82,18 @@ data:
 
 The helper defaults the provider to `go2rtc`, keeps snapshot fallback enabled, and infers `hls` or `mjpeg` from common URL shapes when `stream_type` is omitted. The receiver still uses `camera_entity` for titles and snapshot previews, but live video comes from the saved restream URL. Saved restream URLs are redacted from diagnostics and are not exposed by the Saved Camera Defaults sensor.
 
+If you need help building the manual restream values, run:
+
+```yaml
+service: ha_tv_pip.suggest_restream_source
+target:
+  device_id: living_room_tv
+data:
+  camera_entity: camera.front_door
+```
+
+The response includes candidate stream names, go2rtc-style HLS/MJPEG URL patterns, provider help, and a `save_action` payload to use after you have tested a working URL. This is advisory only; it does not create go2rtc streams or validate the candidate URLs automatically.
+
 Future automations can then stay small:
 
 ```yaml
@@ -114,10 +126,11 @@ Automatic go2rtc setup is not implemented yet, but the calibration response now 
 The current manual go2rtc path is:
 
 1. Create or identify a TV-safe go2rtc stream name for the camera.
-2. Test the go2rtc HLS or MJPEG URL from a device on the same network as the TV.
-3. Save that URL with `ha_tv_pip.save_restream_source`.
-4. Keep `snapshot_fallback: true` so the receiver can show an image while live video loads or if live video fails.
-5. Check the receiver device's `Saved Camera Defaults` sensor to confirm the camera has a saved restream source.
+2. Run `ha_tv_pip.suggest_restream_source` to get candidate stream names and URL patterns.
+3. Test the go2rtc HLS or MJPEG URL from a device on the same network as the TV.
+4. Save that URL with `ha_tv_pip.save_restream_source`.
+5. Keep `snapshot_fallback: true` so the receiver can show an image while live video loads or if live video fails.
+6. Check the receiver device's `Saved Camera Defaults` sensor to confirm the camera has a saved restream source.
 
 Example URL patterns:
 

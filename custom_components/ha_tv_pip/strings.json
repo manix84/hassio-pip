@@ -424,6 +424,18 @@
       "name": "Clear all camera defaults",
       "description": "Remove all stored per-camera defaults for a paired receiver."
     },
+    "suggest_restream_source": {
+      "name": "Suggest restream source",
+      "description": "Suggest manual restream source setup values for a camera and receiver.",
+      "fields": {
+        "camera_entity": {
+          "name": "Camera entity"
+        },
+        "restream_provider": {
+          "name": "Restream provider"
+        }
+      }
+    },
     "save_restream_source": {
       "name": "Save restream source",
       "description": "Save a tested HLS or MJPEG restream URL as the camera default for a paired receiver.",

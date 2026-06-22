@@ -781,3 +781,22 @@ clear_all_camera_defaults:
   target:
     device:
       integration: ha_tv_pip
+suggest_restream_source:
+  target:
+    device:
+      integration: ha_tv_pip
+  fields:
+    camera_entity:
+      required: true
+      selector:
+        entity:
+          domain: camera
+      name: Camera entity
+      description: Camera entity that needs a TV-safe restream source.
+    restream_provider:
+      required: false
+      selector:
+        text:
+      name: Restream provider
+      description: Restream provider to plan for.
+      example: go2rtc

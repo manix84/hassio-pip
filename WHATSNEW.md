@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.31.10 - Restream Source Suggestions 🧭
+
+- Added `ha_tv_pip.suggest_restream_source` to produce manual go2rtc-style restream setup guidance for a selected camera and receiver 📹
+- Returned candidate stream names, candidate HLS/MJPEG URL patterns, provider help, and a follow-up `save_restream_source` action payload 🧰
+- Added Home Assistant service metadata, translations, tests, and compatibility docs for the guided restream suggestion flow 🧪
+
 ## 1.31.9 - Camera Defaults Cleanup 🧹
 
 - Added `ha_tv_pip.clear_all_camera_defaults` to remove every saved per-camera default from a receiver in one action 🧰

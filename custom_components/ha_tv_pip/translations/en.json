@@ -379,6 +379,18 @@
       "name": "Clear all camera defaults",
       "description": "Remove all stored per-camera defaults for a paired receiver."
     },
+    "suggest_restream_source": {
+      "name": "Suggest restream source",
+      "description": "Suggest manual restream source setup values for a camera and receiver.",
+      "fields": {
+        "camera_entity": {
+          "name": "Camera entity"
+        },
+        "restream_provider": {
+          "name": "Restream provider"
+        }
+      }
+    },
     "calibrate_camera": {
       "name": "Calibrate camera",
       "description": "Test a camera against a paired receiver and optionally save the recommended per-camera defaults.",
