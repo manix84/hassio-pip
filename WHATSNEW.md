@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.31.26 - Camera Compatibility Docs Alignment 📚
+
+- Updated the root README to mention copyable camera compatibility follow-up action payloads 🧰
+- Marked the latest restream helper response improvements as completed in the roadmap ✅
+- Kept future WebRTC, automatic provider setup, and transcoding work clearly separated from current manual helper support 🔎
+
 ## 1.31.25 - Complete Restream Follow-Up Actions 🎯
 
 - Added copyable Home Assistant `action` keys and receiver targets to restream `next_action` payloads 🧰

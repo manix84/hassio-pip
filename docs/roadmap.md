@@ -866,6 +866,9 @@ Completed:
 - ✅ Optional `restream_base_url` support for restream source suggestions when go2rtc is not reachable at the default placeholder host.
 - ✅ `ha_tv_pip.test_restream_source` helper action for validating a candidate manual HLS/MJPEG restream URL before saving it.
 - ✅ `save: true` on `ha_tv_pip.test_restream_source` so a valid manual restream URL can be tested and saved in one action.
+- ✅ Redacted `defaults_summary` responses for saved restream sources so provider, stream type, and URL presence can be confirmed without exposing the URL.
+- ✅ Copyable Home Assistant `action` keys in restream helper `save_action`, `test_action`, and `next_action` payloads while keeping legacy `service` keys for compatibility.
+- ✅ Complete follow-up `show_camera` payloads with receiver targets after saving or validating restream defaults.
 - ✅ Diagnostic entity categorization for detailed receiver, compatibility, command-result, connectivity, restreaming, and saved-defaults entities.
 
 Still future:
