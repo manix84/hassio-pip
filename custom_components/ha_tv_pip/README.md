@@ -379,7 +379,7 @@ data:
   height: 405
 ```
 
-The helper saves the URL as the camera's live source, defaults the provider label to `go2rtc`, keeps snapshot fallback enabled unless disabled, and infers `hls` or `mjpeg` from common URL shapes when `stream_type` is omitted. After saving, normal automations can call `ha_tv_pip.show_camera` with only `camera_entity`. Check the receiver device's Saved Camera Defaults sensor to confirm the camera has a saved restream source without exposing the URL.
+The helper saves the URL as the camera's live source, defaults the provider label to `go2rtc`, keeps snapshot fallback enabled unless disabled, and infers `hls` or `mjpeg` from common URL shapes when `stream_type` is omitted. Its response includes `defaults_summary`, which confirms the saved provider, stream type, and `has_restream_url` without echoing the URL. After saving, normal automations can call `ha_tv_pip.show_camera` with only `camera_entity`. Check the receiver device's Saved Camera Defaults sensor to confirm the camera has a saved restream source without exposing the URL.
 
 To get candidate stream names and URL patterns before saving a manual source:
 

@@ -1737,6 +1737,16 @@ def test_save_restream_source_persists_go2rtc_hls_defaults() -> None:
             ATTR_STREAM_TYPE: "hls",
             ATTR_WIDTH: 720,
         },
+        "defaults_summary": {
+            ATTR_HEIGHT: 405,
+            ATTR_RESTREAM_PROVIDER: "go2rtc",
+            "has_restream_url": True,
+            "restream_url_redacted": True,
+            ATTR_SNAPSHOT_CAMERA_ENTITY: "camera.front_door_sub",
+            ATTR_SNAPSHOT_FALLBACK: True,
+            ATTR_STREAM_TYPE: "hls",
+            ATTR_WIDTH: 720,
+        },
         "next_action": {
             "service": "show_camera",
             "data": {ATTR_CAMERA_ENTITY: "camera.front_door"},
@@ -1795,6 +1805,14 @@ def test_save_restream_source_can_save_mjpeg_defaults() -> None:
         ATTR_SNAPSHOT_FALLBACK: False,
         ATTR_STREAM_TYPE: "mjpeg",
     }
+    assert result["defaults_summary"] == {
+        ATTR_RESTREAM_PROVIDER: "custom",
+        "has_restream_url": True,
+        "restream_url_redacted": True,
+        ATTR_SNAPSHOT_FALLBACK: False,
+        ATTR_STREAM_TYPE: "mjpeg",
+    }
+    assert ATTR_RESTREAM_URL not in result["defaults_summary"]
     assert entry.options == {
         "camera_defaults": {
             "camera.front_door": result["defaults"],

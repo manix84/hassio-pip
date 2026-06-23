@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.31.22 - Redacted Defaults Summary 🛡️
+
+- Added `defaults_summary` to `ha_tv_pip.save_restream_source` responses so saved provider, stream type, and URL presence can be confirmed without echoing the URL 🔎
+- Kept the existing `defaults` response for compatibility while documenting the safer summary field 🧰
+- Updated tests and camera compatibility docs for the redacted confirmation payload 🧪
+
 ## 1.31.21 - Restream Test Follow-Up 🧪
 
 - Added `test_action` to `ha_tv_pip.suggest_restream_source` responses so users can validate the first suggested HLS candidate without assembling the next service call manually 🧰

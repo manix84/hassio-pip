@@ -1084,6 +1084,7 @@ async def async_handle_save_restream_source(hass: Any, call: Any) -> dict[str, A
         "camera_entity": request.camera_entity,
         "receiver": receiver.name,
         "defaults": defaults,
+        "defaults_summary": _camera_defaults_summary(defaults),
         "next_action": {
             "service": SERVICE_SHOW_CAMERA,
             "data": {ATTR_CAMERA_ENTITY: request.camera_entity},
@@ -1761,6 +1762,28 @@ def _camera_defaults_payload(request: ShowCameraRequest) -> dict[str, Any]:
     if request.height_explicit and request.height is not None:
         defaults[ATTR_HEIGHT] = request.height
     return defaults
+
+
+def _camera_defaults_summary(defaults: dict[str, Any]) -> dict[str, Any]:
+    summary: dict[str, Any] = {}
+    if ATTR_RESTREAM_PROVIDER in defaults:
+        summary[ATTR_RESTREAM_PROVIDER] = defaults.get(ATTR_RESTREAM_PROVIDER)
+    if ATTR_RESTREAM_URL in defaults:
+        summary["has_restream_url"] = True
+        summary["restream_url_redacted"] = True
+    for key in (
+        ATTR_STREAM_TYPE,
+        ATTR_SNAPSHOT_FALLBACK,
+        ATTR_SNAPSHOT_CAMERA_ENTITY,
+        ATTR_STREAM_CAMERA_ENTITY,
+        ATTR_DURATION_SECONDS,
+        ATTR_POSITION,
+        ATTR_WIDTH,
+        ATTR_HEIGHT,
+    ):
+        if key in defaults:
+            summary[key] = defaults.get(key)
+    return summary
 
 
 def _save_camera_defaults(

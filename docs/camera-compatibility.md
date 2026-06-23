@@ -85,7 +85,7 @@ data:
   snapshot_fallback: true
 ```
 
-The helper defaults the provider to `go2rtc`, keeps snapshot fallback enabled, and infers `hls` or `mjpeg` from common URL shapes when `stream_type` is omitted. The receiver still uses `camera_entity` for titles and snapshot previews, but live video comes from the saved restream URL. Saved restream URLs are redacted from diagnostics and are not exposed by the Saved Camera Defaults sensor.
+The helper defaults the provider to `go2rtc`, keeps snapshot fallback enabled, and infers `hls` or `mjpeg` from common URL shapes when `stream_type` is omitted. The response includes `defaults_summary` with `has_restream_url` and redacted URL state for confirmation. The receiver still uses `camera_entity` for titles and snapshot previews, but live video comes from the saved restream URL. Saved restream URLs are redacted from diagnostics and are not exposed by the Saved Camera Defaults sensor.
 
 If you need help building the manual restream values, run:
 
