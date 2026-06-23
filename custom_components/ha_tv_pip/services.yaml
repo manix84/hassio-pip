@@ -469,6 +469,129 @@ test_camera_stream:
       name: Save recommendation
       description: Save the recommended stream strategy and any explicit test fields as per-camera defaults.
       example: false
+setup_camera:
+  target:
+    device:
+      integration: ha_tv_pip
+  fields:
+    camera_entity:
+      required: true
+      selector:
+        entity:
+          domain: camera
+      name: Camera entity
+      description: Camera entity to set up against the selected receiver.
+    stream_camera_entity:
+      required: false
+      selector:
+        entity:
+          domain: camera
+      name: Stream camera entity
+      description: Optional camera entity to use for live stream calibration and saved defaults.
+    snapshot_camera_entity:
+      required: false
+      selector:
+        entity:
+          domain: camera
+      name: Snapshot fallback camera entity
+      description: Optional camera entity to use for snapshot checks and saved defaults.
+    restream_url:
+      required: false
+      selector:
+        text:
+      name: Restream URL
+      description: Optional candidate HLS or MJPEG restream URL. When provided, setup validates this URL instead of running normal calibration.
+      example: http://homeassistant.local:1984/api/stream.m3u8?src=front_door
+    restream_provider:
+      required: false
+      default: go2rtc
+      selector:
+        text:
+      name: Restream provider
+      description: Optional label for the restream source.
+      example: go2rtc
+    restream_base_url:
+      required: false
+      selector:
+        text:
+      name: Restream base URL
+      description: Optional base URL for candidate restream suggestions when calibration recommends restreaming.
+      example: http://homeassistant.local:1984
+    stream_type:
+      selector:
+        select:
+          options:
+            - auto
+            - hls
+            - mjpeg
+            - mjpeg_first
+            - snapshot
+      name: Preferred stream strategy
+      description: Optional stream strategy to evaluate and save.
+      example: auto
+    check_reachability:
+      required: false
+      default: false
+      selector:
+        boolean:
+      name: Check reachability
+      description: Try a lightweight URL reachability check from Home Assistant when restream_url is provided.
+      example: false
+    save:
+      required: false
+      default: false
+      selector:
+        boolean:
+      name: Save
+      description: Save recommended calibration defaults or a valid restream source.
+      example: true
+    snapshot_fallback:
+      selector:
+        boolean:
+      name: Snapshot fallback
+      description: Snapshot fallback preference to evaluate and save when save is enabled.
+      example: true
+    duration_seconds:
+      selector:
+        number:
+          min: 1
+          max: 3600
+          mode: box
+          unit_of_measurement: seconds
+      name: Duration
+      description: Per-camera duration to save when save is enabled.
+      example: 30
+    position:
+      selector:
+        select:
+          options:
+            - top_right
+            - top_left
+            - bottom_right
+            - bottom_left
+      name: Position
+      description: Per-camera popup position to save when save is enabled.
+      example: top_right
+    width:
+      selector:
+        number:
+          min: 240
+          max: 1600
+          mode: box
+          unit_of_measurement: px
+      name: Width
+      description: Per-camera popup width to save when save is enabled.
+      example: 720
+    height:
+      selector:
+        number:
+          min: 120
+          max: 900
+          mode: box
+          unit_of_measurement: px
+      name: Height
+      description: Per-camera popup height to save when save is enabled.
+      example: 405
 calibrate_camera:
   target:
     device:

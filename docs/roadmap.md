@@ -831,6 +831,7 @@ Completed:
 - ✅ `Last Camera Compatibility` sensor for showing the latest stream test recommendation on the receiver device.
 - ✅ `recommended_defaults` preview in compatibility test responses before saving per-camera defaults.
 - ✅ `ha_tv_pip.calibrate_camera` action for a user-friendly test, summary, and optional save workflow.
+- ✅ `ha_tv_pip.setup_camera` guided action that runs calibration by default or validates/saves a candidate restream URL when one is supplied.
 - ✅ Stored per-camera defaults in config entry diagnostics.
 - ✅ Restreaming guidance in camera compatibility and calibration results for snapshot-only or unavailable live stream paths.
 - ✅ `Camera Restreaming Recommended` binary sensor for showing restreaming guidance directly on the receiver device.

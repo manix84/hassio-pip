@@ -63,6 +63,19 @@ SERVICE_EXAMPLES: dict[str, set[str]] = {
         "restream_provider",
         "restream_url",
     },
+    "setup_camera": {
+        "check_reachability",
+        "duration_seconds",
+        "height",
+        "position",
+        "restream_base_url",
+        "restream_provider",
+        "restream_url",
+        "save",
+        "snapshot_fallback",
+        "stream_type",
+        "width",
+    },
     "calibrate_camera": {
         "duration_seconds",
         "position",
@@ -120,6 +133,11 @@ NO_EXAMPLE_FIELDS: dict[str, set[str]] = {
     },
     "show_notification": set(),
     "test_camera_stream": {
+        "camera_entity",
+        "snapshot_camera_entity",
+        "stream_camera_entity",
+    },
+    "setup_camera": {
         "camera_entity",
         "snapshot_camera_entity",
         "stream_camera_entity",

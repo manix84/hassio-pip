@@ -11,7 +11,7 @@ export const en = {
     currentStatus: {
       body: [
         "HA TV PiP now supports discovery, TV-visible pairing, authenticated receiver control, camera stream popups, snapshots, styled notifications, receiver management, remote receiver transport, and per-camera receiver defaults.",
-        "Post-1.0 compatibility work is underway. The Home Assistant integration can calibrate a camera against a receiver, preview and save recommended defaults, use manual TV-safe restream URLs, expose go2rtc helper metadata for manual restream setup, flag when a restreamed source is likely needed, expose receiver service health, show suggested next steps on the receiver device, and report whether the installed receiver is current, degraded, legacy, or incompatible. Automatic restreaming providers remain planned extension points, not active requirements.",
+        "Post-1.0 compatibility work is underway. The Home Assistant integration can guide camera setup, calibrate a camera against a receiver, preview and save recommended defaults, use manual TV-safe restream URLs, expose go2rtc helper metadata for manual restream setup, flag when a restreamed source is likely needed, expose receiver service health, show suggested next steps on the receiver device, and report whether the installed receiver is current, degraded, legacy, or incompatible. Automatic restreaming providers remain planned extension points, not active requirements.",
       ],
       eyebrow: "Current status",
       title: "Post-v1.0 compatibility polish",

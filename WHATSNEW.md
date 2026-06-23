@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.31.17 - Guided Camera Setup 🧭
+
+- Added `ha_tv_pip.setup_camera` as the preferred guided camera setup action for normal calibration and manual restream validation 🧰
+- Returned `setup_mode` and `setup_summary` so Home Assistant action responses are easier to follow 🔎
+- Updated service metadata, translations, docs, website copy, and tests for the guided setup path 🧪
+
 ## 1.31.16 - One-Step Restream Save 🧭
 
 - Added `save: true` to `ha_tv_pip.test_restream_source` so a valid manual restream URL can be tested and saved in one action 🧰

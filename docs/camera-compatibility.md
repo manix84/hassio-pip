@@ -38,10 +38,10 @@ Unsupported high-resolution camera main streams are expected to fail on some And
 
 ## Recommended Workflow 🧭
 
-Use `ha_tv_pip.calibrate_camera` first:
+Use `ha_tv_pip.setup_camera` first:
 
 ```yaml
-service: ha_tv_pip.calibrate_camera
+service: ha_tv_pip.setup_camera
 target:
   device_id: living_room_tv
 data:
@@ -53,7 +53,9 @@ data:
   save: false
 ```
 
-Review the returned `summary`, `action_plan`, `recommended_stream_type`, `recommended_defaults`, `restreaming_recommended`, `restreaming_next_step`, `restreaming_options`, and `restreaming_provider`.
+Review the returned `setup_mode`, `setup_summary`, `summary`, `action_plan`, `recommended_stream_type`, `recommended_defaults`, `restreaming_recommended`, `restreaming_next_step`, `restreaming_options`, and `restreaming_provider`.
+
+`setup_camera` runs the normal calibration workflow when no `restream_url` is supplied. If you provide a candidate `restream_url`, it switches to restream validation and can save the source in the same action with `save: true`.
 
 The `action_plan` block is the fastest path for normal users. It includes:
 

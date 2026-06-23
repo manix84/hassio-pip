@@ -330,6 +330,54 @@
         }
       }
     },
+    "setup_camera": {
+      "name": "Set up camera",
+      "description": "Guide camera setup by calibrating normal streams or validating and saving a manual restream URL.",
+      "fields": {
+        "camera_entity": {
+          "name": "Camera entity"
+        },
+        "stream_camera_entity": {
+          "name": "Stream camera entity"
+        },
+        "snapshot_camera_entity": {
+          "name": "Snapshot fallback camera entity"
+        },
+        "restream_url": {
+          "name": "Restream URL"
+        },
+        "restream_provider": {
+          "name": "Restream provider"
+        },
+        "restream_base_url": {
+          "name": "Restream base URL"
+        },
+        "stream_type": {
+          "name": "Preferred stream strategy"
+        },
+        "check_reachability": {
+          "name": "Check reachability"
+        },
+        "save": {
+          "name": "Save"
+        },
+        "snapshot_fallback": {
+          "name": "Snapshot fallback"
+        },
+        "duration_seconds": {
+          "name": "Duration"
+        },
+        "position": {
+          "name": "Position"
+        },
+        "width": {
+          "name": "Width"
+        },
+        "height": {
+          "name": "Height"
+        }
+      }
+    },
     "calibrate_camera": {
       "name": "Calibrate camera",
       "description": "Test a camera against a paired receiver and optionally save the recommended per-camera defaults.",

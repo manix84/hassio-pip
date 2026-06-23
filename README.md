@@ -60,6 +60,7 @@ Post-1.0 compatibility polish is active. Current work focuses on camera stream c
 The latest receiver/integration flow includes:
 
 - Receiver-level Home Assistant defaults for preferred stream strategy, duration, popup position, snapshot fallback, width, and height.
+- Guided camera setup through `ha_tv_pip.setup_camera`, which calibrates normal camera paths or validates and saves a manual restream URL.
 - Per-camera defaults through `ha_tv_pip.calibrate_camera`, `ha_tv_pip.test_camera_stream`, `ha_tv_pip.set_camera_defaults`, and `ha_tv_pip.clear_camera_defaults`.
 - Compatibility tests that check HLS, MJPEG, and snapshot availability for a camera/receiver pair.
 - `recommended_defaults` previews so users can inspect exactly what would be saved before applying defaults.

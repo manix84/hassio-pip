@@ -40,6 +40,7 @@ from .const import (
     SERVICE_CLEAR_CAMERA_DEFAULTS,
     SERVICE_SAVE_RESTREAM_SOURCE,
     SERVICE_SET_CAMERA_DEFAULTS,
+    SERVICE_SETUP_CAMERA,
     SERVICE_SHOW_CAMERA,
     SERVICE_SHOW_NOTIFICATION,
     SERVICE_SHOW_SNAPSHOT,
@@ -365,6 +366,14 @@ async def async_register_services(hass: Any) -> None:
             vol.Optional(ATTR_SAVE, default=False): bool,
         }
     )
+    camera_setup_schema = vol.Schema(
+        {
+            **camera_defaults_fields,
+            vol.Optional(ATTR_CHECK_REACHABILITY, default=False): bool,
+            vol.Optional(ATTR_RESTREAM_BASE_URL): str,
+            vol.Optional(ATTR_SAVE, default=False): bool,
+        }
+    )
     save_restream_schema = vol.Schema(
         {
             **target_schema,
@@ -458,6 +467,9 @@ async def async_register_services(hass: Any) -> None:
     async def handle_calibrate_camera(call: Any) -> dict[str, Any]:
         return await async_handle_calibrate_camera(hass, call)
 
+    async def handle_setup_camera(call: Any) -> dict[str, Any]:
+        return await async_handle_setup_camera(hass, call)
+
     async def handle_set_camera_defaults(call: Any) -> dict[str, Any]:
         return await async_handle_set_camera_defaults(hass, call)
 
@@ -517,6 +529,15 @@ async def async_register_services(hass: Any) -> None:
             SERVICE_CALIBRATE_CAMERA,
             handle_calibrate_camera,
             schema=camera_calibration_schema,
+            **response_kwargs,
+        )
+
+    if not hass.services.has_service(DOMAIN, SERVICE_SETUP_CAMERA):
+        hass.services.async_register(
+            DOMAIN,
+            SERVICE_SETUP_CAMERA,
+            handle_setup_camera,
+            schema=camera_setup_schema,
             **response_kwargs,
         )
 
@@ -915,6 +936,23 @@ async def async_handle_calibrate_camera(hass: Any, call: Any) -> dict[str, Any]:
         save_field=ATTR_SAVE,
         include_summary=True,
     )
+
+
+async def async_handle_setup_camera(hass: Any, call: Any) -> dict[str, Any]:
+    """Guide camera setup with either calibration or restream validation."""
+
+    data = dict(getattr(call, "data", {}))
+    if _optional_text(data.get(ATTR_RESTREAM_URL)) is not None:
+        result = await async_handle_test_restream_source(hass, call)
+        return _camera_setup_response(result, mode="restream_source")
+
+    result = await async_handle_calibrate_camera(hass, call)
+    if bool(result.get("restreaming_recommended", False)) and (
+        ATTR_RESTREAM_BASE_URL in data or ATTR_RESTREAM_PROVIDER in data
+    ):
+        suggestion = await async_handle_suggest_restream_source(hass, call)
+        result = {**result, "restream_source_suggestion": suggestion}
+    return _camera_setup_response(result, mode="calibration")
 
 
 async def _async_handle_camera_compatibility_workflow(
@@ -1804,6 +1842,54 @@ def _camera_calibration_summary(result: dict[str, Any]) -> dict[str, Any]:
             "next_step"
         )
     return summary
+
+
+def _camera_setup_response(result: dict[str, Any], *, mode: str) -> dict[str, Any]:
+    """Attach a concise summary to a guided setup action response."""
+
+    response = {**result, "setup_mode": mode}
+    action_plan = result.get("action_plan")
+    summary = result.get("summary")
+    response["setup_summary"] = {
+        "mode": mode,
+        "complete": bool(result.get("saved_as_defaults", False)),
+        "next_step": (
+            result.get("next_step")
+            or (summary.get("next_step") if isinstance(summary, dict) else None)
+        ),
+        "primary_action": (
+            action_plan.get("primary_action")
+            if isinstance(action_plan, dict)
+            else result.get("next_step")
+        ),
+        "primary_action_label": (
+            action_plan.get("primary_action_label")
+            if isinstance(action_plan, dict)
+            else _camera_setup_primary_action_label(result)
+        ),
+    }
+    if result.get("save_recommended") is not None:
+        response["setup_summary"]["save_recommended"] = result.get(
+            "save_recommended"
+        )
+    if result.get("recommended_stream_type") is not None:
+        response["setup_summary"]["recommended_stream_type"] = result.get(
+            "recommended_stream_type"
+        )
+    return response
+
+
+def _camera_setup_primary_action_label(result: dict[str, Any]) -> str | None:
+    next_step = result.get("next_step")
+    if next_step == "save_restream_source":
+        return "Save the validated restream source"
+    if next_step == "choose_playable_stream_endpoint":
+        return "Choose a playable HLS or MJPEG endpoint"
+    if next_step == "choose_supported_hls_or_mjpeg_url":
+        return "Choose a receiver-supported HLS or MJPEG URL"
+    if next_step == "fix_url_or_network_access":
+        return "Fix URL or network access before saving"
+    return None
 
 
 def _camera_calibration_next_step(compatible: bool, saved: bool) -> str:

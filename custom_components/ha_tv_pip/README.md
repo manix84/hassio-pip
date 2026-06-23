@@ -244,10 +244,10 @@ data:
 
 ## Camera Compatibility Test 🧭
 
-For the normal setup workflow, use `ha_tv_pip.calibrate_camera`:
+For the normal setup workflow, use `ha_tv_pip.setup_camera`:
 
 ```yaml
-service: ha_tv_pip.calibrate_camera
+service: ha_tv_pip.setup_camera
 target:
   device_id: living_room_tv
 data:
@@ -259,7 +259,9 @@ data:
   save: true
 ```
 
-Calibration tests HLS, MJPEG, and snapshot availability, returns a summary with the recommended stream strategy and next step, includes an `action_plan` with the next service call to try, and can save the recommendation as per-camera defaults.
+Setup runs calibration when no `restream_url` is supplied, or validates and optionally saves a manual restream URL when one is supplied. The response includes `setup_mode`, `setup_summary`, and either the calibration/action-plan result or the restream validation result.
+
+The lower-level `ha_tv_pip.calibrate_camera` action remains available for troubleshooting. Calibration tests HLS, MJPEG, and snapshot availability, returns a summary with the recommended stream strategy and next step, includes an `action_plan` with the next service call to try, and can save the recommendation as per-camera defaults.
 
 If live HLS/MJPEG paths are unavailable, the response includes `restreaming_recommended: true`, `restreaming_reason`, `restreaming_next_step`, and `restreaming_options`. This means the current camera entity is likely snapshot-only for HA TV PiP, or needs a TV-safe source such as another camera entity, a lower-resolution profile, go2rtc, WebRTC, or future transcoding support.
 

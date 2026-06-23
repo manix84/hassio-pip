@@ -2240,6 +2240,113 @@ def test_test_restream_source_can_save_supported_hls_defaults(
     }
 
 
+def test_setup_camera_can_validate_and_save_restream_source(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from custom_components.ha_tv_pip import services
+
+    monkeypatch.setattr(
+        services,
+        "_async_receiver_capabilities",
+        lambda receiver: asyncio.sleep(0, result=_capabilities()),
+    )
+    entry = FakeEntry(
+        entry_id="entry-1",
+        data={
+            CONF_DEVICE_ID: "device-1",
+            CONF_NAME: "Nursery TV",
+            CONF_HOST: "10.0.0.236",
+            CONF_PORT: 8765,
+            CONF_TOKEN: "token",
+        },
+        options={},
+    )
+    hass = FakeHass(
+        entries=[entry],
+        states={"camera.front_door": FakeState({"friendly_name": "Front Door"})},
+    )
+
+    result = asyncio.run(
+        services.async_handle_setup_camera(
+            hass,
+            FakeCall(
+                data={
+                    ATTR_CAMERA_ENTITY: "camera.front_door",
+                    ATTR_RESTREAM_PROVIDER: "go2rtc",
+                    ATTR_RESTREAM_URL: (
+                        "http://go2rtc.local:1984/api/stream.m3u8?"
+                        "src=front_door"
+                    ),
+                    ATTR_SAVE: True,
+                },
+                target={ATTR_DEVICE_ID: "device-1"},
+            ),
+        )
+    )
+
+    assert result["setup_mode"] == "restream_source"
+    assert result["setup_summary"] == {
+        "mode": "restream_source",
+        "complete": True,
+        "next_step": "save_restream_source",
+        "primary_action": "save_restream_source",
+        "primary_action_label": "Save the validated restream source",
+        "save_recommended": True,
+    }
+    assert result["saved_as_defaults"] is True
+    assert entry.options is not None
+    assert entry.options[CONF_CAMERA_DEFAULTS]["camera.front_door"] == {
+        ATTR_RESTREAM_PROVIDER: "go2rtc",
+        ATTR_RESTREAM_URL: "http://go2rtc.local:1984/api/stream.m3u8?src=front_door",
+        ATTR_SNAPSHOT_FALLBACK: True,
+        ATTR_STREAM_TYPE: "hls",
+    }
+
+
+def test_setup_camera_without_restream_url_runs_calibration(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from custom_components.ha_tv_pip import services
+
+    async def fake_calibrate_camera(hass: Any, call: Any) -> dict[str, Any]:
+        return {
+            "camera_entity": "camera.front_door",
+            "recommended_stream_type": "auto",
+            "saved_as_defaults": False,
+            "summary": {
+                "next_step": "review_recommended_defaults_or_run_again_with_save"
+            },
+            "action_plan": {
+                "primary_action": "save_recommended_defaults",
+                "primary_action_label": "Save the recommended per-camera defaults",
+            },
+        }
+
+    monkeypatch.setattr(
+        services,
+        "async_handle_calibrate_camera",
+        fake_calibrate_camera,
+    )
+    hass = FakeHass(entries=[])
+
+    result = asyncio.run(
+        services.async_handle_setup_camera(
+            hass,
+            FakeCall(data={ATTR_CAMERA_ENTITY: "camera.front_door"}),
+        )
+    )
+
+    assert result["setup_mode"] == "calibration"
+    assert result["setup_summary"] == {
+        "mode": "calibration",
+        "complete": False,
+        "next_step": "review_recommended_defaults_or_run_again_with_save",
+        "primary_action": "save_recommended_defaults",
+        "primary_action_label": "Save the recommended per-camera defaults",
+        "recommended_stream_type": "auto",
+    }
+
+
 def test_test_restream_source_warns_when_receiver_lacks_stream_support(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
