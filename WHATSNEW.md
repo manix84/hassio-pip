@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.31.25 - Complete Restream Follow-Up Actions 🎯
+
+- Added copyable Home Assistant `action` keys and receiver targets to restream `next_action` payloads 🧰
+- Made saved restream defaults and one-step setup responses easier to paste back into Home Assistant actions 🔁
+- Updated integration tests for the complete follow-up action shape 🧪
+
 ## 1.31.24 - Copyable Restream Helper Actions 📋
 
 - Added copyable Home Assistant `action` keys to restream helper `save_action` and `test_action` payloads 🧰

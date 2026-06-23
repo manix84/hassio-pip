@@ -1749,6 +1749,8 @@ def test_save_restream_source_persists_go2rtc_hls_defaults() -> None:
         },
         "next_action": {
             "service": "show_camera",
+            "action": "ha_tv_pip.show_camera",
+            "target": {ATTR_DEVICE_ID: "device-1"},
             "data": {ATTR_CAMERA_ENTITY: "camera.front_door"},
         },
     }
@@ -2365,6 +2367,8 @@ def test_test_restream_source_can_save_supported_hls_defaults(
     assert result["saved_defaults"] == expected_defaults
     assert result["next_action"] == {
         "service": "show_camera",
+        "action": "ha_tv_pip.show_camera",
+        "target": {ATTR_DEVICE_ID: "device-1"},
         "data": {ATTR_CAMERA_ENTITY: "camera.front_door"},
     }
     assert entry.options == {
@@ -2465,6 +2469,8 @@ def test_setup_camera_can_validate_and_save_restream_source(
             "status": "ready",
             "action": {
                 "service": "show_camera",
+                "action": "ha_tv_pip.show_camera",
+                "target": {ATTR_DEVICE_ID: "device-1"},
                 "data": {ATTR_CAMERA_ENTITY: "camera.front_door"},
             },
         },

@@ -1085,10 +1085,11 @@ async def async_handle_save_restream_source(hass: Any, call: Any) -> dict[str, A
         "receiver": receiver.name,
         "defaults": defaults,
         "defaults_summary": _camera_defaults_summary(defaults),
-        "next_action": {
-            "service": SERVICE_SHOW_CAMERA,
-            "data": {ATTR_CAMERA_ENTITY: request.camera_entity},
-        },
+        "next_action": _service_action_payload(
+            SERVICE_SHOW_CAMERA,
+            receiver,
+            {ATTR_CAMERA_ENTITY: request.camera_entity},
+        ),
     }
 
 
@@ -1239,10 +1240,11 @@ async def async_handle_test_restream_source(
             _save_camera_defaults(hass, receiver, camera_entity, save_defaults)
             result["saved_as_defaults"] = True
             result["saved_defaults"] = save_defaults
-            result["next_action"] = {
-                "service": SERVICE_SHOW_CAMERA,
-                "data": {ATTR_CAMERA_ENTITY: camera_entity},
-            }
+            result["next_action"] = _service_action_payload(
+                SERVICE_SHOW_CAMERA,
+                receiver,
+                {ATTR_CAMERA_ENTITY: camera_entity},
+            )
     elif bool(data.get(ATTR_SAVE, False)):
         result["saved_as_defaults"] = False
     return result
@@ -2182,6 +2184,17 @@ def _service_call_payload(
         "action": f"{DOMAIN}.{service}",
         "target": {ATTR_DEVICE_ID: receiver.device_id},
         "data": data,
+    }
+
+
+def _service_action_payload(
+    service: str,
+    receiver: ReceiverEntry,
+    data: dict[str, Any],
+) -> dict[str, Any]:
+    return {
+        "service": service,
+        **_service_call_payload(service, receiver, data),
     }
 
 
