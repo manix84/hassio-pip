@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.31.19 - Frigate Restream Guidance 📹
+
+- Added Frigate as a manual restream helper path alongside go2rtc 🧰
+- Made `ha_tv_pip.suggest_restream_source` preserve `restream_provider: frigate` and return Frigate/go2rtc-style HLS/MJPEG candidate URLs 🔎
+- Updated provider diagnostics, docs, website copy, and tests for the broader manual restream helper flow 🧪
+
 ## 1.31.18 - Guided Setup Steps 🧭
 
 - Added ordered `setup_steps` to `ha_tv_pip.setup_camera` responses so UI helpers and troubleshooting flows can show the next action clearly 🧰

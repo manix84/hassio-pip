@@ -767,7 +767,12 @@ def test_camera_restreaming_binary_sensor_reads_latest_result() -> None:
         ],
         "restreaming_provider_status": "planned",
         "restreaming_supported_providers": [],
-        "restreaming_planned_providers": ["go2rtc", "webrtc", "transcoding"],
+        "restreaming_planned_providers": [
+            "go2rtc",
+            "frigate",
+            "webrtc",
+            "transcoding",
+        ],
         "restreaming_recommended_current_paths": [
             "use_stream_camera_entity",
             "use_mjpeg_first",

@@ -2106,6 +2106,52 @@ def test_suggest_restream_source_uses_custom_base_url() -> None:
     }
 
 
+def test_suggest_restream_source_returns_manual_frigate_plan() -> None:
+    from custom_components.ha_tv_pip import services
+
+    entry = FakeEntry(
+        entry_id="entry-1",
+        data={
+            CONF_DEVICE_ID: "device-1",
+            CONF_NAME: "Nursery TV",
+            CONF_HOST: "10.0.0.236",
+            CONF_PORT: 8765,
+            CONF_TOKEN: "token",
+        },
+    )
+    hass = FakeHass(
+        entries=[entry],
+        states={"camera.front_door": FakeState({"friendly_name": "Front Door"})},
+    )
+
+    result = asyncio.run(
+        services.async_handle_suggest_restream_source(
+            hass,
+            FakeCall(
+                data={
+                    ATTR_CAMERA_ENTITY: "camera.front_door",
+                    ATTR_RESTREAM_PROVIDER: "frigate",
+                },
+                target={ATTR_DEVICE_ID: "device-1"},
+            ),
+        )
+    )
+
+    assert result["provider"] == "frigate"
+    assert result["restream_base_url"] == "http://frigate.local:1984"
+    assert result["candidate_urls"][0] == {
+        "stream_name": "front_door",
+        "hls": "http://frigate.local:1984/api/stream.m3u8?src=front_door",
+        "mjpeg": "http://frigate.local:1984/api/stream.mjpeg?src=front_door",
+    }
+    assert result["save_action"]["data"] == {
+        ATTR_CAMERA_ENTITY: "camera.front_door",
+        ATTR_RESTREAM_PROVIDER: "frigate",
+        ATTR_RESTREAM_URL: "<tested frigate HLS or MJPEG URL for front_door>",
+        ATTR_SNAPSHOT_FALLBACK: True,
+    }
+
+
 def test_test_restream_source_returns_save_action_for_supported_hls(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

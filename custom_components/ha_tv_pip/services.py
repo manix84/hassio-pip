@@ -1147,9 +1147,7 @@ async def async_handle_suggest_restream_source(
     _validate_camera_entity(hass, camera_entity)
 
     receiver = _resolve_receiver_from_target(hass, call)
-    provider = _optional_text(data.get(ATTR_RESTREAM_PROVIDER)) or "go2rtc"
-    if provider != "go2rtc":
-        provider = "manual"
+    provider = _suggested_restream_provider(data.get(ATTR_RESTREAM_PROVIDER))
     base_url = _validated_restream_base_url(data.get(ATTR_RESTREAM_BASE_URL))
 
     return _restream_source_suggestion(
@@ -2238,7 +2236,7 @@ def _provider_url_patterns(
     *,
     base_url: str | None = None,
 ) -> list[dict[str, str]]:
-    if provider != "go2rtc":
+    if provider not in {"go2rtc", "frigate"}:
         return [
             {
                 "stream_name": stream_name,
@@ -2272,7 +2270,16 @@ def _provider_url_patterns(
 def _default_restream_base_url(provider: str) -> str:
     if provider == "go2rtc":
         return "http://homeassistant.local:1984"
+    if provider == "frigate":
+        return "http://frigate.local:1984"
     return f"<{provider} base URL>"
+
+
+def _suggested_restream_provider(value: Any) -> str:
+    provider = (_optional_text(value) or "go2rtc").lower()
+    if provider in {"go2rtc", "frigate"}:
+        return provider
+    return "manual"
 
 
 def _action_plan_safe_defaults(defaults: dict[str, Any]) -> dict[str, Any]:

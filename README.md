@@ -68,12 +68,12 @@ The latest receiver/integration flow includes:
 - `ha_tv_pip.save_restream_source` for saving a tested go2rtc or similar restream URL as the camera's TV-safe live source.
 - Saved Camera Defaults receiver sensor so saved per-camera defaults and restream source state are visible without exposing stream URLs.
 - `ha_tv_pip.clear_all_camera_defaults` for resetting saved compatibility choices on a receiver before recalibrating.
-- `ha_tv_pip.suggest_restream_source` for candidate manual restream stream names, go2rtc-style HLS/MJPEG URL patterns, and save-action payloads.
+- `ha_tv_pip.suggest_restream_source` for candidate manual restream stream names, go2rtc/Frigate-style HLS/MJPEG URL patterns, and save-action payloads.
 - Optional restream base URL support for generating candidate URLs against a real go2rtc host.
 - `ha_tv_pip.test_restream_source` for validating candidate restream URLs before saving them as per-camera defaults.
 - Automatic `restream_source_suggestion` guidance in compatibility and calibration results when restreaming is recommended.
 - `restreaming_recommended`, `restreaming_reason`, `restreaming_next_step`, and `restreaming_options` fields when a camera likely needs a TV-safe restreamed source.
-- Manual go2rtc helper metadata in calibration/action-plan responses, including example URL patterns and the `set_camera_defaults` fields to save a working TV-safe restream URL.
+- Manual go2rtc and Frigate helper metadata in calibration/action-plan responses, including example URL patterns and the `set_camera_defaults` fields to save a working TV-safe restream URL.
 - `Last Camera Compatibility`, `Camera Restreaming Recommended`, `Last Camera Result`, and `Last Command Result` entities on the receiver device.
 - Receiver/integration compatibility checks for current, degraded, legacy, and incompatible receiver states, exposed through a dedicated Receiver Compatibility sensor, update guidance, and status attributes.
 - Receiver service health diagnostics for foreground service state, start count, boot/package-replaced startup activity, and last service start reason.
@@ -247,7 +247,7 @@ Available now:
 
 Future roadmap:
 
-- Better camera stream compatibility through automatic stream profile selection, richer go2rtc helpers, WebRTC support, and optional transcoding paths 🧵
+- Better camera stream compatibility through automatic stream profile selection, richer restream provider helpers, WebRTC support, and optional transcoding paths 🧵
 - More notification styling options inspired by existing TV popup tools, including title/message styling, media sizing, and corner placement polish 🔔
 - Default HACS repository inclusion so HA TV PiP can be installed without adding a custom repository 🧩
 - Long-term official Home Assistant integration track, including config-flow polish, repairs, diagnostics, translations, tests, and architecture review readiness 🏠

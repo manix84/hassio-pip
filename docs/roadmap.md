@@ -856,11 +856,11 @@ Completed:
 - ✅ Discovery repair for DHCP address changes, using the stable receiver id from Zeroconf to update the stored host, port, version, pairing, and API metadata.
 - ✅ Compact Home Assistant receiver options screen with advanced popup size, position, and remote receiver credential fields hidden behind an explicit advanced-settings step.
 - ✅ Camera calibration and compatibility action plans so users can see the recommended next service call, safe data payload, and restreaming/source fields to try.
-- ✅ Manual go2rtc helper workflow metadata in restreaming provider diagnostics and calibration action plans, including URL patterns and fields to save a working TV-safe restream URL.
+- ✅ Manual go2rtc and Frigate helper workflow metadata in restreaming provider diagnostics and calibration action plans, including URL patterns and fields to save a working TV-safe restream URL.
 - ✅ `ha_tv_pip.save_restream_source` helper action for saving a tested HLS/MJPEG restream URL as per-camera defaults without using the lower-level defaults service.
 - ✅ Saved Camera Defaults sensor on receiver devices so saved per-camera defaults and restream source state can be confirmed without opening diagnostics.
 - ✅ `ha_tv_pip.clear_all_camera_defaults` helper action for resetting saved camera compatibility choices across one receiver.
-- ✅ `ha_tv_pip.suggest_restream_source` advisory action for candidate go2rtc-style stream names, HLS/MJPEG URL patterns, provider help, and save-action payloads.
+- ✅ `ha_tv_pip.suggest_restream_source` advisory action for candidate go2rtc/Frigate-style stream names, HLS/MJPEG URL patterns, provider help, and save-action payloads.
 - ✅ Automatic `restream_source_suggestion` payloads in compatibility and calibration results when restreaming is recommended.
 - ✅ Optional `restream_base_url` support for restream source suggestions when go2rtc is not reachable at the default placeholder host.
 - ✅ `ha_tv_pip.test_restream_source` helper action for validating a candidate manual HLS/MJPEG restream URL before saving it.

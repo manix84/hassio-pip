@@ -267,7 +267,7 @@ If live HLS/MJPEG paths are unavailable, the response includes `restreaming_reco
 
 If you already expose a TV-safe stream through go2rtc or another local restreaming tool, set `restream_url` and `restream_provider` with `ha_tv_pip.save_restream_source`. The receiver will use that URL for live video while still using `camera_entity` for titles and snapshot previews. Saved restream URLs are redacted from diagnostics and are not exposed by the Saved Camera Defaults sensor.
 
-Use `ha_tv_pip.suggest_restream_source` when you need help turning a camera entity into manual restream setup values. It returns candidate stream names, go2rtc-style HLS/MJPEG URL patterns, provider help, and the follow-up `save_restream_source` action payload to use after a URL has been tested.
+Use `ha_tv_pip.suggest_restream_source` when you need help turning a camera entity into manual restream setup values. It returns candidate stream names, go2rtc/Frigate-style HLS/MJPEG URL patterns, provider help, and the follow-up `save_restream_source` action payload to use after a URL has been tested.
 
 Use `ha_tv_pip.test_restream_source` before saving a manual URL. It infers whether the candidate is HLS or MJPEG, checks that the selected receiver reports support for that stream type, optionally performs a lightweight reachability check from Home Assistant, and returns a safe `save_restream_source` payload when the URL looks worth saving.
 
@@ -299,9 +299,9 @@ Restreaming provider support is planned, not active. Until go2rtc, WebRTC, or tr
 
 The response includes `recommended_defaults`, which previews the exact per-camera defaults that would be stored. Inspect that payload first if you want to verify the recommendation before saving it.
 
-The response also includes `action_plan`. For compatible cameras, this points to saving recommended defaults or using `show_camera` after defaults have been saved. For snapshot-only cameras, it points to either saving snapshot alerts now or configuring a TV-safe live source with fields such as `stream_camera_entity`, `restream_url`, and `restream_provider`. For cameras where no path works, it points to checking camera access or trying another stream source. When restreaming is recommended, `action_plan.provider_help` includes manual go2rtc URL helper metadata that can be used today, plus planned WebRTC and transcoding provider notes for future support.
+The response also includes `action_plan`. For compatible cameras, this points to saving recommended defaults or using `show_camera` after defaults have been saved. For snapshot-only cameras, it points to either saving snapshot alerts now or configuring a TV-safe live source with fields such as `stream_camera_entity`, `restream_url`, and `restream_provider`. For cameras where no path works, it points to checking camera access or trying another stream source. When restreaming is recommended, `action_plan.provider_help` includes manual go2rtc and Frigate URL helper metadata that can be used today, plus planned WebRTC and transcoding provider notes for future support.
 
-When restreaming is recommended, the response also includes `restream_source_suggestion` with candidate stream names, go2rtc-style HLS/MJPEG URL patterns, provider help, and a safe follow-up `save_restream_source` payload.
+When restreaming is recommended, the response also includes `restream_source_suggestion` with candidate stream names, go2rtc/Frigate-style HLS/MJPEG URL patterns, provider help, and a safe follow-up `save_restream_source` payload.
 
 Set `save_recommendation: true` to save the recommended stream strategy as per-camera defaults. Any explicit test fields, such as width, height, duration, position, snapshot fallback, stream camera entity, or snapshot camera entity, are saved with it. If no compatible stream is found, no defaults are saved.
 
@@ -358,7 +358,7 @@ The service defaults to the receiver's preferred stream strategy, or `stream_typ
 If a receiver reports that a requested stream type, snapshot mode, notification mode, or media text footer is unsupported, Home Assistant stops before sending the command and returns a clear service error. Older receivers that do not report capabilities keep the previous best-effort behaviour.
 For cameras with multiple streams, use a TV-compatible H.264/HLS stream where possible, or try `stream_type: mjpeg` when HLS is unsupported on the receiver. Lower-resolution secondary streams are often more reliable for TV popups than high-resolution main streams. The receiver enables Media3 decoder fallback, but unsupported camera codecs still need a compatible camera profile, MJPEG fallback, go2rtc/WebRTC, or future transcoding support.
 
-Automatic restreaming providers are not active yet. Manual `restream_url` support is available for users who already expose a TV-safe HLS or MJPEG source. Compatibility and calibration responses include manual provider helper metadata for go2rtc, including example URL patterns and the `set_camera_defaults` fields to save once a URL works. Diagnostics include a planned provider section so future support tooling can distinguish "manual URL configured" from "automatic provider not implemented". HLS, MJPEG, and snapshots remain the supported receiver paths today.
+Automatic restreaming providers are not active yet. Manual `restream_url` support is available for users who already expose a TV-safe HLS or MJPEG source. Compatibility and calibration responses include manual provider helper metadata for go2rtc and Frigate-style restream URLs, including example URL patterns and the `set_camera_defaults` fields to save once a URL works. Diagnostics include a planned provider section so future support tooling can distinguish "manual URL configured" from "automatic provider not implemented". HLS, MJPEG, and snapshots remain the supported receiver paths today.
 
 The receiver device also exposes a `Restreaming Provider Status` sensor. It reports `planned` today, with attributes for configured, active, supported, and planned providers. This is intentionally a visibility surface only; it does not enable go2rtc, WebRTC, or transcoding yet.
 
@@ -389,7 +389,8 @@ target:
   device_id: living_room_tv
 data:
   camera_entity: camera.front_door
-  restream_base_url: http://homeassistant.local:1984
+  restream_provider: frigate
+  restream_base_url: http://frigate.local:1984
 ```
 
 To validate one candidate before saving it:

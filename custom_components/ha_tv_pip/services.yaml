@@ -921,15 +921,15 @@ suggest_restream_source:
       selector:
         text:
       name: Restream provider
-      description: Restream provider to plan for.
-      example: go2rtc
+      description: Restream provider to plan for. Supported helper labels are go2rtc, frigate, or manual.
+      example: frigate
     restream_base_url:
       required: false
       selector:
         text:
       name: Restream base URL
       description: Optional base URL for the restream provider.
-      example: http://homeassistant.local:1984
+      example: http://frigate.local:1984
 test_restream_source:
   target:
     device:

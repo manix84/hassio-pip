@@ -97,7 +97,7 @@ data:
   restream_base_url: http://homeassistant.local:1984
 ```
 
-The response includes candidate stream names, go2rtc-style HLS/MJPEG URL patterns, provider help, and a `save_action` payload to use after you have tested a working URL. `restream_base_url` is optional; omit it to use the default `http://homeassistant.local:1984` suggestion. This is advisory only; it does not create go2rtc streams automatically.
+The response includes candidate stream names, go2rtc/Frigate-style HLS/MJPEG URL patterns, provider help, and a `save_action` payload to use after you have tested a working URL. `restream_base_url` is optional; omit it to use the provider default suggestion. This is advisory only; it does not create provider streams automatically.
 
 Before saving one candidate, validate it with:
 
@@ -137,20 +137,20 @@ target:
 
 The response includes `cleared_camera_count` and `cleared_cameras`, and the receiver device's `Saved Camera Defaults` sensor should return to `0`.
 
-## Manual go2rtc Helper Workflow 🧰
+## Manual Restream Helper Workflow 🧰
 
-Automatic go2rtc setup is not implemented yet, but the calibration response now exposes enough helper metadata to guide a manual setup:
+Automatic restream provider setup is not implemented yet, but the calibration response exposes enough helper metadata to guide manual setup for TV-safe HLS/MJPEG sources such as go2rtc or Frigate's bundled go2rtc endpoint:
 
 - `restreaming_provider.manual_provider_workflows`: current provider workflows that can be used today.
 - `action_plan.provider_help.manual_provider_workflows`: the same helper data attached to the suggested next action.
-- `example_url_patterns`: example HLS and MJPEG URL shapes for a go2rtc stream name.
+- `example_url_patterns`: example HLS and MJPEG URL shapes for a provider stream name.
 - `service` and `fields`: the HA TV PiP service and fields to use when saving the working URL as per-camera defaults.
 
-The current manual go2rtc path is:
+The current manual restream path is:
 
-1. Create or identify a TV-safe go2rtc stream name for the camera.
+1. Create or identify a TV-safe stream name for the camera.
 2. Run `ha_tv_pip.suggest_restream_source` to get candidate stream names and URL patterns.
-3. Test the go2rtc HLS or MJPEG URL from a device on the same network as the TV.
+3. Test the HLS or MJPEG URL from a device on the same network as the TV.
 4. Run `ha_tv_pip.test_restream_source` to confirm URL shape and receiver stream support. Use `save: true` when you want the action to save the source automatically after validation passes.
 5. Save that URL with `ha_tv_pip.save_restream_source`.
 6. Keep `snapshot_fallback: true` so the receiver can show an image while live video loads or if live video fails.
@@ -161,9 +161,11 @@ Example URL patterns:
 ```txt
 http://homeassistant.local:1984/api/stream.m3u8?src=<stream_name>
 http://homeassistant.local:1984/api/stream.mjpeg?src=<stream_name>
+http://frigate.local:1984/api/stream.m3u8?src=<camera_name>
+http://frigate.local:1984/api/stream.mjpeg?src=<camera_name>
 ```
 
-Treat these as provider helper patterns, not guaranteed URLs. Your actual host, port, stream name, and go2rtc configuration may differ.
+Treat these as provider helper patterns, not guaranteed URLs. Your actual host, port, stream name, Frigate camera name, and go2rtc configuration may differ.
 
 ## When Restreaming Is Recommended 🧵
 

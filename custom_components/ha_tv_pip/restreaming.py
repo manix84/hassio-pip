@@ -18,6 +18,7 @@ RESTREAMING_CURRENT_PATHS = [
 ]
 RESTREAMING_PLANNED_PROVIDER_PATHS = [
     "go2rtc",
+    "frigate",
     "webrtc",
     "transcoding",
 ]
@@ -42,12 +43,40 @@ RESTREAMING_MANUAL_PROVIDER_WORKFLOWS: list[dict[str, Any]] = [
             "http://homeassistant.local:1984/api/stream.mjpeg?src=<stream_name>",
         ],
     },
+    {
+        "provider": "frigate",
+        "status": "manual_url_supported",
+        "current_support": (
+            "Save a known TV-safe Frigate/go2rtc HLS or MJPEG URL as a "
+            "per-camera restream_url."
+        ),
+        "service": "save_restream_source",
+        "fields": [
+            "camera_entity",
+            "restream_provider",
+            "restream_url",
+            "stream_type",
+            "snapshot_fallback",
+        ],
+        "example_url_patterns": [
+            "http://frigate.local:1984/api/stream.m3u8?src=<camera_name>",
+            "http://frigate.local:1984/api/stream.mjpeg?src=<camera_name>",
+        ],
+    },
 ]
 RESTREAMING_FUTURE_PROVIDER_WORKFLOWS: list[dict[str, Any]] = [
     {
         "provider": "go2rtc",
         "status": "planned",
         "planned_support": "Guided setup and stream-source helpers.",
+    },
+    {
+        "provider": "frigate",
+        "status": "planned",
+        "planned_support": (
+            "Guided setup around Frigate camera names and bundled go2rtc "
+            "stream endpoints."
+        ),
     },
     {
         "provider": "webrtc",
