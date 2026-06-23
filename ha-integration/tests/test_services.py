@@ -2193,6 +2193,48 @@ def test_suggest_restream_source_returns_manual_frigate_plan() -> None:
     }
 
 
+def test_suggest_restream_source_falls_back_to_manual_provider() -> None:
+    from custom_components.ha_tv_pip import services
+
+    entry = FakeEntry(
+        entry_id="entry-1",
+        data={
+            CONF_DEVICE_ID: "device-1",
+            CONF_NAME: "Nursery TV",
+            CONF_HOST: "10.0.0.236",
+            CONF_PORT: 8765,
+            CONF_TOKEN: "token",
+        },
+    )
+    hass = FakeHass(
+        entries=[entry],
+        states={"camera.front_door": FakeState({"friendly_name": "Front Door"})},
+    )
+
+    result = asyncio.run(
+        services.async_handle_suggest_restream_source(
+            hass,
+            FakeCall(
+                data={
+                    ATTR_CAMERA_ENTITY: "camera.front_door",
+                    ATTR_RESTREAM_PROVIDER: "some_future_provider",
+                },
+                target={ATTR_DEVICE_ID: "device-1"},
+            ),
+        )
+    )
+
+    assert result["provider"] == "manual"
+    assert result["restream_base_url"] == "<manual base URL>"
+    assert result["candidate_urls"][0] == {
+        "stream_name": "front_door",
+        "hls": "<manual HLS URL for stream 'front_door'>",
+        "mjpeg": "<manual MJPEG URL for stream 'front_door'>",
+    }
+    assert result["test_action"]["data"][ATTR_RESTREAM_PROVIDER] == "manual"
+    assert result["save_action"]["data"][ATTR_RESTREAM_PROVIDER] == "manual"
+
+
 def test_test_restream_source_returns_save_action_for_supported_hls(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

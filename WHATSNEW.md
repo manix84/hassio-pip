@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.31.23 - Restream Helper Presets 🧭
+
+- Made `suggest_restream_source` expose `go2rtc`, `frigate`, and `manual` helper presets in Home Assistant service metadata 🧰
+- Added regression coverage for unknown provider labels falling back to generic manual URL placeholders 🔎
+- Aligned README and roadmap wording so manual helper support is marked complete while automatic provider integrations remain future work 📚
+
 ## 1.31.22 - Redacted Defaults Summary 🛡️
 
 - Added `defaults_summary` to `ha_tv_pip.save_restream_source` responses so saved provider, stream type, and URL presence can be confirmed without echoing the URL 🔎

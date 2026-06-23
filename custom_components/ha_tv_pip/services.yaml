@@ -919,7 +919,11 @@ suggest_restream_source:
     restream_provider:
       required: false
       selector:
-        text:
+        select:
+          options:
+            - go2rtc
+            - frigate
+            - manual
       name: Restream provider
       description: Restream provider to plan for. Supported helper labels are go2rtc, frigate, or manual.
       example: frigate

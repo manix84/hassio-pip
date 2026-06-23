@@ -95,10 +95,11 @@ target:
   device_id: living_room_tv
 data:
   camera_entity: camera.front_door
+  restream_provider: go2rtc
   restream_base_url: http://homeassistant.local:1984
 ```
 
-The response includes candidate stream names, go2rtc/Frigate-style HLS/MJPEG URL patterns, provider help, a `test_action` payload for validating the first HLS candidate, and a `save_action` payload to use after you have tested a working URL. `restream_base_url` is optional; omit it to use the provider default suggestion. This is advisory only; it does not create provider streams automatically.
+The response includes candidate stream names, go2rtc/Frigate-style HLS/MJPEG URL patterns, provider help, a `test_action` payload for validating the first HLS candidate, and a `save_action` payload to use after you have tested a working URL. `restream_provider` accepts the helper presets `go2rtc`, `frigate`, or `manual`; unknown provider labels fall back to generic manual placeholders. `restream_base_url` is optional; omit it to use the provider default suggestion. This is advisory only; it does not create provider streams automatically.
 
 Before saving one candidate, validate it with:
 
@@ -201,7 +202,8 @@ The provider status metadata also includes today's recommended paths:
 
 Provider roadmap:
 
-- `go2rtc`: manual `restream_url` support and helper metadata work today; guided setup helpers remain future work.
+- `go2rtc`: manual `restream_url` support and helper metadata work today; automatic stream creation remains future work.
+- `Frigate`: manual Frigate/go2rtc URL helper metadata works today; automatic Frigate API integration remains future work.
 - `WebRTC`: future low-latency path where the receiver and platform constraints allow it.
 - `transcoding`: future optional path for converting unsupported camera formats into receiver-compatible video.
 

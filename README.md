@@ -65,11 +65,11 @@ The latest receiver/integration flow includes:
 - Compatibility tests that check HLS, MJPEG, and snapshot availability for a camera/receiver pair.
 - `recommended_defaults` previews so users can inspect exactly what would be saved before applying defaults.
 - Optional `restream_url` and `restream_provider` per-camera defaults for users who already expose a TV-safe go2rtc or similar HLS/MJPEG stream.
-- `ha_tv_pip.save_restream_source` for saving a tested go2rtc or similar restream URL as the camera's TV-safe live source.
+- `ha_tv_pip.save_restream_source` for saving a tested go2rtc, Frigate, or similar restream URL as the camera's TV-safe live source, with a redacted `defaults_summary` confirmation.
 - Saved Camera Defaults receiver sensor so saved per-camera defaults and restream source state are visible without exposing stream URLs.
 - `ha_tv_pip.clear_all_camera_defaults` for resetting saved compatibility choices on a receiver before recalibrating.
-- `ha_tv_pip.suggest_restream_source` for candidate manual restream stream names, go2rtc/Frigate-style HLS/MJPEG URL patterns, and save-action payloads.
-- Optional restream base URL support for generating candidate URLs against a real go2rtc host.
+- `ha_tv_pip.suggest_restream_source` for candidate manual restream stream names, go2rtc/Frigate-style HLS/MJPEG URL patterns, validation payloads, and save-action payloads.
+- Optional restream base URL support for generating candidate URLs against a real go2rtc or Frigate host.
 - `ha_tv_pip.test_restream_source` for validating candidate restream URLs before saving them as per-camera defaults.
 - Automatic `restream_source_suggestion` guidance in compatibility and calibration results when restreaming is recommended.
 - `restreaming_recommended`, `restreaming_reason`, `restreaming_next_step`, and `restreaming_options` fields when a camera likely needs a TV-safe restreamed source.

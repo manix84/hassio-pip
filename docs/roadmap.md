@@ -807,8 +807,8 @@ These should not block the MVP.
 - Do-not-disturb integration.
 - Overlay position and size options.
 - Enhanced notification overlay styling with title, message, colors, and corner position options.
-- Frigate integration helpers.
-- go2rtc integration helpers.
+- Automatic Frigate integration helpers.
+- Automatic go2rtc integration helpers.
 - WebRTC low-latency mode.
 - Broad video format support through stream capability detection, restreaming, or transcoding so high-quality camera main streams can work on receiver devices.
 - Companion mobile app support.
@@ -861,6 +861,7 @@ Completed:
 - ✅ Saved Camera Defaults sensor on receiver devices so saved per-camera defaults and restream source state can be confirmed without opening diagnostics.
 - ✅ `ha_tv_pip.clear_all_camera_defaults` helper action for resetting saved camera compatibility choices across one receiver.
 - ✅ `ha_tv_pip.suggest_restream_source` advisory action for candidate go2rtc/Frigate-style stream names, HLS/MJPEG URL patterns, provider help, and save-action payloads.
+- ✅ `go2rtc`, `frigate`, and `manual` helper presets for manual restream source suggestions.
 - ✅ Automatic `restream_source_suggestion` payloads in compatibility and calibration results when restreaming is recommended.
 - ✅ Optional `restream_base_url` support for restream source suggestions when go2rtc is not reachable at the default placeholder host.
 - ✅ `ha_tv_pip.test_restream_source` helper action for validating a candidate manual HLS/MJPEG restream URL before saving it.
@@ -871,7 +872,7 @@ Still future:
 
 - WebRTC low-latency mode.
 - Restreaming or transcoding for broad camera codec support.
-- Guided camera-platform helpers such as go2rtc or Frigate-specific setup shortcuts.
+- Automatic camera-platform helpers such as go2rtc stream creation or Frigate API setup shortcuts.
 
 ## Additional TV Platforms
 
