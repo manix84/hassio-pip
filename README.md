@@ -12,7 +12,7 @@ HA TV PiP is a local-first Home Assistant companion project for showing short-li
 
 | Android TV receiver dashboard | Camera popup over Google TV | Camera notification over Google TV |
 | --- | --- | --- |
-| ![HA TV PiP receiver dashboard on Android TV](docs/assets/screenshots/android-tv-dashboard.png) | ![HA TV PiP camera popup over the Google TV home screen](docs/assets/screenshots/android-tv-homepage-camera-popup.png) | ![HA TV PiP camera notification over the Google TV home screen](docs/assets/screenshots/android-tv-homepage-camera-notification.png) |
+| ![HA TV PiP receiver dashboard on Android TV](docs/assets/screenshots/android-tv-dashboard.png) | ![HA TV PiP camera popup over the Google TV home screen](docs/assets/screenshots/android-tv-homepage-camera-popup.jpg) | ![HA TV PiP camera notification over the Google TV home screen](docs/assets/screenshots/android-tv-homepage-camera-notification.jpg) |
 
 ## Install HA TV PiP 🚀
 

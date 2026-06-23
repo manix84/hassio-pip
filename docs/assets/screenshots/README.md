@@ -9,6 +9,10 @@ This folder contains sanitized screenshots for project promotion and release mat
 - `android-tv-camera-notification.png` — cropped camera popup with notification title and message.
 - `android-tv-homepage-camera-popup.png` — full Google TV home screen with the camera popup visible and the profile avatar replaced.
 - `android-tv-homepage-camera-notification.png` — full Google TV home screen with the notification popup visible and the profile avatar replaced.
+- `android-tv-homepage-camera-popup.jpg` — web-optimized version used by the root README.
+- `android-tv-homepage-camera-notification.jpg` — web-optimized version used by the root README.
+
+The website uses additional optimized JPEG copies under `website/src/assets/` for photo-like slideshow images so the deployed page stays lighter without losing the source PNG captures.
 
 ## Planned Captures 📋
 

@@ -76,6 +76,7 @@ Before committing screenshots:
 - `docs/assets/screenshots/android-tv-dashboard.png` exists as a sanitized Android TV dashboard capture.
 - `docs/assets/screenshots/android-tv-camera-popup.png` and `android-tv-camera-notification.png` show cropped popup detail captures.
 - `docs/assets/screenshots/android-tv-homepage-camera-popup.png` and `android-tv-homepage-camera-notification.png` show full Google TV launcher captures with the profile avatar replaced.
+- `docs/assets/screenshots/android-tv-homepage-camera-popup.jpg` and `android-tv-homepage-camera-notification.jpg` are web-optimized README copies; use the PNGs if Play Console accepts the larger source captures cleanly.
 - `brand/`, `icon.png`, and `logo.png` support HACS / repository presentation.
 - Android launcher and TV banner assets live in the Android app resources.
 - Website imagery lives under `website/src/assets/`.

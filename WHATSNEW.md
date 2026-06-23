@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.31.37 - Web Screenshot Asset Optimization 🖼️
+
+- Switched photo-like website screenshots and generated visuals to smaller JPEG assets for faster page loads ⚡
+- Updated the root README to use optimized homepage PiP screenshots while keeping source PNG captures in docs 📸
+- Documented the PNG/JPEG screenshot asset split for website and Play Store preparation 🧭
+
 ## 1.31.36 - Website Screenshot Slideshow 🎞️
 
 - Added cropped PiP and full Google TV homepage PiP screenshots to the promotional website 📺
