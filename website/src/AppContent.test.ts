@@ -41,7 +41,7 @@ describe("App content", () => {
   it("describes the current status as post-v1.0 work", () => {
     expect(websiteContent.en.currentStatus.title).toContain("Post-v1.0");
     expect(websiteContent.en.currentStatus.body.join(" ")).toContain(
-      "Post-1.0 compatibility work"
+      "Post-1.0 compatibility and release-readiness work"
     );
 
     for (const locale of supportedLocales) {

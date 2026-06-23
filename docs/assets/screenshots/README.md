@@ -6,6 +6,10 @@ This folder contains sanitized screenshots for project promotion and release mat
 
 - `android-tv-dashboard.png` — Android TV receiver dashboard on a connected Google TV device.
 
+## Planned Captures 📋
+
+See `docs/play-store-assets.md` for the full Play Store screenshot and graphics checklist. The next captures should cover the receiver dashboard, pairing popup, PiP/overlay camera popup, snapshot popup, remote receiver state, and Home Assistant device controls using only non-sensitive test data.
+
 ## Privacy Notes 🔐
 
 - Do not commit screenshots that show real Home Assistant URLs, bearer tokens, pairing codes, IP addresses, device IDs, personal profiles, or private camera feeds.

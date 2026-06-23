@@ -6,7 +6,14 @@ This document prepares HA TV PiP for a future Android TV / Google TV Play Store 
 
 HA TV PiP is still pre-release software. GitHub Releases remain the distribution target for now, while HACS custom-repository installation is prepared for the Home Assistant integration.
 
-Stage 12 proved the beta release path through GitHub Releases and HACS custom-repository installs. Play Store deployment should wait until signed release artifacts, listing assets, tester guidance, and broader receiver feedback are ready.
+Stage 12 proved the beta release path through GitHub Releases and HACS custom-repository installs. Post-v1.0 release work now produces signed APK/AAB artifacts when signing secrets are configured, publishes a public privacy URL, and keeps listing metadata in source control.
+
+The current external blocker is Google Play developer account verification. While that is pending, use these companion checklists to finish everything that can be prepared outside Play Console:
+
+- `docs/play-console-submission.md` - app creation, reviewer notes, testing track, and manual Console steps.
+- `docs/play-store-data-safety.md` - working answer sheet for the Play data-safety form.
+- `docs/play-store-assets.md` - screenshots, graphics, and privacy-safe capture guidance.
+- `docs/release-qa.md` - release and device smoke-test checklist.
 
 The Android app package name is:
 
@@ -152,6 +159,8 @@ Graphic assets to prepare:
 - At least 2 Android TV screenshots.
 - Optional tablet/phone screenshots only if Play Console requests them for listing completeness.
 
+Personal developer avatar/header graphics can be used for the Play developer profile or account presence if needed, but the app listing should remain product-led and use HA TV PiP-specific app graphics.
+
 Safety rules:
 
 - Do not show real security cameras, real home interiors, real addresses, access tokens, pairing tokens, LAN IPs, or Nabu Casa URLs.
@@ -238,6 +247,10 @@ Production release notes should include:
 ## Pre-Submission Checklist ✅
 
 - Full `npm run check` passes.
+- `docs/play-console-submission.md` is reviewed for current Play Console fields.
+- `docs/play-store-data-safety.md` still matches the actual app behavior.
+- `docs/play-store-assets.md` has enough privacy-safe screenshot coverage.
+- `docs/release-qa.md` has been run for the candidate release.
 - Website build passes.
 - Home Assistant integration package builds.
 - Android debug APK builds.

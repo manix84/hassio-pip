@@ -195,15 +195,16 @@ GitHub Releases are the distribution target for now. When code is pushed or merg
 ```txt
 ha-tv-pip-android-debug-vX.Y.Z.apk
 ha-tv-pip-android-release-vX.Y.Z.apk
+ha-tv-pip-android-release-vX.Y.Z.aab
 ha-tv-pip-integration-vX.Y.Z.zip
 ha-tv-pip-integration.zip
 ```
 
-The release APK is the recommended sideload artifact for normal users. The debug APK remains available for troubleshooting and development. The stable `ha-tv-pip-integration.zip` asset is for HACS. That zip contains the integration files at archive root because HACS extracts `zip_release` assets directly into `config/custom_components/ha_tv_pip/`.
+The release APK is the recommended sideload artifact for normal users. The debug APK remains available for troubleshooting and development. The AAB is generated for future Play Console upload. The stable `ha-tv-pip-integration.zip` asset is for HACS. That zip contains the integration files at archive root because HACS extracts `zip_release` assets directly into `config/custom_components/ha_tv_pip/`.
 
 Published GitHub Releases are treated as immutable. If a release for the current version already exists, bump the root `package.json` version before producing another release.
 
-Play Store deployment is not implemented yet. Release-prep notes for listing copy, privacy wording, screenshots, signing, and release notes live in `docs/play-store.md`.
+Play Store deployment is not implemented yet. Release-prep notes for listing copy, privacy wording, screenshots, signing, release notes, app-submission fields, data safety, and QA live in `docs/play-store.md`, `docs/play-console-submission.md`, `docs/play-store-data-safety.md`, `docs/play-store-assets.md`, and `docs/release-qa.md`.
 
 Beta install/update validation for `1.27.0` confirmed:
 
@@ -253,7 +254,7 @@ Future roadmap:
 - More notification styling options inspired by existing TV popup tools, including title/message styling, media sizing, and corner placement polish 🔔
 - Default HACS repository inclusion so HA TV PiP can be installed without adding a custom repository 🧩
 - Long-term official Home Assistant integration track, including config-flow polish, repairs, diagnostics, translations, tests, and architecture review readiness 🏠
-- Play Store distribution for the Android TV app, including signing, listing materials, screenshots, privacy wording, and tester guidance 📺
+- Play Store distribution for the Android TV app, including Console submission, listing assets, data-safety review, screenshots, and tester guidance once Google developer account verification is complete 📺
 - Receiver management improvements, including hiding the launcher icon safely while keeping receiver control available after TV restarts 🕹️
 - Fire TV / Vega OS receiver support so HA TV PiP is not limited to Android TV and Google TV devices 🔥
 - Exploratory Apple TV support, likely as a separate receiver design because tvOS has different background, PiP, and distribution constraints 🍎

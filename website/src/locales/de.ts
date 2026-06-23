@@ -168,7 +168,7 @@ export const de = {
         "Snapshot-Unterstützung",
         "WebRTC-Unterstützung",
         "Remote-Modus",
-        "Play-Store- und HACS-Verteilung",
+        "HACS-Verteilung und Play-Store-Vorbereitung",
       ],
       title: "Der Weg vom MVP zum Smart-Home-Werkzeug für den Alltag.",
     },

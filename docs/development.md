@@ -690,6 +690,8 @@ The same release asset validation can be run locally after building the APKs and
 npm run package:release:check
 ```
 
+Use `docs/release-qa.md` as the release smoke-test checklist before treating a GitHub Release as a beta candidate or uploading the generated AAB to Play Console internal testing.
+
 ## HACS Distribution
 
 HACS expects custom integration repositories to provide a root `hacs.json` and installable integration content under `custom_components/<domain>/`. HA TV PiP keeps the integration source at `custom_components/ha_tv_pip/` so the monorepo remains directly HACS-compliant without duplicated source folders.

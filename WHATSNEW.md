@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.31.34 - Play Store Readiness Checklists 📋
+
+- Added Play Console submission, data-safety, app-store asset, and release QA checklists 📺
+- Updated Play Store prep docs to separate account/profile assets from product listing assets 🖼️
+- Updated README and website status wording for AAB release assets and Play Store readiness 🚀
+
 ## 1.31.33 - Website Privacy Page 🔒
 
 - Added a public website privacy policy page suitable for Play Console privacy-policy URL requirements 🌐
