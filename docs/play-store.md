@@ -16,6 +16,14 @@ com.hatvpip.receiver
 
 The Play Store release track should start as internal testing, then closed testing, before any public production release.
 
+Fastlane-compatible listing metadata drafts live in:
+
+```txt
+android-tv-app/fastlane/metadata/
+```
+
+These files are source-controlled preparation only. They are not wired to Play Console upload or deployment yet.
+
 ## Store Listing Draft 📝
 
 ### App Name
@@ -223,6 +231,7 @@ Production release notes should include:
 - Release artifact version matches root `package.json`.
 - `PRIVACY.md` matches Play Console privacy answers.
 - Store listing screenshots contain no sensitive user data.
+- `android-tv-app/fastlane/metadata/` matches the current Play Store listing draft.
 - Overlay permission explanation is visible in docs and app UX.
 - HACS release zip remains available for the integration.
 

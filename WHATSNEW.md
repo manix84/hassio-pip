@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.31.31 - Play Store Metadata Drafts 📺
+
+- Added Fastlane-compatible English Play Store listing metadata drafts for the Android TV receiver app 📝
+- Added initial internal-test release notes metadata for future Play Console prep 📦
+- Updated Play Store prep docs to point at the source-controlled metadata folder 🧭
+
 ## 1.31.30 - Version Mismatch Repair Issue 🛠️
 
 - Added a Home Assistant repair issue when a receiver APK version does not match the installed integration version 🧭

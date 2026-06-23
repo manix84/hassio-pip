@@ -1,0 +1,6 @@
+Initial Android TV receiver test release.
+
+- Pair with Home Assistant using a TV-visible code.
+- Show camera streams and snapshots from Home Assistant.
+- Use native PiP where available or the overlay fallback on supported devices.
+- Manage receiver status, launcher visibility, and remote receiver setup.

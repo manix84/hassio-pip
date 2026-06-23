@@ -1,0 +1,16 @@
+HA TV PiP Receiver is a local-first Android TV companion app for Home Assistant.
+
+Use Home Assistant automations to show camera streams, snapshots, and visual alerts on Android TV and Google TV devices. The receiver supports Android Picture-in-Picture where available and uses a local overlay fallback on devices that do not expose native PiP to third-party TV apps.
+
+Current features:
+- Home Assistant discovery and pairing
+- TV-visible pairing code
+- Authenticated local receiver control
+- Camera stream popups
+- Snapshot popups
+- Snapshot fallback while video loads
+- Receiver status and diagnostics
+- Optional launcher hiding with Home Assistant recovery controls
+- Optional remote receiver mode using your own Home Assistant external URL
+
+HA TV PiP is not a cloud relay service. Remote receiver mode connects back to your own Home Assistant instance. The project does not collect analytics, telemetry, or usage data.
