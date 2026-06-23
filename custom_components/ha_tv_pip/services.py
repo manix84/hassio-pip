@@ -1876,7 +1876,133 @@ def _camera_setup_response(result: dict[str, Any], *, mode: str) -> dict[str, An
         response["setup_summary"]["recommended_stream_type"] = result.get(
             "recommended_stream_type"
         )
+    response["setup_steps"] = _camera_setup_steps(result, mode=mode)
     return response
+
+
+def _camera_setup_steps(
+    result: dict[str, Any],
+    *,
+    mode: str,
+) -> list[dict[str, Any]]:
+    if mode == "restream_source":
+        return _camera_setup_restream_steps(result)
+    return _camera_setup_calibration_steps(result)
+
+
+def _camera_setup_restream_steps(result: dict[str, Any]) -> list[dict[str, Any]]:
+    save_recommended = bool(result.get("save_recommended", False))
+    saved = bool(result.get("saved_as_defaults", False))
+    next_step = result.get("next_step")
+    steps: list[dict[str, Any]] = [
+        {
+            "key": "validate_restream_source",
+            "label": "Validate the TV-safe stream URL",
+            "status": "complete" if save_recommended else "blocked",
+            "details": _camera_setup_restream_validation_details(result),
+        }
+    ]
+
+    save_step: dict[str, Any] = {
+        "key": "save_restream_source",
+        "label": "Save the validated restream source",
+        "status": "complete" if saved else "recommended",
+    }
+    if result.get("save_action") is not None:
+        save_step["action"] = result.get("save_action")
+    if save_recommended and not saved:
+        save_step["notes"] = [
+            "Run setup_camera again with save enabled, or call save_restream_source."
+        ]
+    if save_recommended:
+        steps.append(save_step)
+
+    if saved:
+        steps.append(
+            {
+                "key": "use_camera_defaults",
+                "label": "Use show_camera without repeating stream settings",
+                "status": "ready",
+                "action": result.get("next_action"),
+            }
+        )
+    elif not save_recommended:
+        steps.append(
+            {
+                "key": next_step or "choose_restream_source",
+                "label": _camera_setup_primary_action_label(result)
+                or "Choose a TV-safe HLS or MJPEG stream URL",
+                "status": "required",
+            }
+        )
+    return steps
+
+
+def _camera_setup_restream_validation_details(
+    result: dict[str, Any],
+) -> dict[str, Any]:
+    details: dict[str, Any] = {}
+    url_shape = result.get("url_shape")
+    if isinstance(url_shape, dict):
+        details["url_shape"] = url_shape
+    details["receiver_supports_stream_type"] = result.get(
+        "receiver_supports_stream_type"
+    )
+    reachability = result.get("reachability")
+    if isinstance(reachability, dict):
+        details["reachability"] = reachability
+    return {key: value for key, value in details.items() if value is not None}
+
+
+def _camera_setup_calibration_steps(result: dict[str, Any]) -> list[dict[str, Any]]:
+    recommended = result.get("recommended_stream_type")
+    saved = bool(result.get("saved_as_defaults", False))
+    action_plan = result.get("action_plan")
+    compatible = recommended is not None
+    steps: list[dict[str, Any]] = [
+        {
+            "key": "calibrate_camera",
+            "label": "Check available camera stream paths",
+            "status": "complete" if compatible else "blocked",
+        }
+    ]
+
+    if saved:
+        steps.append(
+            {
+                "key": "use_camera_defaults",
+                "label": "Use show_camera without repeating stream settings",
+                "status": "ready",
+                "action": action_plan
+                if isinstance(action_plan, dict)
+                else result.get("next_action"),
+            }
+        )
+        return steps
+
+    if isinstance(action_plan, dict):
+        steps.append(
+            {
+                "key": str(action_plan.get("primary_action") or "next_action"),
+                "label": action_plan.get("primary_action_label")
+                or "Review the recommended next action",
+                "status": "recommended" if compatible else "required",
+                "action": action_plan,
+            }
+        )
+
+    suggestion = result.get("restream_source_suggestion")
+    if isinstance(suggestion, dict):
+        steps.append(
+            {
+                "key": "test_restream_source",
+                "label": "Test a TV-safe restream URL",
+                "status": "optional" if compatible else "recommended",
+                "action": suggestion.get("save_action"),
+                "candidate_urls": suggestion.get("candidate_urls", []),
+            }
+        )
+    return steps
 
 
 def _camera_setup_primary_action_label(result: dict[str, Any]) -> str | None:

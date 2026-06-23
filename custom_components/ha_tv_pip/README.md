@@ -259,7 +259,7 @@ data:
   save: true
 ```
 
-Setup runs calibration when no `restream_url` is supplied, or validates and optionally saves a manual restream URL when one is supplied. The response includes `setup_mode`, `setup_summary`, and either the calibration/action-plan result or the restream validation result.
+Setup runs calibration when no `restream_url` is supplied, or validates and optionally saves a manual restream URL when one is supplied. The response includes `setup_mode`, `setup_summary`, `setup_steps`, and either the calibration/action-plan result or the restream validation result. `setup_steps` is an ordered checklist with stable keys, labels, statuses, and follow-up actions or validation details for UI helpers and troubleshooting.
 
 The lower-level `ha_tv_pip.calibrate_camera` action remains available for troubleshooting. Calibration tests HLS, MJPEG, and snapshot availability, returns a summary with the recommended stream strategy and next step, includes an `action_plan` with the next service call to try, and can save the recommendation as per-camera defaults.
 

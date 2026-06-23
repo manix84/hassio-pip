@@ -2293,6 +2293,49 @@ def test_setup_camera_can_validate_and_save_restream_source(
         "primary_action_label": "Save the validated restream source",
         "save_recommended": True,
     }
+    assert result["setup_steps"] == [
+        {
+            "key": "validate_restream_source",
+            "label": "Validate the TV-safe stream URL",
+            "status": "complete",
+            "details": {
+                "url_shape": {
+                    "valid": True,
+                    "reason": "hls_playlist_endpoint",
+                },
+                "receiver_supports_stream_type": True,
+                "reachability": {"checked": False},
+            },
+        },
+        {
+            "key": "save_restream_source",
+            "label": "Save the validated restream source",
+            "status": "complete",
+            "action": {
+                "service": "save_restream_source",
+                "target": {ATTR_DEVICE_ID: "device-1"},
+                "data": {
+                    ATTR_CAMERA_ENTITY: "camera.front_door",
+                    ATTR_RESTREAM_PROVIDER: "go2rtc",
+                    ATTR_RESTREAM_URL: (
+                        "http://go2rtc.local:1984/api/stream.m3u8?"
+                        "src=front_door"
+                    ),
+                    ATTR_SNAPSHOT_FALLBACK: True,
+                    ATTR_STREAM_TYPE: "hls",
+                },
+            },
+        },
+        {
+            "key": "use_camera_defaults",
+            "label": "Use show_camera without repeating stream settings",
+            "status": "ready",
+            "action": {
+                "service": "show_camera",
+                "data": {ATTR_CAMERA_ENTITY: "camera.front_door"},
+            },
+        },
+    ]
     assert result["saved_as_defaults"] is True
     assert entry.options is not None
     assert entry.options[CONF_CAMERA_DEFAULTS]["camera.front_door"] == {
@@ -2345,6 +2388,22 @@ def test_setup_camera_without_restream_url_runs_calibration(
         "primary_action_label": "Save the recommended per-camera defaults",
         "recommended_stream_type": "auto",
     }
+    assert result["setup_steps"] == [
+        {
+            "key": "calibrate_camera",
+            "label": "Check available camera stream paths",
+            "status": "complete",
+        },
+        {
+            "key": "save_recommended_defaults",
+            "label": "Save the recommended per-camera defaults",
+            "status": "recommended",
+            "action": {
+                "primary_action": "save_recommended_defaults",
+                "primary_action_label": "Save the recommended per-camera defaults",
+            },
+        },
+    ]
 
 
 def test_test_restream_source_warns_when_receiver_lacks_stream_support(

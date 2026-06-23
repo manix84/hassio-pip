@@ -53,9 +53,11 @@ data:
   save: false
 ```
 
-Review the returned `setup_mode`, `setup_summary`, `summary`, `action_plan`, `recommended_stream_type`, `recommended_defaults`, `restreaming_recommended`, `restreaming_next_step`, `restreaming_options`, and `restreaming_provider`.
+Review the returned `setup_mode`, `setup_summary`, `setup_steps`, `summary`, `action_plan`, `recommended_stream_type`, `recommended_defaults`, `restreaming_recommended`, `restreaming_next_step`, `restreaming_options`, and `restreaming_provider`.
 
 `setup_camera` runs the normal calibration workflow when no `restream_url` is supplied. If you provide a candidate `restream_url`, it switches to restream validation and can save the source in the same action with `save: true`.
+
+The `setup_steps` list is an ordered checklist for UI helpers and troubleshooting. Each step includes a stable key, label, status, and any relevant follow-up action or validation details.
 
 The `action_plan` block is the fastest path for normal users. It includes:
 

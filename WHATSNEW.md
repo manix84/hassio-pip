@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.31.18 - Guided Setup Steps 🧭
+
+- Added ordered `setup_steps` to `ha_tv_pip.setup_camera` responses so UI helpers and troubleshooting flows can show the next action clearly 🧰
+- Included validation details, save actions, and ready-to-use `show_camera` follow-ups in guided restream setup responses 🔎
+- Updated docs, website copy, and tests for the richer guided setup response 🧪
+
 ## 1.31.17 - Guided Camera Setup 🧭
 
 - Added `ha_tv_pip.setup_camera` as the preferred guided camera setup action for normal calibration and manual restream validation 🧰
