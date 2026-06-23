@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.31.29 - Receiver Version Alignment Diagnostics 🧭
+
+- Added receiver and integration version alignment attributes to Home Assistant receiver status and compatibility diagnostics 🔎
+- Reused the integration manifest version helper in config entry diagnostics so HACS/APK drift is reported consistently 🧰
+- Updated tests and troubleshooting docs for checking matched beta release installs 🧪
+
 ## 1.31.28 - Android Workflow SDK Setup Fix 🛠️
 
 - Removed the obsolete Android SDK `tools` package from release and Android quality workflow setup 🧰

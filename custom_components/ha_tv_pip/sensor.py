@@ -32,6 +32,7 @@ from .services import (
     camera_defaults_signal,
     last_command_result_signal,
 )
+from .version import version_alignment
 
 if TYPE_CHECKING:
 
@@ -591,6 +592,7 @@ def _status_attributes(status: ReceiverStatus) -> dict[str, Any]:
         "last_error": status.error,
         "last_seen": datetime.now().isoformat(timespec="seconds"),
     }
+    attributes.update(version_alignment(status.version))
     capabilities = status.capabilities
     if capabilities is not None:
         attributes.update(

@@ -10,8 +10,10 @@ HA TV PiP is still in beta. The most useful support data is the Android receiver
 2. Confirm the receiver app has been opened at least once after install or update.
 3. Confirm Home Assistant and the TV are on the same network for local discovery and local control.
 4. Open the receiver app dashboard and check that the local endpoint is running.
-5. In Home Assistant, open the receiver device and check receiver status, service health, compatibility, and last camera result sensors.
+5. In Home Assistant, open the receiver device and check receiver status, service health, compatibility, version alignment, and last camera result sensors.
 6. Download config entry diagnostics before opening a bug report. Tokens and active stream URLs are redacted by the integration.
+
+The receiver Status sensor and Receiver Compatibility sensor expose `integration_version`, `receiver_version`, `version_alignment`, `versions_match`, and `version_guidance` attributes. If `version_alignment` is `mismatch`, update the Android APK and HACS integration from the same GitHub Release before debugging deeper issues.
 
 For HACS installs, use `v1.27.9` or newer. Earlier public beta builds can install but fail when opening the integration Configuration screen.
 

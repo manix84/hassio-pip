@@ -9,6 +9,7 @@ import custom_components.ha_tv_pip.button as button
 import custom_components.ha_tv_pip.diagnostics as diagnostics
 import custom_components.ha_tv_pip.sensor as sensor
 import custom_components.ha_tv_pip.switch as switch
+import custom_components.ha_tv_pip.version as version_helpers
 from custom_components.ha_tv_pip.client import (
     ReceiverCapabilities,
     ReceiverClientError,
@@ -292,6 +293,19 @@ def test_status_sensor_updates_from_receiver(monkeypatch) -> None:  # type: igno
     assert entity._attr_extra_state_attributes["display_mode"] == "overlay"
     assert entity._attr_extra_state_attributes["stream_type"] == "hls"
     assert entity._attr_extra_state_attributes["remote_status"] == "connected"
+    assert entity._attr_extra_state_attributes["app_version"] == "0.24.0"
+    assert entity._attr_extra_state_attributes["receiver_version"] == "0.24.0"
+    assert (
+        entity._attr_extra_state_attributes["integration_version"]
+        == version_helpers.integration_version()
+    )
+    assert entity._attr_extra_state_attributes["version_alignment"] == "mismatch"
+    assert entity._attr_extra_state_attributes["versions_match"] is False
+    assert (
+        entity._attr_extra_state_attributes["version_guidance"]
+        == "Update the Android receiver APK and Home Assistant integration "
+        "from the same HA TV PiP release."
+    )
     assert entity._attr_extra_state_attributes["capabilities_version"] == 1
     assert entity._attr_extra_state_attributes["supported_stream_types"] == [
         "hls",
@@ -381,6 +395,22 @@ def test_restreaming_provider_status_sensor_reports_planned_state() -> None:
 
     assert entity._attr_native_value == "planned"
     assert entity._attr_extra_state_attributes == restreaming_provider_metadata()
+
+
+def test_version_alignment_matches_v_prefixed_receiver_version(
+    monkeypatch: Any,
+) -> None:
+    monkeypatch.setattr(version_helpers, "integration_version", lambda: "1.2.3")
+
+    assert version_helpers.version_alignment("v1.2.3") == {
+        "integration_version": "1.2.3",
+        "receiver_version": "v1.2.3",
+        "version_alignment": "matched",
+        "versions_match": True,
+        "version_guidance": (
+            "Receiver APK and Home Assistant integration versions match."
+        ),
+    }
 
 
 def test_saved_camera_defaults_sensor_reports_empty_defaults() -> None:
@@ -1337,7 +1367,7 @@ def test_diagnostics_redacts_token_and_url(monkeypatch) -> None:  # type: ignore
 
     assert result["entry"][CONF_TOKEN] == diagnostics.REDACTED
     assert result["integration"] == {
-        "version": diagnostics._manifest_version(),
+        "version": version_helpers.integration_version(),
         "minimum_hacs_options_flow_version": "1.27.9",
     }
     assert result["camera_defaults"] == {

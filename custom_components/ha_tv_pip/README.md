@@ -54,6 +54,8 @@ If the receiver was previously paired with another Home Assistant instance, open
 
 For beta updates, update the HACS integration, restart Home Assistant, then install the matching Android receiver APK from the same GitHub Release. The receiver and integration can gracefully degrade around some missing optional features, but matching versions are the recommended support path.
 
+The receiver Status sensor and Receiver Compatibility sensor expose `integration_version`, `receiver_version`, `version_alignment`, `versions_match`, and `version_guidance` attributes. Use those fields to confirm the HACS integration and Android APK came from the same release before debugging playback or pairing issues.
+
 Current beta features:
 
 - Local network discovery with Zeroconf / mDNS 🔎
@@ -182,7 +184,7 @@ The integration reads receiver `/status` API and capability metadata and compute
 - `legacy`: the receiver does not report capability metadata, so Home Assistant uses best-effort behavior.
 - `incompatible`: the receiver is missing a required API version or display stream support.
 
-Compatibility state, missing features, warnings, and update guidance are exposed on the status and Receiver Compatibility sensor attributes and in config entry diagnostics. Camera and snapshot commands gracefully drop optional title/message footer fields when the receiver cannot render media text, while still sending the media command where possible.
+Compatibility state, missing features, warnings, version alignment, and update guidance are exposed on the status and Receiver Compatibility sensor attributes and in config entry diagnostics. Camera and snapshot commands gracefully drop optional title/message footer fields when the receiver cannot render media text, while still sending the media command where possible.
 
 ## Receiver Defaults ⚙️
 

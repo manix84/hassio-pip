@@ -191,6 +191,8 @@ npm run check
 
 `npm run check` runs version consistency, linting, type checking, and tests.
 
+The root `package.json` version is mirrored into the Android app package, the Home Assistant integration manifest, and subproject package files by the version-bump scripts. The Home Assistant integration also exposes installed integration and receiver APK version alignment through receiver status attributes so beta testers can spot HACS/APK drift after updates.
+
 Project-specific quality commands:
 
 ```sh

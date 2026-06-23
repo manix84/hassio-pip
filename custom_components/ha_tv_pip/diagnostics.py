@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import json
-from pathlib import Path
 from typing import Any
 
 from .client import ReceiverClientError, async_get_receiver_status
@@ -14,6 +12,7 @@ from .services import (
     CAMERA_LAST_RESULT_KEY,
     LAST_COMMAND_RESULT_KEY,
 )
+from .version import integration_version
 
 REDACTED = "**REDACTED**"
 REDACTED_KEYS = {
@@ -39,7 +38,7 @@ async def async_get_config_entry_diagnostics(hass: Any, entry: Any) -> dict[str,
     diagnostics: dict[str, Any] = {
         "entry": data,
         "integration": {
-            "version": _manifest_version(),
+            "version": integration_version(),
             "minimum_hacs_options_flow_version": MIN_HACS_OPTIONS_FLOW_VERSION,
         },
         "camera_defaults": _redact(
@@ -86,17 +85,6 @@ async def async_get_config_entry_diagnostics(hass: Any, entry: Any) -> dict[str,
         "warnings": list(status.compatibility.warnings),
     }
     return diagnostics
-
-
-def _manifest_version() -> str:
-    manifest_path = Path(__file__).with_name("manifest.json")
-    try:
-        with manifest_path.open(encoding="utf-8") as manifest_file:
-            manifest = json.load(manifest_file)
-    except (OSError, json.JSONDecodeError):
-        return "unknown"
-    return str(manifest.get("version", "unknown"))
-
 
 def _redact(value: Any) -> Any:
     if isinstance(value, dict):

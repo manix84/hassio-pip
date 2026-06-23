@@ -77,6 +77,7 @@ The latest receiver/integration flow includes:
 - Manual go2rtc and Frigate helper metadata in calibration/action-plan responses, including example URL patterns and the `set_camera_defaults` fields to save a working TV-safe restream URL.
 - `Last Camera Compatibility`, `Camera Restreaming Recommended`, `Last Camera Result`, and `Last Command Result` entities on the receiver device.
 - Receiver/integration compatibility checks for current, degraded, legacy, and incompatible receiver states, exposed through a dedicated Receiver Compatibility sensor, update guidance, and status attributes.
+- Receiver/integration version alignment attributes so HACS/APK release drift is visible directly on receiver status and compatibility diagnostics.
 - Receiver service health diagnostics for foreground service state, start count, boot/package-replaced startup activity, and last service start reason.
 - Redacted diagnostics for camera results, per-camera defaults, receiver status, service health, compatibility, and planned restreaming provider support.
 - Restreaming provider metadata that points users toward today's TV-safe stream workarounds before future go2rtc, WebRTC, or transcoding support exists.
