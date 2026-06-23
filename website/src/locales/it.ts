@@ -34,6 +34,7 @@ export const it = {
     languageAriaLabel: "Lingua",
     problem: { body: "Home Assistant può rilevare campanelli, movimento, persone ed eventi camera, ma mostrarli in modo naturale sulla TV è ancora scomodo.", eyebrow: "Il problema", title: "Gli avvisi smart home meritano un momento TV migliore." },
     roadmap: { eyebrow: "Anteprima roadmap", items: ["Endpoint di controllo locale", "Discovery mDNS", "Pairing dispositivo", "Servizio Home Assistant", "Supporto snapshot", "Supporto WebRTC", "Modalità remota", "Distribuzione HACS e preparazione Play Store"], title: "Il percorso da MVP a strumento smart home quotidiano." },
+    screenshots: { eyebrow: "Screenshot", items: [{ alt: "Dashboard HA TV PiP in esecuzione su Android TV", description: "La dashboard del receiver è progettata per navigazione D-pad, stato pairing chiaro, controlli PiP visibili e guida rapida alla configurazione.", title: "Dashboard receiver Android TV" }], title: "Schermate reali del receiver su Android TV." },
     solution: { eyebrow: "La soluzione", imageAlt: "Mockup di controlli Home Assistant collegati a un receiver PiP Android TV", steps: ["Installa l'app receiver Android TV.", "Installa l'integrazione Home Assistant.", "Abbinali localmente.", "Attiva popup camera dalle automazioni."], title: "Un'app receiver per la TV, un controller in Home Assistant." },
     statusLabels: { complete: "Completo", future: "Futuro", planned: "Pianificato" },
     theme: { ariaLabel: "Selettore tema", auto: "auto", dark: "scuro", light: "chiaro" },

@@ -332,6 +332,48 @@
   object-position: center;
 }
 
+.screenshotGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.screenshotCard {
+  background:
+    linear-gradient(140deg, var(--tv-frame-glint), transparent 34%),
+    var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  margin: 0;
+  overflow: hidden;
+}
+
+.screenshotCard img {
+  aspect-ratio: 16 / 9;
+  display: block;
+  object-fit: cover;
+  width: 100%;
+}
+
+.screenshotCard figcaption {
+  border-top: 1px solid var(--border);
+  display: grid;
+  gap: 0.45rem;
+  padding: 1rem 1.1rem 1.1rem;
+}
+
+.screenshotCard strong {
+  color: var(--text);
+  font-size: 1.05rem;
+}
+
+.screenshotCard p {
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
 .roadmap {
   display: grid;
   gap: 0.85rem;

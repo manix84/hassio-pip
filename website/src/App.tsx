@@ -1,6 +1,7 @@
 import { useEffect, useId, useState } from "react";
 import styles from "./App.module.scss";
 import controlMockup from "./assets/home-assistant-control.png";
+import dashboardScreenshot from "./assets/ha-tv-pip-dashboard.png";
 import networkMockup from "./assets/local-network-pip.png";
 import heroCleanMockup from "./assets/tv-pip-hero-clean.png";
 import phaseOnePromoMockup from "./assets/tv-pip-promo.png";
@@ -443,6 +444,24 @@ function App() {
             className={styles.phaseOneImage}
             src={phaseOnePromoMockup}
           />
+        </div>
+      </Section>
+
+      <Section
+        eyebrow={content.screenshots.eyebrow}
+        id="screenshots"
+        title={content.screenshots.title}
+      >
+        <div className={styles.screenshotGrid}>
+          {content.screenshots.items.map((screenshot) => (
+            <figure className={styles.screenshotCard} key={screenshot.title}>
+              <img alt={screenshot.alt} src={dashboardScreenshot} />
+              <figcaption>
+                <strong>{screenshot.title}</strong>
+                <p>{screenshot.description}</p>
+              </figcaption>
+            </figure>
+          ))}
         </div>
       </Section>
 

@@ -75,6 +75,7 @@ describe("App content", () => {
       expect(content.features).toHaveLength(8);
       expect(content.faqItems).toHaveLength(8);
       expect(content.roadmap.items).toHaveLength(8);
+      expect(content.screenshots.items).toHaveLength(1);
       expect(content.deviceSupport.items).toHaveLength(4);
       expect(content.translations.tiers).toHaveLength(3);
       expect(content.statusLabels.complete).toBeTruthy();

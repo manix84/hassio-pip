@@ -34,6 +34,7 @@ export const pl = {
     languageAriaLabel: "Język",
     problem: { body: "Home Assistant wykrywa dzwonki, ruch, osoby i zdarzenia kamer, ale naturalne pokazanie ich na telewizorze nadal jest niewygodne.", eyebrow: "Problem", title: "Alerty smart home zasługują na lepszy moment na TV." },
     roadmap: { eyebrow: "Podgląd roadmapy", items: ["Lokalny endpoint sterowania", "Wykrywanie mDNS", "Parowanie urządzeń", "Usługa Home Assistant", "Obsługa snapshotów", "Obsługa WebRTC", "Tryb zdalny", "Dystrybucja HACS i przygotowanie Play Store"], title: "Droga od MVP do codziennego narzędzia smart home." },
+    screenshots: { eyebrow: "Zrzuty ekranu", items: [{ alt: "Panel HA TV PiP działający na Android TV", description: "Panel odbiornika jest zaprojektowany pod nawigację D-pad, czytelny stan parowania, widoczne kontrolki PiP i szybkie wskazówki konfiguracji.", title: "Panel odbiornika Android TV" }], title: "Prawdziwe ekrany odbiornika z Android TV." },
     solution: { eyebrow: "Rozwiązanie", imageAlt: "Makieta kontrolek Home Assistant połączonych z odbiornikiem PiP Android TV", steps: ["Zainstaluj aplikację odbiornika Android TV.", "Zainstaluj integrację Home Assistant.", "Sparuj je lokalnie.", "Wywołuj popupy kamer z automatyzacji."], title: "Aplikacja odbiornika dla TV, kontroler w Home Assistant." },
     statusLabels: { complete: "Gotowe", future: "Przyszłość", planned: "Planowane" },
     theme: { ariaLabel: "Wybór motywu", auto: "auto", dark: "ciemny", light: "jasny" },

@@ -85,6 +85,15 @@ export type WebsiteContent = {
     items: string[];
     title: string;
   };
+  screenshots: {
+    eyebrow: string;
+    items: Array<{
+      alt: string;
+      description: string;
+      title: string;
+    }>;
+    title: string;
+  };
   solution: {
     eyebrow: string;
     imageAlt: string;

@@ -172,6 +172,18 @@ export const de = {
       ],
       title: "Der Weg vom MVP zum Smart-Home-Werkzeug für den Alltag.",
     },
+    screenshots: {
+      eyebrow: "Screenshots",
+      items: [
+        {
+          alt: "HA TV PiP Receiver-Dashboard auf Android TV",
+          description:
+            "Das Receiver-Dashboard ist für D-Pad-Navigation, klaren Pairing-Status, sichtbare PiP-Steuerung und schnelle Setup-Hinweise ausgelegt.",
+          title: "Android-TV-Receiver-Dashboard",
+        },
+      ],
+      title: "Echte Receiver-Bildschirme von Android TV.",
+    },
     solution: {
       eyebrow: "Die Lösung",
       imageAlt:

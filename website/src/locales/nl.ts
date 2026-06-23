@@ -34,6 +34,7 @@ export const nl = {
     languageAriaLabel: "Taal",
     problem: { body: "Home Assistant kan deurbellen, beweging, personen en camera-events detecteren, maar die events natuurlijk tonen op een tv blijft omslachtig.", eyebrow: "Het probleem", title: "Smart-home meldingen verdienen een beter tv-moment." },
     roadmap: { eyebrow: "Roadmap-preview", items: ["Lokale control endpoint", "mDNS-discovery", "Apparaatkoppeling", "Home Assistant-service", "Snapshotondersteuning", "WebRTC-ondersteuning", "Remote mode", "HACS-distributie en Play Store-voorbereiding"], title: "Het pad van MVP naar dagelijks smart-home gereedschap." },
+    screenshots: { eyebrow: "Screenshots", items: [{ alt: "HA TV PiP receiverdashboard op Android TV", description: "Het receiverdashboard is ontworpen voor D-pad-navigatie, duidelijke koppelstatus, zichtbare PiP-bediening en snelle setupbegeleiding.", title: "Android TV receiverdashboard" }], title: "Echte receiverschermen van Android TV." },
     solution: { eyebrow: "De oplossing", imageAlt: "Mockup van Home Assistant-bediening verbonden met een Android TV PiP receiver", steps: ["Installeer de Android TV receiver-app.", "Installeer de Home Assistant-integratie.", "Koppel ze lokaal.", "Trigger camera-pop-ups vanuit automatiseringen."], title: "Een receiver-app voor de tv, een controller in Home Assistant." },
     statusLabels: { complete: "Klaar", future: "Toekomst", planned: "Gepland" },
     theme: { ariaLabel: "Themakeuze", auto: "auto", dark: "donker", light: "licht" },

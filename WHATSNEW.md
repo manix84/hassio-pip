@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.31.35 - Website Screenshot Section 📸
+
+- Added a real Android TV receiver dashboard screenshot to the promotional website 🖼️
+- Added localized screenshot-section copy across Tier 1 website locales 🌍
+- Refreshed the stored dashboard screenshot so it shows the connected receiver state ✅
+
 ## 1.31.34 - Play Store Readiness Checklists 📋
 
 - Added Play Console submission, data-safety, app-store asset, and release QA checklists 📺

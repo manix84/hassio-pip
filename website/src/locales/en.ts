@@ -207,6 +207,18 @@ export const en = {
       ],
       title: "The path from MVP to daily-driver smart-home tool.",
     },
+    screenshots: {
+      eyebrow: "Screenshots",
+      items: [
+        {
+          alt: "HA TV PiP receiver dashboard running on Android TV",
+          description:
+            "The receiver dashboard is designed for D-pad navigation, clear pairing state, visible PiP controls, and quick setup guidance.",
+          title: "Android TV receiver dashboard",
+        },
+      ],
+      title: "Real receiver screens from Android TV.",
+    },
     solution: {
       eyebrow: "The solution",
       imageAlt:

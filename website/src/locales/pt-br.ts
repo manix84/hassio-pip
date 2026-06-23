@@ -34,6 +34,7 @@ export const ptbr = {
     languageAriaLabel: "Idioma",
     problem: { body: "O Home Assistant pode detectar campainhas, movimento, pessoas e eventos de câmera, mas mostrar esses eventos naturalmente na TV ainda é complicado.", eyebrow: "O problema", title: "Alertas de casa inteligente merecem um momento melhor na TV." },
     roadmap: { eyebrow: "Prévia do roadmap", items: ["Endpoint de controle local", "Descoberta mDNS", "Pareamento de dispositivo", "Serviço Home Assistant", "Suporte a snapshots", "Suporte WebRTC", "Modo remoto", "Distribuição HACS e preparação para Play Store"], title: "O caminho do MVP até uma ferramenta diária de casa inteligente." },
+    screenshots: { eyebrow: "Capturas", items: [{ alt: "Painel HA TV PiP em execução no Android TV", description: "O painel do receptor foi projetado para navegação por D-pad, estado de pareamento claro, controles PiP visíveis e orientação rápida de configuração.", title: "Painel do receptor Android TV" }], title: "Telas reais do receptor no Android TV." },
     solution: { eyebrow: "A solução", imageAlt: "Mockup mostrando controles Home Assistant conectados a um receptor PiP Android TV", steps: ["Instale o app receptor Android TV.", "Instale a integração Home Assistant.", "Faça o pareamento localmente.", "Acione popups de câmera por automações."], title: "Um app receptor para a TV, um controlador no Home Assistant." },
     statusLabels: { complete: "Concluído", future: "Futuro", planned: "Planejado" },
     theme: { ariaLabel: "Seletor de tema", auto: "auto", dark: "escuro", light: "claro" },
