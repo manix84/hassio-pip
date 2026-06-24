@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.31.41 - Receiver Launcher Recovery Fix 🕹️
+
+- Prevented hiding the Android TV launcher icon until receiver pairing is complete 🔐
+- Restored the launcher icon automatically when pairing is reset or missing, so setup remains recoverable 📺
+- Opened the receiver app automatically when pairing starts so the TV-side pairing code popup appears immediately 🔢
+
 ## 1.31.40 - Play Console Screenshot Assets 📱
 
 - Added two Play Console-compatible portrait screenshots for the required generic phone/tablet screenshot slot 📸
