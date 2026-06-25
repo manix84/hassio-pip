@@ -1,5 +1,11 @@
 # What's New ✨
 
+## 1.31.44 - Play Store Upload Automation 📲
+
+- Added an opt-in release workflow job to upload the signed Android App Bundle to Play Console after release assets pass validation 📦
+- Defaulted Play uploads to the internal testing track as a draft edit, so releases can be reviewed in Play Console before being activated 🔐
+- Fixed packaged Home Assistant brand icon aliases and strengthened release checks so HACS and manual-install zips keep the expected icon assets 🏠
+
 ## 1.31.43 - Home Assistant Unpair Sync 🔐
 
 - Added an authenticated receiver reset endpoint so Home Assistant can tell the Android TV app when a receiver config entry is deleted 🔁

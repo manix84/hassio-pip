@@ -16,7 +16,7 @@ Phase 9 adds optional remote receiver mode. The app can connect outbound to the 
 
 Phase 10 continues the Android TV polish pass. The main screen is now a TV-first dashboard with primary PiP controls near the top, receiver status cards, launcher controls, remote receiver status, and lower-priority diagnostics separated from everyday actions. Onboarding, pairing, and troubleshooting are intentionally handled as dashboard sections for now instead of separate screens, keeping the app simple to navigate with a TV remote. Active pairing requests also show a prominent TV-side pairing popup.
 
-Stage 12 completed beta release hardening. Android work now keeps the signed GitHub Release APK path reliable while Play Store distribution remains a future step.
+Stage 12 completed beta release hardening. Android work now keeps the signed GitHub Release APK path reliable and can upload signed AABs to Play Console when release automation is explicitly enabled.
 
 ## Build 🛠️
 
@@ -54,7 +54,7 @@ Android lint uses the Android Gradle plugin. Type checking compiles the debug Ko
 Unit tests run on the JVM with Gradle's debug unit test task.
 The dry-run build assembles the debug APK.
 The release APK is signed when local signing properties or GitHub Actions signing secrets are configured; otherwise local release builds stay unsigned for validation.
-The release bundle command builds the `.aab` used for future Play Store prep. Play Store upload is not implemented yet.
+The release bundle command builds the `.aab` used for Play Store prep. The release workflow can upload that AAB to Play Console when Play upload is explicitly enabled in GitHub repository settings.
 
 ## Run 🚀
 

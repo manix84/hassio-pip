@@ -1,6 +1,6 @@
 # Play Store Release Prep 📺
 
-This document prepares HA TV PiP for a future Android TV / Google TV Play Store release. It does not implement Play Console deployment or submission yet.
+This document prepares HA TV PiP for Android TV / Google TV Play Store release.
 
 ## Current Release Position 🚦
 
@@ -29,7 +29,7 @@ Fastlane-compatible listing metadata drafts live in:
 android-tv-app/fastlane/metadata/
 ```
 
-These files are source-controlled preparation only. They are not wired to Play Console upload or deployment yet.
+These files are source-controlled preparation only. The release workflow uploads the AAB when Play upload is explicitly enabled, but listing metadata, screenshots, data-safety answers, and submission forms remain manual Play Console work.
 
 ## Store Listing Draft 📝
 
@@ -220,7 +220,52 @@ The AAB is for Play Console upload only. Users should continue to sideload `ha-t
 
 Do not commit keystores, passwords, generated signing reports, or Play Console credentials.
 
-The current automation builds the release APK and App Bundle, and signs them when Android release signing secrets are configured. Play Store upload remains a future task.
+The current automation builds the release APK and App Bundle, signs them when Android release signing secrets are configured, and can upload the AAB to Play Console after an explicit opt-in.
+
+## Play Console Upload Automation 📲
+
+The release workflow has a `Play Store AAB Upload 📲` job. It runs after the AAB is built and release assets pass validation, and before the GitHub Release is published.
+
+Upload is disabled by default. To enable it, configure this repository secret:
+
+```txt
+GOOGLE_PLAY_SERVICE_ACCOUNT_JSON
+```
+
+The secret must contain the full Google service account JSON key for a service account that has Play Console access to package `com.hatvpip.receiver`.
+
+Then configure this repository variable:
+
+```txt
+PLAY_STORE_UPLOAD_ENABLED=true
+```
+
+Optional repository variables:
+
+```txt
+PLAY_STORE_TRACK=internal
+PLAY_STORE_RELEASE_STATUS=draft
+PLAY_STORE_CHANGES_NOT_SENT_FOR_REVIEW=true
+```
+
+Defaults are intentionally conservative:
+
+- `PLAY_STORE_TRACK=internal` targets internal testing.
+- `PLAY_STORE_RELEASE_STATUS=draft` creates a draft release instead of activating it for testers immediately.
+- `PLAY_STORE_CHANGES_NOT_SENT_FOR_REVIEW=true` leaves the edit for explicit review submission from Play Console where supported.
+
+Set `PLAY_STORE_RELEASE_STATUS=completed` only when the selected testing track should receive the build automatically from the release workflow.
+
+Service account setup:
+
+1. Enable the Google Play Android Developer API in the Google Cloud project used for Play Console automation.
+2. Create a Google Cloud service account and JSON key.
+3. Add the service account email as a Play Console user.
+4. Grant app permission for `com.hatvpip.receiver`, including release management on the intended testing track.
+5. Store the JSON key in the GitHub secret `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON`.
+6. Set `PLAY_STORE_UPLOAD_ENABLED=true` only after the app exists in Play Console and the first manual upload/setup requirements are complete.
+
+If `PLAY_STORE_UPLOAD_ENABLED` is not `true`, the release workflow records a successful skip. If it is `true` but the service account secret is missing or the upload fails, the workflow fails before publishing the GitHub Release.
 
 ## Release Notes Guidance 📦
 
@@ -257,6 +302,7 @@ Production release notes should include:
 - Android release APK builds.
 - Android release APK is signed when signing secrets are configured.
 - Android App Bundle build exists.
+- Play upload is either intentionally disabled or completed successfully for the selected testing track.
 - GitHub Release includes `ha-tv-pip-android-release-vX.Y.Z.aab`.
 - Release artifact version matches root `package.json`.
 - `PRIVACY.md` matches Play Console privacy answers.
@@ -267,7 +313,6 @@ Production release notes should include:
 
 ## Not Yet Implemented 🚧
 
-- Play Store deployment.
 - Play Console metadata upload.
 - Store screenshot generation automation.
 - Public production release approval.

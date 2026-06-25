@@ -327,6 +327,88 @@ jobs:
       - name: Check release assets
         run: npm run package:release:check
 
+  play-store-upload:
+    name: Play Store AAB Upload 📲
+    runs-on: ubuntu-latest
+    needs:
+      - setup
+      - android-bundle
+      - release-check
+    if: needs.setup.outputs.should_release == 'true'
+    env:
+      GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+      PLAY_STORE_UPLOAD_ENABLED: ${{ vars.PLAY_STORE_UPLOAD_ENABLED }}
+      PLAY_STORE_TRACK: ${{ vars.PLAY_STORE_TRACK || 'internal' }}
+      PLAY_STORE_RELEASE_STATUS: ${{ vars.PLAY_STORE_RELEASE_STATUS || 'draft' }}
+      PLAY_STORE_CHANGES_NOT_SENT_FOR_REVIEW: ${{ vars.PLAY_STORE_CHANGES_NOT_SENT_FOR_REVIEW || 'true' }}
+
+    steps:
+      - name: Check Play Store upload config
+        id: play_store_config
+        run: |
+          enabled=$(printf '%s' "$PLAY_STORE_UPLOAD_ENABLED" | tr '[:upper:]' '[:lower:]')
+          changes_not_sent_for_review=$(printf '%s' "$PLAY_STORE_CHANGES_NOT_SENT_FOR_REVIEW" | tr '[:upper:]' '[:lower:]')
+
+          if [ "$enabled" != "true" ]; then
+            echo "should_upload=false" >> "$GITHUB_OUTPUT"
+            echo "Play Store upload is disabled. Set repository variable PLAY_STORE_UPLOAD_ENABLED=true to enable it." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          if [ -z "$GOOGLE_PLAY_SERVICE_ACCOUNT_JSON" ]; then
+            echo "::error::PLAY_STORE_UPLOAD_ENABLED is true, but GOOGLE_PLAY_SERVICE_ACCOUNT_JSON is not configured."
+            exit 1
+          fi
+
+          if [ -z "$PLAY_STORE_TRACK" ]; then
+            echo "::error::PLAY_STORE_TRACK must not be empty."
+            exit 1
+          fi
+
+          case "$PLAY_STORE_RELEASE_STATUS" in
+            completed|draft|halted|inProgress) ;;
+            *)
+              echo "::error::PLAY_STORE_RELEASE_STATUS must be one of completed, draft, halted, or inProgress."
+              exit 1
+              ;;
+          esac
+
+          case "$changes_not_sent_for_review" in
+            true|false) ;;
+            *)
+              echo "::error::PLAY_STORE_CHANGES_NOT_SENT_FOR_REVIEW must be true or false."
+              exit 1
+              ;;
+          esac
+
+          echo "PLAY_STORE_CHANGES_NOT_SENT_FOR_REVIEW=$changes_not_sent_for_review" >> "$GITHUB_ENV"
+          echo "should_upload=true" >> "$GITHUB_OUTPUT"
+          {
+            echo "Play Store upload enabled."
+            echo "Track: $PLAY_STORE_TRACK"
+            echo "Release status: $PLAY_STORE_RELEASE_STATUS"
+            echo "Changes not sent for review: $changes_not_sent_for_review"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Download release AAB artifact
+        if: steps.play_store_config.outputs.should_upload == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: android-release-aab
+          path: dist
+
+      - name: Upload AAB to Play Store
+        if: steps.play_store_config.outputs.should_upload == 'true'
+        uses: r0adkll/upload-google-play@v1.1.5
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.hatvpip.receiver
+          releaseFiles: dist/ha-tv-pip-android-release-v${{ needs.setup.outputs.version }}.aab
+          tracks: ${{ env.PLAY_STORE_TRACK }}
+          releaseName: HA TV PiP v${{ needs.setup.outputs.version }}
+          status: ${{ env.PLAY_STORE_RELEASE_STATUS }}
+          changesNotSentForReview: ${{ env.PLAY_STORE_CHANGES_NOT_SENT_FOR_REVIEW }}
+
   publish:
     name: Publish Release 🚀
     runs-on: ubuntu-latest
@@ -337,6 +419,7 @@ jobs:
       - android-bundle
       - ha-integration
       - release-check
+      - play-store-upload
     if: needs.setup.outputs.should_release == 'true'
 
     steps:
@@ -440,6 +523,7 @@ jobs:
       - android-bundle
       - ha-integration
       - release-check
+      - play-store-upload
       - publish
     if: always()
 

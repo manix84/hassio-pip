@@ -5,7 +5,7 @@ This folder contains Play Store listing metadata drafts for the Android TV recei
 These files are preparation only:
 
 - They do not upload to Play Console.
-- They do not configure deployment.
+- They do not configure deployment; AAB upload is controlled by GitHub release workflow secrets and variables.
 - They should stay aligned with `docs/play-store.md`.
 - Screenshots and graphics are tracked in `docs/play-store-assets.md`.
 - The current feature graphic placeholder is `docs/assets/play-store-feature-graphic.jpg`.

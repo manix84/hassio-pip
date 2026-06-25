@@ -47,7 +47,7 @@ Keep the Play listing product-led. Personal profile graphics can be used for the
 
 ## Release Artifact 📦
 
-Upload the Android App Bundle from the latest GitHub Release:
+Upload the Android App Bundle from the latest GitHub Release, or enable the release workflow's Play Store upload job after the first Play Console setup is complete:
 
 ```txt
 ha-tv-pip-android-release-vX.Y.Z.aab
@@ -117,7 +117,7 @@ For personal developer accounts, Google may require a closed-testing period befo
 4. Add the privacy URL.
 5. Upload the app icon, TV banner, feature graphic, and screenshots.
 6. Complete data-safety, content-rating, app-access, and target-audience forms.
-7. Upload the latest release AAB to internal testing.
+7. Upload the latest release AAB to internal testing, or enable `PLAY_STORE_UPLOAD_ENABLED=true` after the service account has release permissions.
 8. Add internal testers.
 9. Run the pre-release QA checklist from `docs/release-qa.md`.
 10. Submit the internal test build.
