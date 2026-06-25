@@ -646,10 +646,9 @@ Optional repository variables:
 ```txt
 PLAY_STORE_TRACK=internal
 PLAY_STORE_RELEASE_STATUS=draft
-PLAY_STORE_CHANGES_NOT_SENT_FOR_REVIEW=true
 ```
 
-The defaults upload to the internal testing track as a draft release and do not send the edit for review automatically. Set `PLAY_STORE_RELEASE_STATUS=completed` only when the release should become active on the selected testing track without manual Console promotion.
+The defaults upload to the internal testing track as a draft release. Set `PLAY_STORE_RELEASE_STATUS=completed` only when the release should become active on the selected testing track without manual Console promotion.
 
 ## Integration Local Packaging
 

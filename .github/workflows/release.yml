@@ -340,14 +340,12 @@ jobs:
       PLAY_STORE_UPLOAD_ENABLED: ${{ vars.PLAY_STORE_UPLOAD_ENABLED }}
       PLAY_STORE_TRACK: ${{ vars.PLAY_STORE_TRACK || 'internal' }}
       PLAY_STORE_RELEASE_STATUS: ${{ vars.PLAY_STORE_RELEASE_STATUS || 'draft' }}
-      PLAY_STORE_CHANGES_NOT_SENT_FOR_REVIEW: ${{ vars.PLAY_STORE_CHANGES_NOT_SENT_FOR_REVIEW || 'true' }}
 
     steps:
       - name: Check Play Store upload config
         id: play_store_config
         run: |
           enabled=$(printf '%s' "$PLAY_STORE_UPLOAD_ENABLED" | tr '[:upper:]' '[:lower:]')
-          changes_not_sent_for_review=$(printf '%s' "$PLAY_STORE_CHANGES_NOT_SENT_FOR_REVIEW" | tr '[:upper:]' '[:lower:]')
 
           if [ "$enabled" != "true" ]; then
             echo "should_upload=false" >> "$GITHUB_OUTPUT"
@@ -373,21 +371,11 @@ jobs:
               ;;
           esac
 
-          case "$changes_not_sent_for_review" in
-            true|false) ;;
-            *)
-              echo "::error::PLAY_STORE_CHANGES_NOT_SENT_FOR_REVIEW must be true or false."
-              exit 1
-              ;;
-          esac
-
-          echo "PLAY_STORE_CHANGES_NOT_SENT_FOR_REVIEW=$changes_not_sent_for_review" >> "$GITHUB_ENV"
           echo "should_upload=true" >> "$GITHUB_OUTPUT"
           {
             echo "Play Store upload enabled."
             echo "Track: $PLAY_STORE_TRACK"
             echo "Release status: $PLAY_STORE_RELEASE_STATUS"
-            echo "Changes not sent for review: $changes_not_sent_for_review"
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Download release AAB artifact
@@ -407,7 +395,6 @@ jobs:
           tracks: ${{ env.PLAY_STORE_TRACK }}
           releaseName: HA TV PiP v${{ needs.setup.outputs.version }}
           status: ${{ env.PLAY_STORE_RELEASE_STATUS }}
-          changesNotSentForReview: ${{ env.PLAY_STORE_CHANGES_NOT_SENT_FOR_REVIEW }}
 
   publish:
     name: Publish Release 🚀

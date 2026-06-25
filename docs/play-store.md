@@ -245,14 +245,12 @@ Optional repository variables:
 ```txt
 PLAY_STORE_TRACK=internal
 PLAY_STORE_RELEASE_STATUS=draft
-PLAY_STORE_CHANGES_NOT_SENT_FOR_REVIEW=true
 ```
 
 Defaults are intentionally conservative:
 
 - `PLAY_STORE_TRACK=internal` targets internal testing.
 - `PLAY_STORE_RELEASE_STATUS=draft` creates a draft release instead of activating it for testers immediately.
-- `PLAY_STORE_CHANGES_NOT_SENT_FOR_REVIEW=true` leaves the edit for explicit review submission from Play Console where supported.
 
 Set `PLAY_STORE_RELEASE_STATUS=completed` only when the selected testing track should receive the build automatically from the release workflow.
 
