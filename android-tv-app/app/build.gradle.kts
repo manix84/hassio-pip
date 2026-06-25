@@ -34,7 +34,7 @@ android {
         applicationId = "com.hatvpip.receiver"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1031043
+        versionCode = 1031044
         versionName = "1.31.44"
     }
 
