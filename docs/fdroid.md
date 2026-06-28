@@ -65,54 +65,43 @@ metadata/com.hatvpip.receiver.yml
 
 ## Signing
 
-Initial F-Droid submission uses the default F-Droid signing model. F-Droid will build the APK from source and sign it with F-Droid's key.
+F-Droid verifies the source build against the developer-signed GitHub release APK. The `fdroiddata` metadata includes:
 
-The `fdroiddata` metadata intentionally does not include `Binaries` or `AllowedAPKSigningKeys` yet. That keeps the first submission focused on proving F-Droid can build the app from source.
+- `Binaries`, pointing at `https://github.com/manix84/ha-tv-pip/releases/download/v%v/ha-tv-pip-android-release-v%v.apk`
+- `AllowedAPKSigningKeys`, set to the SHA-256 certificate fingerprint from the release APK
 
-### Channel Switching
+Keep the Android release signing key backed up and private. If the key is lost, F-Droid reproducible verification for future updates cannot continue with the same signing identity.
 
-The Android package name remains:
+### Reproducible Build Metadata
+
+The first F-Droid submission includes reproducible-build metadata because F-Droid cannot enable it later for the same app.
+
+The build block uses:
+
+- A full git commit hash instead of a tag or branch.
+- `subdir: android-tv-app/app`, the module path where the Gradle `build` directory is generated.
+- No explicit `output`, so F-Droid uses the default APK output under the module build directory.
+
+The release APK signer fingerprint is:
 
 ```txt
-com.hatvpip.receiver
+0607b6647534f792578736382b977853b09449e48c7c651ec1d6a9828073f951
 ```
-
-GitHub/Play builds and F-Droid builds will have different signing keys. Android does not allow an installed app to be updated by an APK signed with a different key, even when the package name is the same.
-
-Users switching between GitHub/Play and F-Droid builds must:
-
-1. Uninstall the currently installed receiver app.
-2. Install the receiver from the new channel.
-3. Delete the stale receiver entry in Home Assistant.
-4. Pair the receiver again from Home Assistant.
-
-Uninstalling the Android receiver clears local pairing tokens and receiver settings. The Home Assistant integration may still have the old config entry until the user deletes and re-adds it.
-
-### Future Developer-Signed Path
-
-Developer-signed F-Droid publishing requires reproducible APK builds and extra `fdroiddata` signature metadata. Treat that as a later hardening pass after the first F-Droid build succeeds.
-
-Future work for developer-signed reproducible builds:
-
-1. Build a signed GitHub release APK from a clean tagged checkout.
-2. Confirm the same tag builds an equivalent unsigned APK in an F-Droid build environment.
-3. Extract the release APK signing certificate fingerprint.
-4. Add `Binaries` and `AllowedAPKSigningKeys` to `fdroiddata`.
-5. Use F-Droid signature copying only after reproducibility is confirmed.
 
 ## Submission Checklist
 
 - Confirm the release commit is tagged as `vX.Y.Z`.
 - Confirm `npm run fdroid:changelog:check` passes.
-- Confirm `npm run android:assemble:release` builds from a clean checkout without local signing secrets.
+- Confirm the GitHub release includes a signed `ha-tv-pip-android-release-vX.Y.Z.apk`.
+- Confirm `AllowedAPKSigningKeys` matches the release APK signer fingerprint.
+- Confirm the signed release APK does not include F-Droid's rejected `Dependency metadata` APK signing block.
+- Confirm the Play Store AAB still builds with `includeInBundle = false`.
 - Fork `fdroiddata`.
 - Copy `docs/fdroiddata/metadata/com.hatvpip.receiver.yml` to `metadata/com.hatvpip.receiver.yml` in the `fdroiddata` fork.
 - Run `fdroid lint com.hatvpip.receiver`.
 - Run `fdroid checkupdates --allow-dirty com.hatvpip.receiver`.
 - Run or let GitLab CI run `fdroid build com.hatvpip.receiver`.
 - Open a merge request against `fdroid/fdroiddata`.
-
-Do not add developer-signed binary verification metadata to the first submission unless reproducible builds have already been proven.
 
 ## Local Validation Notes
 
@@ -131,6 +120,13 @@ Results:
 - `fdroid lint com.hatvpip.receiver` passed.
 - `fdroid checkupdates --allow-dirty com.hatvpip.receiver` exited successfully. The local `fdroiddata` config printed unrelated `serverwebroot` environment warnings.
 - `fdroid build -v -l com.hatvpip.receiver` built `1.31.44` successfully from tag `v1.31.44`.
+- `apksigner verify --print-certs` against the GitHub release APK reported SHA-256 fingerprint `0607b6647534f792578736382b977853b09449e48c7c651ec1d6a9828073f951`.
+- After reviewer feedback, `fdroid build -v -l --test --force com.hatvpip.receiver` also passed with full commit hash `65e1e1b34a6252a6075224ae57ca7691900483a8`, `subdir: android-tv-app/app`, no explicit `output`, `Binaries`, and `AllowedAPKSigningKeys`.
+- The reproducible-build check compared the built APK to the supplied GitHub release APK successfully and reported the allowed signer fingerprint.
+- F-Droid rejected the signed `v1.31.44` APK because it contained APK signing block `0x504B4453` (`Dependency metadata`).
+- `v1.31.45` disables Android Gradle dependency metadata for APKs and bundles with `dependenciesInfo { includeInApk = false; includeInBundle = false }`.
+- A locally temp-signed `1.31.45` release APK no longer contained the rejected `Dependency metadata` signing block. It only showed the APK signature scheme blocks and verity padding.
+- `npm run android:bundle:release` passed for `1.31.45`, so the Play Store AAB path remains valid.
 
 Local setup notes:
 

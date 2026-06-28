@@ -658,7 +658,7 @@ PLAY_STORE_RELEASE_STATUS=draft
 
 The defaults upload to the internal testing track as a draft release. Set `PLAY_STORE_RELEASE_STATUS=completed` only when the release should become active on the selected testing track without manual Console promotion.
 
-F-Droid's initial distribution path uses F-Droid-signed APKs built from source through `fdroiddata`; it does not reuse the GitHub/Play signing key. Users switching between GitHub/Play and F-Droid builds must uninstall and re-pair because Android rejects updates signed by a different key. Developer-signed F-Droid builds require a separate reproducible-build pass.
+F-Droid distribution uses reproducible-build verification against the signed GitHub release APK. The `fdroiddata` metadata points `Binaries` at the GitHub release APK and pins `AllowedAPKSigningKeys` to the Android release signing certificate fingerprint. Keep the Android release signing key backed up and private; losing it breaks future F-Droid updates with the same signing identity.
 
 ## Integration Local Packaging
 

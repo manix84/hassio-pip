@@ -44,8 +44,11 @@ Before submitting or updating F-Droid metadata:
 - Confirm `docs/fdroiddata/metadata/com.hatvpip.receiver.yml` matches the current release version and `versionCode`.
 - Confirm `android-tv-app/fastlane/metadata/android/en-US/changelogs/<versionCode>.txt` exists and is under 500 characters.
 - Confirm the release commit is tagged as `vX.Y.Z`.
-- Confirm the first F-Droid submission uses F-Droid signing, not developer-signed binary verification.
-- Confirm release notes explain that switching between GitHub/Play and F-Droid builds requires uninstalling the receiver app and pairing again.
+- Confirm the F-Droid metadata uses the full release commit hash, not a tag or branch.
+- Confirm `Binaries` points at the signed GitHub release APK.
+- Confirm `AllowedAPKSigningKeys` matches the release APK signer fingerprint.
+- Confirm the signed release APK does not include the rejected `Dependency metadata` APK signing block.
+- Confirm the release AAB builds for Play Store upload after `dependenciesInfo.includeInBundle = false`.
 
 ## Android Receiver Smoke Test 📺
 
